@@ -1,4 +1,3 @@
-import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/View/AllMeetingsScreen.dart';

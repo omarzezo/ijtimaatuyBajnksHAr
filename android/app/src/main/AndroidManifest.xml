@@ -11,7 +11,7 @@
 
     <application
         android:label="Ijtimaati 4.0"
-        android:icon="@mipmap/igtimaati_logo"
+        android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
        <meta-data android:name="com.google.android.geo.API_KEY"

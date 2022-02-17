@@ -10,8 +10,10 @@ import 'package:itimaaty/Models/news_response_model.dart';
 import 'package:itimaaty/Repository/NewsRepository.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
+import 'package:itimaaty/VideoExample.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
 
+import '../Models/DeleteCommentResponse.dart';
 import 'SignInScreen.dart';
 
 
@@ -64,6 +66,55 @@ class _DetailsScreenState extends State<NewsDetailsScreen> {
           navigateAndFinish(context, SignInScreen());
         }
       }
+    });
+  }
+
+  void getNewsData2(String token){
+    // load();
+    newsRepository=NewsRepository();
+    Future<NewsDetailsResponseModel> newsData = newsRepository.getNewsDetailsData(token,widget.id);
+    newsData.then((value) {
+      if(value!=null) {
+        // showSuccess();
+        setState(() {
+          newsDetailsResponseModel = value;
+          name=newsDetailsResponseModel.authoruser.name;
+          image=newsDetailsResponseModel.authoruser.image;
+          like=newsDetailsResponseModel.liked;
+          commentsList=value.comments;
+          likersList=value.likers;
+        });
+      }else{
+        // showError();
+        if(value==null){
+          navigateAndFinish(context, SignInScreen());
+        }
+      }
+    });
+  }
+
+  void deleteComment(String token, int id) {
+    load();
+    newsRepository = new NewsRepository();
+    Future<DeleteCommentResponse> allList = newsRepository.deleteComment(id,token);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          if(value.message.contains('successfully')) {
+            showSuccessMsg("Deleted Successfully");
+            getNewsData2(token);
+          }else{
+            showErrorWithMsg('this item not deleted');
+          }
+
+        }else{
+          showError();
+          if(value==null){
+            showErrorWithMsg('this item not deleted');
+            // navigateAndFinish(context, SignInScreen());
+          }
+        }
+      });
     });
   }
 
@@ -169,7 +220,13 @@ class _DetailsScreenState extends State<NewsDetailsScreen> {
                   ),
                   const SizedBox(height: 6,),
                   Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
-
+                  const SizedBox(height: 10,),
+                  InkWell(
+                    onTap: () {
+                      deleteComment(token, leave.id);
+                    },
+                    child:Text(AppLocalizations.of(context).lblDelete,style: blueColorBoldStyle(16),) ,
+                  )
                 ],
               ),
             )
@@ -180,32 +237,32 @@ class _DetailsScreenState extends State<NewsDetailsScreen> {
   }
 
   void makeLike(String token,id){
-    load();
+    // load();
     newsRepository=NewsRepository();
     Future<LikedResponseModel> like = newsRepository.makeLike(token,id);
     like.then((value) {
       setState(() {
         if(value!=null){
-          showSuccess();
-          getNewsData(token);
+          // showSuccess();
+          getNewsData2(token);
         }else{
-          showError();
+          // showError();
         }
       });
     });
   }
 
   void makeDisLike(String token,id){
-    load();
+    // load();
     newsRepository=NewsRepository();
     Future<LikedResponseModel> like = newsRepository.makeDisLike(token,id);
     like.then((value) {
       setState(() {
         if(value!=null){
-          showSuccess();
-          getNewsData(token);
+          // showSuccess();
+          getNewsData2(token);
         }else{
-          showError();
+          // showError();
         }
       });
     });
@@ -308,25 +365,67 @@ class _DetailsScreenState extends State<NewsDetailsScreen> {
                                   },
                                   itemCount: newsDetailsResponseModel.gallery.length,
 
-                                  itemBuilder: (context, index) =>
-                                      Stack(
-                                        children: <Widget>[
-                                          Container(
+                                  itemBuilder: (context, index) {
+                                    if(newsDetailsResponseModel.gallery[index].image!=null){
+                                      if(newsDetailsResponseModel.gallery[index].image.contains('mp4')){
+                                        return Stack(
+                                            children: <Widget>[
+                                        VideoScreen(newsDetailsResponseModel.gallery[index].image),
+                                            Align(
+                                                alignment: Alignment.bottomCenter,
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                      bottom: 40),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .center,
+                                                    children: List.generate(
+                                                      newsDetailsResponseModel
+                                                          .gallery.length,
+                                                          (index) =>
+                                                          InkWell(
+                                                              onTap: () {
+                                                                print("index>>" +
+                                                                    index
+                                                                        .toString());
+                                                                _controller
+                                                                    .jumpToPage(
+                                                                    index);
+                                                              },
+                                                              child: buildDot(
+                                                                  index: index)),
+                                                    ),
+                                                  ),
+                                                ))
+                                        ]
+                                        );
+                                      }else {
+                                        return Stack(
+                                          children: <Widget>[
+                                            Container(
                                               height: 420,
                                               clipBehavior: Clip.antiAlias,
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
-                                                borderRadius: BorderRadius.circular(20),
+                                                borderRadius: BorderRadius
+                                                    .circular(20),
                                               ),
                                               // margin: const EdgeInsets.only(right: 20),
                                               child: CachedNetworkImage(
-                                                  width: double.infinity,height: 245,fit: BoxFit.cover,
-                                                placeholder: (context, url) => Image.asset("assets/images/loade_color.gif",
-                                                  width: 100,height: 100,),
-                                                // imageUrl:  "https://elyafta.com/tmp/public/images/companies/"+path,
-                                                imageUrl:   newsDetailsResponseModel.gallery[index].image!=null?
-                                                newsDetailsResponseModel.gallery[index].image:
-                                                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
+                                                  width: double.infinity,
+                                                  height: 245,
+                                                  fit: BoxFit.cover,
+                                                  placeholder: (context, url) =>
+                                                      Image.asset(
+                                                        "assets/images/loade_color.gif",
+                                                        width: 100, height: 100,),
+                                                  // imageUrl:  "https://elyafta.com/tmp/public/images/companies/"+path,
+                                                  imageUrl: newsDetailsResponseModel
+                                                      .gallery[index].image !=
+                                                      null ?
+                                                  newsDetailsResponseModel
+                                                      .gallery[index].image :
+                                                  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
 
 
                                               // Image(image:
@@ -335,27 +434,103 @@ class _DetailsScreenState extends State<NewsDetailsScreen> {
                                               // newsDetailsResponseModel.gallery[index].image:
                                               // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
                                               //   width: double.infinity,height: 245,fit: BoxFit.cover,)
+                                            ),
+                                            Align(
+                                                alignment: Alignment.bottomCenter,
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                      bottom: 40),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment
+                                                        .center,
+                                                    children: List.generate(
+                                                      newsDetailsResponseModel
+                                                          .gallery.length,
+                                                          (index) =>
+                                                          InkWell(
+                                                              onTap: () {
+                                                                print("index>>" +
+                                                                    index
+                                                                        .toString());
+                                                                _controller
+                                                                    .jumpToPage(
+                                                                    index);
+                                                              },
+                                                              child: buildDot(
+                                                                  index: index)),
+                                                    ),
+                                                  ),
+                                                ))
+                                          ],
+                                        );
+                                      }
+                                    }else{
+                                      return Stack(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 420,
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius
+                                                  .circular(20),
+                                            ),
+                                            // margin: const EdgeInsets.only(right: 20),
+                                            child: CachedNetworkImage(
+                                                width: double.infinity,
+                                                height: 245,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    Image.asset(
+                                                      "assets/images/loade_color.gif",
+                                                      width: 100, height: 100,),
+                                                // imageUrl:  "https://elyafta.com/tmp/public/images/companies/"+path,
+                                                imageUrl: newsDetailsResponseModel
+                                                    .gallery[index].image !=
+                                                    null ?
+                                                newsDetailsResponseModel
+                                                    .gallery[index].image :
+                                                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
+
+
+                                            // Image(image:
+                                            // NetworkImage(
+                                            //     newsDetailsResponseModel.gallery[index].image!=null?
+                                            // newsDetailsResponseModel.gallery[index].image:
+                                            // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
+                                            //   width: double.infinity,height: 245,fit: BoxFit.cover,)
                                           ),
                                           Align(
                                               alignment: Alignment.bottomCenter,
                                               child: Container(
-                                                margin: EdgeInsets.only(bottom: 40),
+                                                margin: EdgeInsets.only(
+                                                    bottom: 40),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment
+                                                      .center,
                                                   children: List.generate(
-                                                    newsDetailsResponseModel.gallery.length,
-                                                        (index) => InkWell(
+                                                    newsDetailsResponseModel
+                                                        .gallery.length,
+                                                        (index) =>
+                                                        InkWell(
                                                             onTap: () {
-                                                              print("index>>"+index.toString());
-                                                              _controller.jumpToPage(index);
+                                                              print("index>>" +
+                                                                  index
+                                                                      .toString());
+                                                              _controller
+                                                                  .jumpToPage(
+                                                                  index);
                                                             },
-                                                            child: buildDot(index: index)),
+                                                            child: buildDot(
+                                                                index: index)),
                                                   ),
                                                 ),
                                               ))
                                         ],
-                                      )
+                                      );
+                                    }
 
+                                  }
 
                               ),
                             ):Container(),

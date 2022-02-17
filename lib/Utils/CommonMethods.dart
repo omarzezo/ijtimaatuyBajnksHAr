@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pspdfkit_flutter/src/main.dart';
 import 'package:http/http.dart' as http;
 
+import 'AppColors.dart';
 import 'Pdf/pspdfkit_annotations_example.dart';
 // String getDoubleDigit(String value) {
 //   if (value.length >= 2) return value;
@@ -24,11 +25,18 @@ import 'Pdf/pspdfkit_annotations_example.dart';
 //   return formattedDate;
 // }
 
+
+
 Future<File> createFileOfPdfUrl(String filename,String url) async {
+  print("filenameIs>>"+filename.toString());
+  if(filename==null||filename.isEmpty){
+    filename="emptyFile";
+  }
   http.Client _client = new http.Client();
-  print("UrlForPrint"+url);
+  // print("UrlForPrint"+url);
   var req = await _client.get(Uri.parse(url));
   var bytes = req.bodyBytes;
+  // String dir = (await getApplicationDocumentsDirectory()).absolute.path;
   String dir = (await getApplicationDocumentsDirectory()).path;
   File file = new File('$dir/$filename');
   await file.writeAsBytes(bytes);
@@ -36,89 +44,71 @@ Future<File> createFileOfPdfUrl(String filename,String url) async {
   return file;
 }
 
-void showDocument(String url,BuildContext context) async {
+void showDocument(String type, int subId,int meetingId,int id ,int library_id,String name ,String url,BuildContext context) async {
+  onLoading(context);
   print("urlllll>>"+url.toString());
+
   try {
+    // String newUrl;
+    // if(url.contains('pdf')){
+    //   const end = ".pdf";
+    //   final endIndex = url.indexOf(end);
+    //   newUrl=url.substring(0,endIndex);
+    //   print("newUrlIs>>"+url.substring(0,endIndex).toString()); // brown fox jumps
+    //   // url.substring(0,endIndex);
+    // }
     // await Pspdfkit.se
     // await Pspdfkit.setLicenseKeys(Constants.android, Constants.ios);
     // await Pspdfkit.setLicenseKey(Constants.android);
-    createFileOfPdfUrl("test",  url).then((value) async {
+
+    createFileOfPdfUrl(name,  url).then((value) async {
+      // File(value.path).exists().then((value) {
+      //   print("valueIsssssssss>>"+value.toString());
+      // });
       // Pspdfkit.
 
       // final extractedDocument = await extractAsset(_documentPath);
+      print("valuevalueIs>>"+value.toString());
       print("pathIs>>"+value.path.toString());
-      // await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
-      //     builder: (_) => PspdfkitAnnotationsExampleWidget(
-      //         documentPath: value.path)));
+      dismissLoading(context);
 
-      Pspdfkit.present(value.path,{
-        // Common options:
-        enableAnnotationEditing: true, // Annotation item on the main toolbar.
-        toolbarTitle: 'Ijtimaat',
+      Navigator.pop(context);
+      await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
+          builder: (_) => PspdfkitAnnotationsExampleWidget(
+            type: type,
+              subId: subId,
+              documentPath: value.path,
+          meetingId: meetingId,
+          id: id,
+          library_Id: library_id,)));
 
-        iOSAllowToolbarTitleChange: false,
-        // iOS-specific options:
-        iOSRightBarButtonItems: [ // List of buttons to show on the right side of the main toolbar.
-          'thumbnailsButtonItem',
-          'activityButtonItem',
-          'annotationButtonItem',
-          'searchButtonItem'
-        ],
-        iOSLeftBarButtonItems: [ // List of buttons to show on the left side of the main toolbar. (Only one item supported.)
-          'settingsButtonItem'
-        ],
-
-        // Android-specific options:
-        androidShowSearchAction: true, // Search action on the main toolbar.
-        androidShowThumbnailGridAction: true, // Document editor action on the main toolbar.
-        androidShowShareAction: true, // Share action on the main toolbar.
-        androidShowPrintAction: true, // Print item on the main toolbar and inside the sharing sheet.
-        androidEnableDocumentEditor: true, // Enable document editing in thumbnail view.
-      });
     });
-    // if (await Pspdfkit.checkAndroidWriteExternalStoragePermission()) {
-    //
-    //   createFileOfPdfUrl("test",  url).then((value) {
-    //     Pspdfkit.present(value.path,{
-    //       // Common options:
-    //       enableAnnotationEditing: true, // Annotation item on the main toolbar.
-    //       toolbarTitle: 'Ijtimaat',
-    //       iOSAllowToolbarTitleChange: false,
-    //       // iOS-specific options:
-    //       iOSRightBarButtonItems: [ // List of buttons to show on the right side of the main toolbar.
-    //         'thumbnailsButtonItem',
-    //         'activityButtonItem',
-    //         'annotationButtonItem',
-    //         'searchButtonItem'
-    //       ],
-    //       iOSLeftBarButtonItems: [ // List of buttons to show on the left side of the main toolbar. (Only one item supported.)
-    //         'settingsButtonItem'
-    //       ],
-    //
-    //       // Android-specific options:
-    //       androidShowSearchAction: true, // Search action on the main toolbar.
-    //       androidShowThumbnailGridAction: true, // Document editor action on the main toolbar.
-    //       androidShowShareAction: true, // Share action on the main toolbar.
-    //       androidShowPrintAction: true, // Print item on the main toolbar and inside the sharing sheet.
-    //       androidEnableDocumentEditor: true, // Enable document editing in thumbnail view.
-    //     });
-    //   });
-    // } else {
-    //   AndroidPermissionStatus permissionStatus = await Pspdfkit.requestAndroidWriteExternalStoragePermission();
-    //   if (permissionStatus == AndroidPermissionStatus.authorized) {
-    //     createFileOfPdfUrl("test",  url)
-    //         .then((value) {
-    //       Pspdfkit.present(value.path);
-    //     });
-    //   } else if (permissionStatus == AndroidPermissionStatus.deniedNeverAsk) {
-    //     // _showToast(context);
-    //   }
-    // }
+
   } on PlatformException catch (e) {
     print("Failed to open document: '${e.message}'.");
   }
 }
 
+void onLoading(BuildContext context) {
+  showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (context) => Center(
+      child: Padding(
+          padding: const EdgeInsets.all(0.0),
+          child: CircularProgressIndicator(
+            backgroundColor: Colors.grey.shade300,
+            valueColor: AlwaysStoppedAnimation<Color>(grayColor),
+            strokeWidth: 10,
+          )
+      ),
+    ),
+  );
+}
+void dismissLoading(BuildContext context) {
+  Navigator.of(context, rootNavigator: true).pop(context);
+  // Navigator.of(context).maybePop();
+}
 
 bool isEmail(String em) {
 
@@ -179,6 +169,7 @@ Route createRoute(Object page) {
 void load(){
   EasyLoading.instance.loadingStyle=EasyLoadingStyle.custom;
   EasyLoading.show(status: 'loading...');
+
 }
 
 void showSuccessMsg(String msg){

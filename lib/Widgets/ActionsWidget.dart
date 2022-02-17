@@ -38,12 +38,14 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
   String userToken='';
   MeetingRepository meetingRepository;
   String status='';
-  List<String> votesList =["In Progress","Complete","Not Complete"];
+  // List<String> votesList =["In Progress","Complete","Not Complete"];
+  List<String> votesList =[];
   String votesValue;
   var voteControler= TextEditingController();
 
   Color colorStatus=Colors.green;
   String getStatus(){
+    status=votesValue;
     if(status=="Complete")  {
       status="Complete";
       colorStatus=Colors.green;
@@ -73,189 +75,394 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
     DateTime dateTime = DateTime.parse(dateString);
     return dateTime;
   }
-  void openBottomSheetChangeProgress(String date,int decisionId){
+
+  void openBottomSheetChangeProgress(String date,int decisionId,BuildContext _context){
+    voteControler.text="";
+    votesValue=null;
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
-        context: context,
+        context: _context,
         backgroundColor: Colors.transparent,
         builder: (BuildContext bc) {
           return StatefulBuilder( builder: (BuildContext context, StateSetter setStateee /*You can rename this!*/) {
             return Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(_context).size.height,
+              width: MediaQuery.of(_context).size.width,
               color: Colors.transparent,
-              child: Padding(
-                padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*(2/3)),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width - 200,
-                  child:
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(height:40 ,),
-                      Container(
-                        margin:EdgeInsets.only(left: 20,right: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                                child:Text("Actions",style: TextStyle(
-                                  color: blueColor ,
-                                  fontFamily: "black",
-                                  fontSize: 24,
-                                  // fontWeight: FontWeight.bold
-                                ),)
-                            ),
-                            InkWell(
-                                onTap:(){
-                                  Navigator.pop(context);
-                                },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 14),
-                        height: 0.3,color: grayTextColor,),
-
-                      Container(
-                          margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
-                          child: Text("My Action",style: blueColorStyleMedium(18),)),
-
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.only(left: 20,right: 20),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: new BorderRadius.circular(10.0),
-                            border: Border.all(
-                                color: grayRoundedColor,// set border color
-                                width: 3.0
-                            )
-                        ),
-                        // height: 56,
-                        padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
-                        child:DropdownButton<String>(
-                          isExpanded: true,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                          iconSize: 22,
-                          elevation: 16,
-                          style: blueColorStyleMedium(20),
-                          underline: Container(
-                            height: 0,
-                            color: Colors.transparent,
-                          ),
-                          onChanged: (String value) {
-                            setStateee(() {
-                              votesValue=value;
-                              // committeeId=value.id.toString();
-                            });
-                          },
-                          value: votesValue,
-                          items: votesList.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(left: 4,right: 4),
-                                    width: 13,
-                                    height: 13,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: value=="Complete"?Colors.green:value=="Not Complete"?Colors.red:
-                                        value=="In Progress"?yellowColor:Colors.green
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4,),
-                                  Container(
-                                      margin: EdgeInsets.only(top: 10),
-                                      child: Text(value)),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child:Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.only(top: 10,bottom: 3),
-                                          height:50,
-                                          width: 180,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: blueColor,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14))
-                                          ),
-                                          child: Center(
-                                            child: Text("cancel",style: blueColorStyleMedium(18),),
-                                          )
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10,),
-                                    InkWell(
-                                      onTap: () {
-                                        if(votesValue!=null) {
-                                          changeStatus(decisionId,userToken,votesValue);
-                                        }else{
-                                          showErrorWithMsg("Please Choose Status");
-                                        }
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.only(top: 10,bottom: 3),
-                                          height:50,
-                                          width: 180,
-                                          decoration: BoxDecoration(
-                                              color: yellowColor,
-                                              border: Border.all(
-                                                color: yellowColor,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14))
-                                          ),
-                                          child: Center(
-                                            child: Text("Confirm",style: TextStyle(
-                                              color: Colors.white ,
-                                              fontFamily: "medium",
-                                              fontSize: 18,
-                                              // fontWeight: FontWeight.bold
-                                            ),),
-                                          )
-                                      ),
-                                    ),
-                                  ],
+              child:  Row(
+                children: [
+                  Expanded(flex:4,child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(color: Colors.transparent,))),
+                  Expanded(
+                    flex:2,
+                    child: Container(
+                      // height: MediaQuery.of(context).size.height,
+                      color: Colors.white,
+                      // width: MediaQuery.of(context).size.width - 200,
+                      child:
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(height:40 ,),
+                          Container(
+                            margin:EdgeInsets.only(left: 20,right: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                    child:Text(AppLocalizations.of(_context).lblActions,style: TextStyle(
+                                      color: blueColor ,
+                                      fontFamily: "black",
+                                      fontSize: 24,
+                                      // fontWeight: FontWeight.bold
+                                    ),)
                                 ),
-                              )
-                          )),
-                    ],
-                  ),
+                                InkWell(
+                                    onTap:(){
+                                      Navigator.pop(context);
+                                    },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 14),
+                            height: 0.3,color: grayTextColor,),
 
-                ),
+                          Container(
+                              margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
+                              child: Text(AppLocalizations.of(_context).lblMyAction,style: blueColorStyleMedium(18),)),
+
+                          Container(
+                            width: MediaQuery.of(_context).size.width,
+                            margin: EdgeInsets.only(left: 20,right: 20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(10.0),
+                                border: Border.all(
+                                    color: grayRoundedColor,// set border color
+                                    width: 3.0
+                                )
+                            ),
+                            // height: 56,
+                            padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
+                            child:DropdownButton<String>(
+                              isExpanded: true,
+                              icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                              iconSize: 22,
+                              elevation: 16,
+                              style: blueColorStyleMedium(20),
+                              underline: Container(
+                                height: 0,
+                                color: Colors.transparent,
+                              ),
+                              onChanged: (String value) {
+                                setStateee(() {
+                                  votesValue=value;
+                                  // committeeId=value.id.toString();
+                                });
+                              },
+                              value: votesValue,
+                              items: votesList.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(left: 4,right: 4),
+                                        width: 13,
+                                        height: 13,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: value==AppLocalizations.of(_context).lblComplete?Colors.green:
+                                            value==AppLocalizations.of(_context).lblNotComplete?Colors.red:
+                                            value==AppLocalizations.of(_context).lblInProgress?yellowColor:Colors.green
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4,),
+                                      Container(
+                                          margin: EdgeInsets.only(top: 0),
+                                          child: Text(value)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+
+                          Expanded(
+                              child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child:Container(
+                                    margin: EdgeInsets.only(bottom: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              height:50,
+                                              width: 180,
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: blueColor,
+                                                  ),
+                                                  borderRadius: BorderRadius.all(Radius.circular(14))
+                                              ),
+                                              child: Center(
+                                                child: Text(AppLocalizations.of(_context).lblCancels,style: blueColorStyleMedium(18),),
+                                              )
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10,),
+                                        InkWell(
+                                          onTap: () {
+                                            if(votesValue!=null) {
+                                              String votesValue2;
+                                              if (votesValue == AppLocalizations.of(_context).lblInProgress) {
+                                                votesValue2="In Progress";
+                                              } else if (votesValue == AppLocalizations.of(_context).lblComplete) {
+                                                votesValue2="Complete";
+                                              } else if (votesValue == AppLocalizations.of(_context).lblNotComplete) {
+                                                votesValue2="Not Complete";
+                                              }
+                                              changeStatus(decisionId,userToken,votesValue2);
+                                            }else{
+                                              showErrorWithMsg("Please Choose Status");
+                                            }
+                                          },
+                                          child: Container(
+                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              height:50,
+                                              width: 180,
+                                              decoration: BoxDecoration(
+                                                  color: yellowColor,
+                                                  border: Border.all(
+                                                    color: yellowColor,
+                                                  ),
+                                                  borderRadius: BorderRadius.all(Radius.circular(14))
+                                              ),
+                                              child: Center(
+                                                child: Text(AppLocalizations.of(_context).lblConfirm,style: TextStyle(
+                                                  color: Colors.white ,
+                                                  fontFamily: "medium",
+                                                  fontSize: 18,
+                                                  // fontWeight: FontWeight.bold
+                                                ),),
+                                              )
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              )),
+                        ],
+                      ),
+
+                    ),
+                  ),
+                ],
               ),
             );
           },);
         });
   }
+
+  // void openBottomSheetChangeProgress(String date,int decisionId){
+  //   showModalBottomSheet(
+  //       isScrollControlled: true,
+  //       isDismissible: false,
+  //       context: context,
+  //       backgroundColor: Colors.transparent,
+  //       builder: (BuildContext bc) {
+  //         return StatefulBuilder( builder: (BuildContext context, StateSetter setStateee /*You can rename this!*/) {
+  //           return Container(
+  //             height: MediaQuery.of(context).size.height,
+  //             width: MediaQuery.of(context).size.width,
+  //             color: Colors.transparent,
+  //             child: Padding(
+  //               padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*(2/3)),
+  //               child: Container(
+  //                 height: MediaQuery.of(context).size.height,
+  //                 color: Colors.white,
+  //                 width: MediaQuery.of(context).size.width - 200,
+  //                 child:
+  //                 Column(
+  //                   mainAxisAlignment: MainAxisAlignment.start,
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Container(height:40 ,),
+  //                     Container(
+  //                       margin:EdgeInsets.only(left: 20,right: 20),
+  //                       child: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         crossAxisAlignment: CrossAxisAlignment.center,
+  //                         children: [
+  //                           Container(
+  //                               child:Text("Actions",style: TextStyle(
+  //                                 color: blueColor ,
+  //                                 fontFamily: "black",
+  //                                 fontSize: 24,
+  //                                 // fontWeight: FontWeight.bold
+  //                               ),)
+  //                           ),
+  //                           InkWell(
+  //                               onTap:(){
+  //                                 Navigator.pop(context);
+  //                               },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     Container(
+  //                       margin: EdgeInsets.only(top: 14),
+  //                       height: 0.3,color: grayTextColor,),
+  //
+  //                     Container(
+  //                         margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
+  //                         child: Text("My Action",style: blueColorStyleMedium(18),)),
+  //
+  //                     Container(
+  //                       width: MediaQuery.of(context).size.width,
+  //                       margin: EdgeInsets.only(left: 20,right: 20),
+  //                       decoration: BoxDecoration(
+  //                           color: Colors.white,
+  //                           borderRadius: new BorderRadius.circular(10.0),
+  //                           border: Border.all(
+  //                               color: grayRoundedColor,// set border color
+  //                               width: 3.0
+  //                           )
+  //                       ),
+  //                       // height: 56,
+  //                       padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
+  //                       child:DropdownButton<String>(
+  //                         isExpanded: true,
+  //                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
+  //                         iconSize: 22,
+  //                         elevation: 16,
+  //                         style: blueColorStyleMedium(20),
+  //                         underline: Container(
+  //                           height: 0,
+  //                           color: Colors.transparent,
+  //                         ),
+  //                         onChanged: (String value) {
+  //                           setStateee(() {
+  //                             votesValue=value;
+  //                             // committeeId=value.id.toString();
+  //                           });
+  //                         },
+  //                         value: votesValue,
+  //                         items: votesList.map((String value) {
+  //                           return DropdownMenuItem<String>(
+  //                             value: value,
+  //                             child: Row(
+  //                               mainAxisAlignment: MainAxisAlignment.start,
+  //                               crossAxisAlignment: CrossAxisAlignment.center,
+  //                               children: [
+  //                                 Container(
+  //                                   margin: EdgeInsets.only(left: 4,right: 4),
+  //                                   width: 13,
+  //                                   height: 13,
+  //                                   decoration: BoxDecoration(
+  //                                       shape: BoxShape.circle,
+  //                                       color: value=="Complete"?Colors.green:value=="Not Complete"?Colors.red:
+  //                                       value=="In Progress"?yellowColor:Colors.green
+  //                                   ),
+  //                                 ),
+  //                                 const SizedBox(width: 4,),
+  //                                 Container(
+  //                                     margin: EdgeInsets.only(top: 10),
+  //                                     child: Text(value)),
+  //                               ],
+  //                             ),
+  //                           );
+  //                         }).toList(),
+  //                       ),
+  //                     ),
+  //
+  //
+  //                     Expanded(
+  //                         child: Align(
+  //                             alignment: Alignment.bottomCenter,
+  //                             child:Container(
+  //                               margin: EdgeInsets.only(bottom: 20),
+  //                               child: Row(
+  //                                 mainAxisAlignment: MainAxisAlignment.center,
+  //                                 crossAxisAlignment: CrossAxisAlignment.center,
+  //                                 children: [
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       Navigator.pop(context);
+  //                                     },
+  //                                     child: Container(
+  //                                         padding: EdgeInsets.only(top: 10,bottom: 3),
+  //                                         height:50,
+  //                                         width: 180,
+  //                                         decoration: BoxDecoration(
+  //                                             border: Border.all(
+  //                                               color: blueColor,
+  //                                             ),
+  //                                             borderRadius: BorderRadius.all(Radius.circular(14))
+  //                                         ),
+  //                                         child: Center(
+  //                                           child: Text("cancel",style: blueColorStyleMedium(18),),
+  //                                         )
+  //                                     ),
+  //                                   ),
+  //                                   const SizedBox(width: 10,),
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       if(votesValue!=null) {
+  //                                         changeStatus(decisionId,userToken,votesValue);
+  //                                       }else{
+  //                                         showErrorWithMsg("Please Choose Status");
+  //                                       }
+  //                                     },
+  //                                     child: Container(
+  //                                         padding: EdgeInsets.only(top: 10,bottom: 3),
+  //                                         height:50,
+  //                                         width: 180,
+  //                                         decoration: BoxDecoration(
+  //                                             color: yellowColor,
+  //                                             border: Border.all(
+  //                                               color: yellowColor,
+  //                                             ),
+  //                                             borderRadius: BorderRadius.all(Radius.circular(14))
+  //                                         ),
+  //                                         child: Center(
+  //                                           child: Text("Confirm",style: TextStyle(
+  //                                             color: Colors.white ,
+  //                                             fontFamily: "medium",
+  //                                             fontSize: 18,
+  //                                             // fontWeight: FontWeight.bold
+  //                                           ),),
+  //                                         )
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             )
+  //                         )),
+  //                   ],
+  //                 ),
+  //
+  //               ),
+  //             ),
+  //           );
+  //         },);
+  //       });
+  // }
 
   void changeStatus(int decisionId,String token,String status) {
     load();
@@ -360,7 +567,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset("assets/images/ic_action.png",width: 24,height: 24,color: Colors.black,),
+                          Image.asset("assets/images/ic_action.webp",width: 24,height: 24,color: Colors.black,),
                           const SizedBox(width: 14,),
                           Container( margin: EdgeInsets.only(top: 4),
                               child: Text(AppLocalizations.of(context).lblActions,style: grayTextColorStyleMedium(20),)),
@@ -371,7 +578,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                 ),
                 Container(
                     margin: EdgeInsets.only(bottom: 10),
-                    child: Image.asset("assets/images/ic_drag.png",width: 30,height: 30)),
+                    child: Image.asset("assets/images/ic_drag.webp",width: 30,height: 30)),
               ],
             ),
             const SizedBox(height: 20,),
@@ -469,7 +676,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                   shrinkWrap: true,
                   itemCount: leave.attachments.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForAttachments(leave.attachments[index],index,context);
+                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
                   },
                 )
             ):Container(),
@@ -485,7 +692,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: leave.subpoints.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForSubPoints(leave.subpoints[index],parentIndex,index,context);
+                    return leaveRowForSubPoints(leave.meetingId,leave.subpoints[index],parentIndex,index,context);
                   },
                 )
             ):Container(),
@@ -526,7 +733,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    openBottomSheetChangeProgress("date", leave.id);
+                    openBottomSheetChangeProgress("date", leave.id,context);
                   },
                   child: Container(
                     padding: EdgeInsets.only(left: 60,right: 60,top: 24,bottom: 20),
@@ -588,6 +795,10 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
 
   @override
   void initState() {
+    Future.delayed(Duration.zero,() {
+      votesList=[AppLocalizations.of(context).lblInProgress,AppLocalizations.of(context).lblComplete,
+        AppLocalizations.of(context).lblNotComplete];
+    });
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
       getUser().then((value) {

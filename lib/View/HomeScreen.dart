@@ -866,7 +866,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                  children: [
                                    Row(
                                      children: [
-                                       Image.asset("assets/images/ic_decisions.png",width: 24,height: 24),
+                                       Image.asset("assets/images/ic_decisions.webp",width: 24,height: 24),
                                        const SizedBox(width: 14,),
                                        Container( margin: EdgeInsets.only(top: 4),
                                            child: Text(AppLocalizations.of(context).lblDesisions,style: grayTextColorStyleBlack(22),)),
@@ -900,7 +900,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                  children: [
                                    Row(
                                      children: [
-                                       Image.asset("assets/images/ic_action.png",width: 24,height: 24),
+                                       Image.asset("assets/images/ic_action.webp",width: 24,height: 24),
                                        const SizedBox(width: 14,),
                                        Container( margin: EdgeInsets.only(top: 4),
                                            child: Text(AppLocalizations.of(context).lblActions,style: grayTextColorStyleBlack(22),)),
@@ -939,9 +939,9 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 30,),
-                                // Text(AppLocalizations.of(context).lblOverview,style: blueColorBoldStyle(28),),
-                                Text(userName,style: blueColorBoldStyle(28),),
+                                // const SizedBox(height: 30,),
+                                // // Text(AppLocalizations.of(context).lblOverview,style: blueColorBoldStyle(28),),
+                                // Text(userName,style: blueColorBoldStyle(28),),
                                 const SizedBox(height: 10,),
 
                                 Row(
@@ -949,6 +949,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                     Expanded(
                                       flex:4,
                                       child: Container(
+                                        margin: EdgeInsets.only(top:0),
                                         padding: EdgeInsets.only(top: 20,bottom:90,left:16,right:16),
                                         // height: 276,
                                         // padding: EdgeInsets.all(16),
@@ -998,6 +999,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                       flex:5,
                                       child: Container(
                                         // height:280,
+                                        margin: EdgeInsets.only(top:30),
                                         child: Column(
                                           children: [
                                             Container(
@@ -1228,7 +1230,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                                                   ],
                                                                 ),
                                                               ),
-                                                              child: Image.asset("assets/images/ic_pending.png",width: 24,height: 24),
+                                                              child: Image.asset("assets/images/ic_pending.webp",width: 24,height: 24),
                                                             ),
                                                             const SizedBox(width: 12,),
                                                             Column(
@@ -1282,7 +1284,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                                                   ],
                                                                 ),
                                                               ),
-                                                              child: Image.asset("assets/images/ic_maybe.png",width: 24,height: 24),
+                                                              child: Image.asset("assets/images/ic_maybe.webp",width: 24,height: 24),
                                                             ),
                                                             const SizedBox(width: 12,),
                                                             Column(
@@ -1314,7 +1316,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                 const SizedBox(height: 30,),
                                 // Text(AppLocalizations.of(context).lblMyAgenda,style: blueColorBoldStyle(24),),
                                 const SizedBox(height: 16,),
-                                InkWell(
+                                talkingpointsList.isNotEmpty? InkWell(
                                   onTap: () {
                                     print(";;;;;");
                                     setState(() {
@@ -1331,7 +1333,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                     children: [
                                       Row(
                                         children: [
-                                          Image.asset("assets/images/ic_talkingpoint.png",width: 24,height: 24),
+                                          Image.asset("assets/images/ic_talkingpoint.webp",width: 24,height: 24),
                                           const SizedBox(width: 14,),
                                           Container( margin: EdgeInsets.only(top: 4),
                                               // child: Text(AppLocalizations.of(context).lblTalkingPoints,style: grayTextColorStyleBlack(22),)),
@@ -1344,11 +1346,12 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                       Icon(Icons.arrow_forward_ios,size: 16,color: grayTextColor,),
                                     ],
                                   ),
-                                ),
+                                ):Container(),
                                 isExpandedTalkingPoints?makeBodyForTalkingpoints(context, talkingpointsList):
+                                // kk
                                 Container(),
                                 const SizedBox(height: 30,),
-                                InkWell(
+                                decisionList.isNotEmpty?   InkWell(
                                   onTap: () {
                                     print(";;;;;");
                                     setState(() {
@@ -1365,7 +1368,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                     children: [
                                       Row(
                                         children: [
-                                          Image.asset("assets/images/ic_decisions.png",width: 24,height: 24),
+                                          Image.asset("assets/images/ic_decisions.webp",width: 24,height: 24),
                                           const SizedBox(width: 14,),
                                           Container( margin: EdgeInsets.only(top: 4),
                                               child: Text(AppLocalizations.of(context).lblDesisions,style: grayTextColorStyleBlack(22),)),
@@ -1377,11 +1380,12 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                       Icon(Icons.arrow_forward_ios,size: 16,color: grayTextColor,),
                                     ],
                                   ),
-                                ),
+                                ):Container(),
                                 isExpandedDecisions?makeBodyForDecisions(context, decisionList):
+
                                 Container(),
                                 const SizedBox(height: 30,),
-                                InkWell(
+                                actionList.isNotEmpty? InkWell(
                                   onTap: () {
                                     print(";;;;;");
                                     setState(() {
@@ -1398,7 +1402,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                     children: [
                                       Row(
                                         children: [
-                                          Image.asset("assets/images/ic_action.png",width: 24,height: 24),
+                                          Image.asset("assets/images/ic_action.webp",width: 24,height: 24),
                                           const SizedBox(width: 14,),
                                           Container( margin: EdgeInsets.only(top: 4),
                                               child: Text(AppLocalizations.of(context).lblActions,style: grayTextColorStyleBlack(22),)),
@@ -1410,7 +1414,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                                       Icon(Icons.arrow_forward_ios,size: 16,color: grayTextColor,),
                                     ],
                                   ),
-                                ),
+                                ):Container(),
                                 isExpandedActions?makeBodyForActions(context, actionList):
                                 Container(),
                                 const SizedBox(height: 30,)

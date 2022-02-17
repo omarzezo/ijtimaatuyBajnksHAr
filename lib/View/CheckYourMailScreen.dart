@@ -112,7 +112,7 @@ class CheckYourMailScreenState extends State<CheckYourMailScreen> {
                                       onTap: () {
                                         Navigator.pop(context);
                                       },
-                                      child: Image.asset("assets/images/back.png",fit: BoxFit.cover,width: 26,)),
+                                      child: Image.asset("assets/images/back.webp",fit: BoxFit.cover,width: 26,)),
                                 ),
                               ),
                             ),
@@ -133,7 +133,7 @@ class CheckYourMailScreenState extends State<CheckYourMailScreen> {
                           margin: EdgeInsets.only(top: 14),
                           height: 0.3,color: grayTextColor,),
                         const SizedBox(height:60,),
-                        Center(child: Image.asset("assets/images/checked.png",fit: BoxFit.fill,
+                        Center(child: Image.asset("assets/images/checked.webp",fit: BoxFit.fill,
                           width: width<600?70:80,height: width<600?70:80,)),
                         const SizedBox(height:24,),
 

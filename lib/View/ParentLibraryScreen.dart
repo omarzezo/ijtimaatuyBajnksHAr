@@ -11,7 +11,6 @@ import 'package:itimaaty/View/CreateMeetingScreen.dart';
 import 'package:itimaaty/View/DrawerWidget.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/View/LibraryScreen.dart';
-import 'package:itimaaty/Widgets/TabBarWidget.dart';
 
 import 'FavouriteScreen.dart';
 import 'SignInScreen.dart';

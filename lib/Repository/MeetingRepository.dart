@@ -1,6 +1,9 @@
 
 import 'dart:convert';
+import 'dart:io';
 
+// import 'package:dio/dio.dart';
+import 'package:http/http.dart';
 import 'package:itimaaty/Models/AddCommentRequestModel.dart';
 import 'package:itimaaty/Models/AddCommentResponseModel.dart';
 import 'package:itimaaty/Models/AddMeetingRequestModel.dart';
@@ -8,6 +11,7 @@ import 'package:itimaaty/Models/ChangeActionStatusRequestModel.dart';
 import 'package:itimaaty/Models/ChangeMeetingStatusRequestModel.dart';
 import 'package:itimaaty/Models/ChangeStatusMeetingResponseModel.dart';
 import 'package:itimaaty/Models/ChangeStatusResponseModel.dart';
+import 'package:itimaaty/Models/DeleteCommentResponse.dart';
 import 'package:itimaaty/Models/actions_comment_response_model.dart';
 import 'package:itimaaty/Models/actions_response_model.dart';
 import 'package:itimaaty/Models/add_meeting_response_model.dart';
@@ -25,6 +29,8 @@ import 'package:itimaaty/Models/talking_points_response_model.dart';
 import 'package:itimaaty/network/end_points.dart';
 import 'package:itimaaty/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
+
+import '../Models/UplodedResponseModel.dart';
 
 class MeetingRepository {
   DioHelper _helper = DioHelper();
@@ -44,6 +50,24 @@ class MeetingRepository {
   //   // }
   //   return response==null?[]: await myModels;
   // }
+
+  Future<List<AllMeetingsResponse>> getAllMeetings2(String token,String date) async {
+    var response ;
+    List<AllMeetingsResponse> myModels;
+    print("UrlIs>>"+BASE_URL + MEETINGS+'?date='+date);
+    try{
+      Map<String, String> headers = {"Content-type": "application/json",
+        'token': token};
+      response = await http.get(Uri.parse(BASE_URL + MEETINGS+'?date='+date),headers: headers);
+      print("ResponsIS>>"+response.toString());
+
+      myModels = (json.decode(response.body) as List).map((i) =>
+          AllMeetingsResponse.fromJson(i)).toList();
+    }catch (e){
+      print("kkkkkkkkkkkkkk"+e.toString());
+    }
+    return response==null?[]: await myModels;
+  }
 
   Future<List<AllMeetingsResponse>> getAllMeetings(String token) async {
     var response ;
@@ -125,6 +149,74 @@ class MeetingRepository {
       print("kkkkkkkkkkkkkk"+e.toString());
     }
     return response==null?null:MeetingDetailsResponseModel.fromJson(response);
+  }
+
+  Future<int> uploadImage (MultipartFile logoFile,int meeting_id,int library_id,String token) async {
+
+    // http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(BASE_URL+UPDATE_FILE+"/"+id.toString()));
+    print("RemoteUrlIs>>"+BASE_URL+UPDATE_FILE);
+    print("meeting_id>>"+meeting_id.toString());
+    print("library_id>>"+library_id.toString());
+
+    http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(BASE_URL+UPDATE_FILE));
+    Map<String, String> headers = {"Content-type": "application/json",
+      'token': token};
+
+    Map<String, String> requestBody = <String, String>{
+      'meeting_id': meeting_id.toString(),
+      'library_id': library_id.toString()
+    };
+
+    request.fields.addAll(requestBody);
+    request.files.add(logoFile);
+    // request.fields['meeting_id'] = meeting_id.toString();
+    // request.fields['library_id'] = library_id.toString();
+    request.headers.addAll(headers);
+    StreamedResponse res;
+    request.send().then((response) {
+      print("Here>>"+logoFile.toString());
+      print(response.toString());
+      print("dddd"+response.statusCode.toString());
+      res=response;
+      // if (response.statusCode == 200){
+      //   print("Uploaded!");
+      // }else{
+      //   print("errror!");
+      // }
+      // return response.statusCode;
+      // var response2 =  http.Response.fromStream(response.stream.bytesToString());
+      // final result = jsonDecode(response.) as Map<String, dynamic>;
+      // return UplodedResponseModel.fromJson(response.stream);
+    });
+    return res.statusCode;
+    // FormData formData;
+    // print("ommmmmmmmmmmmmmmmmmmmmmm");
+    // // formData = new FormData.fromMap(
+    // //     {}
+    // // );
+    // formData = FormData();
+    // formData.files.add(MapEntry("file", logoFile, ));
+    //
+    // try{
+    //   // formData.files.add(MapEntry('company_logo', logoFile));
+    //   print("logoFile");
+    // }catch(err){
+    //   print("errorIsHersLogo>>");
+    //   print("errorIs>>"+err.toString());
+    // }
+    // Map<String, String> headers = {"Content-type": "application/json",'token': token};
+    // print("RemoteUrlIs>>"+BASE_URL+UPDATE_FILE+"/"+id.toString());
+    // Response response = await Dio().post(BASE_URL+UPDATE_FILE+"/"+id.toString(), data: formData,
+    // options: Options(
+    //   // method: 'GET',
+    //   headers: {
+    //     HttpHeaders.authorizationHeader:
+    //     'token $token',
+    //     'content-Type': 'application/json'
+    //   },
+    // ));
+    // print("Datais>>" +response.data.toString());
+
   }
 
   Future<AddNoteResponseModel> addNote(String token,int id,AddNoteRequestModel model) async {
@@ -336,5 +428,17 @@ class MeetingRepository {
     return response==null?[]: await myModels;
   }
 
+  Future<DeleteCommentResponse> deleteComment(int id,String token) async {
+    var response ;
+    print("UrlIs>>"+BASE_URL + DELETE_COMMENT+id.toString());
+    try{
+      Map<String, String> headers = {"Content-type": "application/json",
+        'token': token};
+      response = await DioHelper.deleteWithToken(DELETE_COMMENT+"/"+id.toString(),token);
+    }catch (e){
+      print("kkkkkkkkkkkkkk"+e.toString());
+    }
+    return response==null?null:DeleteCommentResponse.fromJson(response);
+  }
 }
 

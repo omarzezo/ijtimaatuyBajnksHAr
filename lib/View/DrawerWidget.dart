@@ -80,7 +80,7 @@ String firstChar="";
                   FadeAnimation(
                     0.2,
                     _createDrawerItem(context,
-                        icon: "assets/images/ic_home.png",
+                        icon: "assets/images/ic_home.webp",
                         text: AppLocalizations.of(context).lblHomeLabel,
                         isSelected: selectedIndex == 0, onTap: () {
                           setState(() {
@@ -105,7 +105,7 @@ String firstChar="";
                   //     })),
                   FadeAnimation(
                       0.6,_createDrawerItem(context,
-                      icon: "assets/images/ic_news.png",
+                      icon: "assets/images/ic_news.webp",
                       text: AppLocalizations.of(context).lblNews,
                       isSelected: selectedIndex == 2, onTap: () {
                         setState(() {
@@ -123,7 +123,7 @@ String firstChar="";
 
                   FadeAnimation(
                       0.5, _createDrawerItem(context,
-                      icon: "assets/images/ic_calender.png",
+                      icon: "assets/images/ic_calender.webp",
                       text: AppLocalizations.of(context).lblCalender,
                       isSelected: selectedIndex == 3, onTap: () {
                         setState(() {
@@ -141,7 +141,7 @@ String firstChar="";
 
                   FadeAnimation(
                       0.6,_createDrawerItem(context,
-                      icon: "assets/images/ic_meetings.png",
+                      icon: "assets/images/ic_meetings.webp",
                       text: AppLocalizations.of(context).lblMeetings,
                       isSelected: selectedIndex == 4, onTap: () {
                         setState(() {
@@ -155,7 +155,7 @@ String firstChar="";
                       })),
                   FadeAnimation(
                       0.7,   _createDrawerItem(context,
-                      icon: "assets/images/ic_library.png",
+                      icon: "assets/images/ic_library.webp",
                       text: AppLocalizations.of(context).lblLibrary,
                       isSelected: selectedIndex == 5, onTap: () {
                         setState(() {
@@ -200,7 +200,7 @@ String firstChar="";
                   //     })),
                   FadeAnimation(
                       0.7,   _createDrawerItem(context,
-                      icon: "assets/images/ic_profile.png",
+                      icon: "assets/images/ic_profile.webp",
                       text: AppLocalizations.of(context).lblProfile,
                       isSelected: selectedIndex == 10, onTap: () {
                         setState(() {

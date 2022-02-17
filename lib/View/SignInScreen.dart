@@ -47,11 +47,11 @@ class SignInScreenState extends State<SignInScreen> {
     // emailController.text="said.saleh@live.com";
     // passwordController.text='123123';
 
-    emailController.text="Ahmed@ijtimaati.com";
-    passwordController.text='Oman@2020';
+    // emailController.text="Ahmed@ijtimaati.com";
+    // passwordController.text='Oman@2020';
     //
     // emailController.text="mazin@ijtimaati.com";
-    // passwordController.text='Oman@123';
+    // passwordController.text='Oman@1234';
     //
     // emailController.text="zezoomar674@yahoo.com";
     // passwordController.text='123456';
@@ -188,7 +188,7 @@ class SignInScreenState extends State<SignInScreen> {
                               padding: EdgeInsets.only(left: 2,right: 2,top: 2,bottom: 2),
                               child: Align(
                                 alignment: Alignment.center,
-                                child: Image.asset("assets/images/ic_extra.png",width: 26,height: 26,color: Colors.white,),
+                                child: Image.asset("assets/images/ic_extra.webp",width: 26,height: 26,color: Colors.white,),
                               ),
                             ),
                             const SizedBox(width: 14,),

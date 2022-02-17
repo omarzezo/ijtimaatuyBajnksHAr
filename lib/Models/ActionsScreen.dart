@@ -37,6 +37,7 @@ import 'package:itimaaty/cubit/Home/HomeCubit.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
 import 'package:itimaaty/Models/change_vote_response_model.dart';
 
+import 'DeleteCommentResponse.dart';
 import 'actions_comment_response_model.dart';
 
 class ActionsScreen extends StatefulWidget {
@@ -73,13 +74,13 @@ class ActionsScreenState extends State<ActionsScreen> {
   static List<DataForPicChart> data = [];
 
   void getActionData(String token) {
-    load();
+    // load();
     meetingRepository = new MeetingRepository();
     Future<ActionsResponseModel> allList = meetingRepository.getActionData(token,widget.meetingId,widget.decisionId);
     allList.then((value) {
       setState(() {
         if (value != null) {
-          showSuccess();
+          // showSuccess();
           decisonResponseModel = value;
 
           if(decisonResponseModel!=null&&decisonResponseModel.participants!=null){
@@ -130,6 +131,7 @@ class ActionsScreenState extends State<ActionsScreen> {
               print("image>>>>"+decisonResponseModel.comments[i].user_name.toString());
               userAndCommentsList.add(UsersAndComments(
                   comment: decisonResponseModel.comments[i].comment,
+                  id: decisonResponseModel.comments[i].id,
                   // img: i<decisonResponseModel.participants.length?decisonResponseModel.participants[i].user.image:"",
                   img: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
                   name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
@@ -139,7 +141,7 @@ class ActionsScreenState extends State<ActionsScreen> {
           }
           print("dfdfdfdfdfdfdfdfd");
         }else{
-          showError();
+          // showError();
           if(value==null){
             navigateAndFinish(context, SignInScreen());
           }
@@ -181,6 +183,28 @@ class ActionsScreenState extends State<ActionsScreen> {
           showError();
           if(value==null){
             navigateAndFinish(context, SignInScreen());
+          }
+        }
+      });
+    });
+  }
+
+  void deleteComment(String token, int id) {
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(id,token);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          userAndCommentsList=[];
+          writeCommentControler.text='';
+          getActionData(userToken);
+          showSuccessMsg("Deleted Successfully");
+        }else{
+          showError();
+          if(value==null){
+            showErrorWithMsg('this item not deleted');
+            // navigateAndFinish(context, SignInScreen());
           }
         }
       });
@@ -438,6 +462,85 @@ class ActionsScreenState extends State<ActionsScreen> {
         });
   }
 
+  Widget makeBodyForUsersComments(BuildContext context, List<UsersAndComments> activityList,int lenght){
+    return activityList!=null&&activityList.isNotEmpty?
+    ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: activityList.length,
+      itemBuilder: (context, index) {
+        return leaveRowForUsersComments(context,activityList[index],index);
+      },
+    ):Container();
+  }
+
+  Widget leaveRowForUsersComments(BuildContext context,UsersAndComments leave,int index) {
+    return Container(
+      margin: EdgeInsets.only(top: 10),
+      child:Container(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            ClipOval(
+                child:
+                CircleAvatar(
+                  radius: 22,
+                  backgroundColor: Colors.red,
+                  child: CircleAvatar(
+                    radius: 22,
+                    backgroundImage: NetworkImage(
+                      leave.img!=null?!leave.img.contains(".html")?leave.img:
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+                    ),
+                  ),
+                )
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 14,right: 14),
+              padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
+              decoration: BoxDecoration(
+                  color:Color(0xffF7F7F8),
+                  borderRadius: new BorderRadius.circular(14.0),
+                  border: Border.all(
+                      color: Color(0xffF7F7F8),// set border color
+                      width: 2.0
+                  )
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(leave.name!=null?leave.name:"",style: blueColorBoldStyle(18),),
+                      const SizedBox(width: 12,),
+                      Container(height: 20,width: 1,color: grayTextColor,),
+                      const SizedBox(width: 12,),
+                      Text(leave.date!=null?getFormattedDate(stringToDateTime(leave.date)):"",style: blueColorStyleMedium(16),),
+                    ],
+                  ),
+                  const SizedBox(height: 6,),
+                  Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
+                  const SizedBox(height: 10,),
+                  InkWell(
+                    onTap: () {
+                      deleteComment(userToken, leave.id);
+                    },
+                    child:Text(AppLocalizations.of(context).lblDelete,style: blueColorBoldStyle(16),) ,
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     Future.delayed(Duration.zero,() {
@@ -486,7 +589,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                             Navigator.pop(context);
                           },
                           child: Icon(Icons.chevron_left,color: Colors.black,size: 40,)),
-                      Image.asset("assets/images/ic_action.png",width: 24,height: 24,color: Colors.black,),
+                      Image.asset("assets/images/ic_action.webp",width: 24,height: 24,color: Colors.black,),
                       Container(
                         child: Text(
                           AppLocalizations.of(context).lblActions,
@@ -757,7 +860,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                                         const SizedBox(height: 14,),
 
                                         decisonResponseModel.attachments!=null?
-                                        makeBodyForAttachmentsActions(context, decisonResponseModel.attachments, 0):Container()
+                                        makeBodyForAttachmentsActions("actions",widget.decisionId,widget.meetingId,context, decisonResponseModel.attachments, 0):Container()
                                       ],
                                     ),
                                   ],

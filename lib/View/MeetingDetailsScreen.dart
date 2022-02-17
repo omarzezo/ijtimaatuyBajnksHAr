@@ -33,6 +33,7 @@ import 'package:itimaaty/Widgets/AgendaDetailsScreen.dart';
 import 'package:itimaaty/Widgets/DescisionsWidget.dart';
 import 'package:itimaaty/Widgets/HomeWidgets.dart';
 import 'package:itimaaty/Widgets/MeetingDetailsWidgets.dart';
+import 'package:itimaaty/Widgets/TalkingPointsWidget.dart';
 import 'package:itimaaty/cubit/Home/HomeCubit.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
 
@@ -54,6 +55,7 @@ class MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
   MeetingRepository meetingRepository;
   String userToken="";
   int selectedPos=0;
+  bool openTellUs =false;
   List<String> goingList=[];
   List<String> notGoingList=[];
   List<String> pendingList=[];
@@ -100,13 +102,13 @@ class MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
   int userId;
 String attendanceStatus='';
   void getMeetingDetails(String token) {
-    load();
+    // load();
     meetingRepository = new MeetingRepository();
     Future<MeetingDetailsResponseModel> allList = meetingRepository.getMeetingDetails(token,widget.meetingId);
     allList.then((value) {
       setState(() {
         if (value != null) {
-          showSuccess();
+          // showSuccess();
           meetingDetailsResponseModel = value;
           if(meetingDetailsResponseModel.attendanceStatus!=null){
 
@@ -170,7 +172,7 @@ String attendanceStatus='';
           // print("meetingDetailsResponseModel>>"+meetingDetailsResponseModel.startDate.toString());
           // print("meetingDetailsResponseModelName>>"+meetingDetailsResponseModel.currentMember.user.name);
         }else{
-          showError();
+          // showError();
           if(value==null){
             navigateAndFinish(context, SignInScreen());
           }
@@ -179,6 +181,7 @@ String attendanceStatus='';
     });
   }
 
+  String editNote;
   void addNote(String token,String note) {
     load();
     meetingRepository = new MeetingRepository();
@@ -186,6 +189,7 @@ String attendanceStatus='';
     allList.then((value) {
       setState(() {
         if (value != null) {
+          editNote=note;
           showSuccess();
           // meetingDetailsResponseModel = value;
           Navigator.pop(context);
@@ -208,6 +212,7 @@ String attendanceStatus='';
         builder: (BuildContext bc) {
           return StatefulBuilder( builder: (BuildContext context, StateSetter setStateee /*You can rename this!*/) {
             return Container(
+
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               color: Colors.transparent,
@@ -294,7 +299,7 @@ String attendanceStatus='';
                                   Navigator.pop(context);
                                 },
                                 child: Container(
-                                    padding: EdgeInsets.only(top: 10),
+                                    padding: EdgeInsets.only(top: 0),
                                     height:50,
                                     width: 180,
                                     decoration: BoxDecoration(
@@ -304,7 +309,7 @@ String attendanceStatus='';
                                         borderRadius: BorderRadius.all(Radius.circular(14))
                                     ),
                                     child: Center(
-                                      child: Text("cancel",style: blueColorStyleMedium(18),),
+                                      child: Text("cancel",style: blueColorStyleMedium(20),),
                                     )
                                 ),
                               ),
@@ -314,7 +319,7 @@ String attendanceStatus='';
                                   addNote(userToken, noteControler.text!=null?noteControler.text:"");
                                 },
                                 child: Container(
-                                    padding: EdgeInsets.only(top: 10),
+                                    padding: EdgeInsets.only(top: 0),
                                     height:50,
                                     width: 180,
                                     decoration: BoxDecoration(
@@ -328,7 +333,7 @@ String attendanceStatus='';
                                       child: Text("save",style: TextStyle(
                                         color: Colors.white ,
                                         fontFamily: "medium",
-                                        fontSize: 18,
+                                        fontSize: 20,
                                         // fontWeight: FontWeight.bold
                                       ),),
                                     )
@@ -338,6 +343,9 @@ String attendanceStatus='';
                           ),
                         )
                       )),
+                      Padding( // this is new
+                          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)
+                      )
                     ],
                   ),
 
@@ -484,6 +492,7 @@ String attendanceStatus='';
     allList.then((value) {
       setState(() {
         if (value != null) {
+          openTellUs=false;
           if(selectedPos==1){
             attendanceStatus="Going";
           }else if(selectedPos==2){
@@ -633,7 +642,8 @@ String attendanceStatus='';
 
                             // meetingDetailsResponseModel!=null? AgendaDetailsScreen(meetingDetailsResponseModel):Container(),
 
-                            talkingPointsAgendas!=null? makeBodyTaikingPointsForMeetingDetails(widget.meetingId,context,talkingPointsAgendas):Container(),
+                            // talkingPointsAgendas!=null? makeBodyTaikingPointsForMeetingDetails(userId,widget.meetingId,context,talkingPointsAgendas):Container(),
+                            talkingPointsAgendas!=null? TalkingPointsWidget(userId,talkingPointsAgendas,widget.meetingId):Container(),
                             DescisionsWidgetScreen(decisionAgendas,widget.meetingId,talkingPointsAgendas.length),
                             ActionsWidgetScreen(actionsAgendas,widget.meetingId,talkingPointsAgendas.length+decisionAgendas.length),
                           ],
@@ -672,14 +682,14 @@ String attendanceStatus='';
                                         children: [
                                           Row(
                                             children: [
-                                              Flexible(child: Text(totalNum.toString()+" Guests - ", style: blueColorBoldStyle(20),)),
-                                              Flexible(child: Text(goingList.length.toString()+" Going - ", style: blueColorStyleregular(18),))  ,
+                                              Flexible(child: Text(totalNum.toString()+" "+AppLocalizations.of(context).lblGuests+"  - ", style: blueColorBoldStyle(20),)),
+                                              Flexible(child: Text(goingList.length.toString()+" "+AppLocalizations.of(context).lblGoingS+" - ", style: blueColorStyleregular(18),))  ,
                                             ],
                                           ),
                                           Row(
                                             children: [
-                                              Flexible(child: Text(pendingList.length.toString()+" pending - ", style: blueColorStyleregular(18),))  ,
-                                              Flexible(child: Text(notGoingList.length.toString()+" Not Going", style: blueColorStyleregular(18),))  ,
+                                              Flexible(child: Text(pendingList.length.toString()+" "+AppLocalizations.of(context).lblPendingS+" - ", style: blueColorStyleregular(18),))  ,
+                                              Flexible(child: Text(notGoingList.length.toString()+" "+AppLocalizations.of(context).lblNotGoingS+" ", style: blueColorStyleregular(18),))  ,
 
                                             ],
                                           )
@@ -971,10 +981,13 @@ String attendanceStatus='';
                                   Container(
                                     margin: EdgeInsets.only(top: 14),
                                     height: 0.3,color: grayTextColor,),
-                                  Container(
+                                  editNote==null?Container(
                                       margin: EdgeInsets.only(top: 24,left: 16,right: 16),
                                       child: Text(meetingDetailsResponseModel.note!=null&&
-                                          meetingDetailsResponseModel.note.note!=null?meetingDetailsResponseModel.note.note:"", style: blueColorStyleMedium(20),)),
+                                          meetingDetailsResponseModel.note.note!=null?meetingDetailsResponseModel.note.note:"", style: blueColorStyleMedium(20),))
+                                  :Container(
+                                margin: EdgeInsets.only(top: 24,left: 16,right: 16),
+                                child: Text(editNote, style: blueColorStyleMedium(20),)),
                                   const SizedBox(height: 20,),
                                 ],
                               ),
@@ -991,7 +1004,8 @@ String attendanceStatus='';
              isExist? Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: selectedPos==2?150:100,
+                  // height: selectedPos==2?150:100,
+                  height: openTellUs==true?150:100,
                   padding: EdgeInsets.only(bottom: 10),
                   child: SingleChildScrollView(
                     child: Column(
@@ -1008,6 +1022,7 @@ String attendanceStatus='';
                                 InkWell(
                                   onTap: () {
                                     setState(() {
+                                      openTellUs=false;
                                       selectedPos=1;
                                       attendanceStatus="Going";
                                       textColor=Color(0xff04D182);
@@ -1031,11 +1046,13 @@ String attendanceStatus='';
                                         fontSize: 22
                                     ),),
                                   ),
-                                ),InkWell(
+                                ),
+                                InkWell(
                                   onTap: () {
                                     setState(() {
                                       selectedPos=2;
                                       attendanceStatus="Not Going";
+                                      openTellUs=true;
                                       textColor=Color(0xffFF6A81);
                                       bgColor=Color(0xffFF6A81).withOpacity(0.1);
                                       // changeMeetingStatus(userToken);
@@ -1057,10 +1074,12 @@ String attendanceStatus='';
                                         fontSize: 22
                                     ),),
                                   ),
-                                ),InkWell(
+                                ),
+                                InkWell(
                                   onTap: () {
                                     setState(() {
                                       selectedPos=3;
+                                      openTellUs=false;
                                       attendanceStatus="Pending";
                                       textColor=Color(0xffFEC20E);
                                       bgColor=Color(0xffFEC20E).withOpacity(0.1);
@@ -1083,10 +1102,12 @@ String attendanceStatus='';
                                         fontSize: 22
                                     ),),
                                   ),
-                                ),InkWell(
+                                ),
+                                InkWell(
                                   onTap: () {
                                     setState(() {
                                       selectedPos=4;
+                                      openTellUs=false;
                                       attendanceStatus="Maybe";
                                       textColor=Color(0xff7F8FA4);
                                       bgColor=Color(0xff7F8FA4).withOpacity(0.1);
@@ -1115,8 +1136,9 @@ String attendanceStatus='';
                           ],
                         ),
 
-                      const SizedBox(height: 10,),
-                       selectedPos==2? Row(
+                        openTellUs==true? const SizedBox(height: 10,):Container(height: 1,),
+                       // selectedPos==2?
+                       openTellUs==true? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -1172,7 +1194,9 @@ String attendanceStatus='';
                               ),
                             )
                           ],
-                        ):Container(height: 1,),
+                        )
+                           :Container(height: 1,)
+                           // :Container(height: 1,),
                       ],
                     ),
                   ),

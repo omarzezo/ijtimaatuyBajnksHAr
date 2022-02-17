@@ -120,7 +120,7 @@ class TwoFactorAuthenticationScreenState extends State<TwoFactorAuthenticationSc
                             padding: EdgeInsets.only(left: 2,right: 2,top: 2,bottom: 2),
                             child: Align(
                               alignment: Alignment.center,
-                              child: Image.asset("assets/images/ic_extra.png",width: 26,height: 26,color: Colors.white,),
+                              child: Image.asset("assets/images/ic_extra.webp",width: 26,height: 26,color: Colors.white,),
                             ),
                           ),
                           const SizedBox(width: 20,),

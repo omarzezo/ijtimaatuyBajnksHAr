@@ -79,12 +79,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "lblChange" : MessageLookupByLibrary.simpleMessage("تغيير"),
     "lblDailyProductBoard" : MessageLookupByLibrary.simpleMessage("لوحة المنتجات اليومية"),
     "lblFilterBy" : MessageLookupByLibrary.simpleMessage("فرز بواسطة"),
-    "lblReset" : MessageLookupByLibrary.simpleMessage("إعادة ضبط"),
+    "lblReset" : MessageLookupByLibrary.simpleMessage("إعادة تعيين"),
     "lblAttendence" : MessageLookupByLibrary.simpleMessage("الحضور"),
     "lblCommittee" : MessageLookupByLibrary.simpleMessage("اللجنة"),
     "lblStatus" : MessageLookupByLibrary.simpleMessage("الحالة"),
     "lblRole" : MessageLookupByLibrary.simpleMessage("دور"),
-    "lblFilter" : MessageLookupByLibrary.simpleMessage("فلتر"),
+    "lblFilter" : MessageLookupByLibrary.simpleMessage("تنقية"),
     "lblCreateMeeting" : MessageLookupByLibrary.simpleMessage("إنشاء اجتماع"),
     "lblCancel" : MessageLookupByLibrary.simpleMessage("إلغاء"),
     "lblMeetingTitle" : MessageLookupByLibrary.simpleMessage("عنوان الاجتماع"),
@@ -94,7 +94,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "lblLocation" : MessageLookupByLibrary.simpleMessage("موقع"),
     "lblSetAs" : MessageLookupByLibrary.simpleMessage("تعيين كاجتماع افتراضي"),
     "lblCreate" : MessageLookupByLibrary.simpleMessage("إنشاء"),
-    "lblCanceled" : MessageLookupByLibrary.simpleMessage("تم الغاء"),
+    "lblCanceled" : MessageLookupByLibrary.simpleMessage("ملغاة"),
     "lblArchived" : MessageLookupByLibrary.simpleMessage("مؤرشف"),
     "lblHomeLabel" : MessageLookupByLibrary.simpleMessage("الرئيسية"),
     "lblAnalytic" : MessageLookupByLibrary.simpleMessage("تحليلي"),
@@ -183,5 +183,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "lbTwoFactor" : MessageLookupByLibrary.simpleMessage("المصادقة الثنائية"),
     "lbCheckYourSpam" : MessageLookupByLibrary.simpleMessage("تحقق من البريد الالكتروني أو أعد إرسال الرابط"),
     "lbDidNot" : MessageLookupByLibrary.simpleMessage("ألم تتلق البريد الإلكتروني؟"),
+    "lblAll" : MessageLookupByLibrary.simpleMessage("الكل"),
+    "lblDelete" : MessageLookupByLibrary.simpleMessage("حذف"),
+    "lblMonth" : MessageLookupByLibrary.simpleMessage("شهر"),
+    "lblYear" : MessageLookupByLibrary.simpleMessage("سنة"),
+    // "lblDate" : MessageLookupByLibrary.simpleMessage("اختر التاريخ"),
+
+
   };
 }

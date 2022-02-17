@@ -42,7 +42,7 @@ class SplashScreenState extends State<SplashScreen> {
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children:[
                       Container(
                         child:Image.asset(
-                          "assets/images/igtimaati_logo.png",
+                          "assets/images/igtimaati_logo.webp",
                           height:  160,
                           width: (MediaQuery.of(context).size.width/2)+60,
                         ),
@@ -62,7 +62,7 @@ class SplashScreenState extends State<SplashScreen> {
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children:[
                       Container(
                         child:Image.asset(
-                          "assets/images/igtimaati_logo.png",
+                          "assets/images/igtimaati_logo.webp",
                           height:  120,
                           width: 200,
                           fit: BoxFit.fill,

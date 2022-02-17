@@ -1212,6 +1212,8 @@ class MeetingDetailsResponseModelSubpoints {
   int _duration;
   String _description;
   User _user;
+  List<MeetingDetailsResponseModelMembersAttachments> _attachments;
+
 
   int get id => _id;
   int get meetingTalkingPointId => _meetingTalkingPointId;
@@ -1221,6 +1223,7 @@ class MeetingDetailsResponseModelSubpoints {
   int get duration => _duration;
   String get description => _description;
   User get user => _user;
+  List<MeetingDetailsResponseModelMembersAttachments> get attachments => _attachments;
 
   MeetingDetailsResponseModelSubpoints({
     int id,
@@ -1230,7 +1233,8 @@ class MeetingDetailsResponseModelSubpoints {
     String title,
     int duration,
     String description,
-    User user}){
+    User user,
+    List<MeetingDetailsResponseModelMembersAttachments> attachments,}){
     _id = id;
     _meetingTalkingPointId = meetingTalkingPointId;
     _userId = userId;
@@ -1238,6 +1242,7 @@ class MeetingDetailsResponseModelSubpoints {
     _title = title;
     _duration = duration;
     _description = description;
+    _attachments = attachments;
     _user = user;
   }
 
@@ -1251,6 +1256,12 @@ class MeetingDetailsResponseModelSubpoints {
     _duration = json['duration'];
     _description = json['description'];
     _user = json['user'] != null ? User.fromJson(json['user']) : null;
+    if (json['attachments'] != null) {
+      _attachments = [];
+      json['attachments'].forEach((v) {
+        _attachments.add(MeetingDetailsResponseModelMembersAttachments.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -1263,6 +1274,9 @@ class MeetingDetailsResponseModelSubpoints {
     map['duration'] = _duration;
     map['description'] = _description;
     map['user'] = _user;
+    if (_attachments != null) {
+      map['attachments'] = _attachments.map((v) => v.toJson()).toList();
+    }
     return map;
   }
 

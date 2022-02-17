@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/all_meetings_response.dart';
 import 'package:itimaaty/Models/calender_response_model.dart';
@@ -55,7 +55,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
               const SizedBox(width: 14,),
               Container( margin: EdgeInsets.only(top: 4),
                   child: Text(leave.startDate+" - "+leave.duration.toString()+" MIN",style: grayTextColorStyleMedium(17),)),
@@ -66,7 +66,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Image.asset("assets/images/ic_place.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_place.webp",width: 26,height: 26),),
               const SizedBox(width: 8,),
               Flexible(child: Container(
                   margin: EdgeInsets.only(top: 4),
@@ -74,7 +74,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
                     style: grayTextColorStyleMedium(17),)),),
 
               const SizedBox(width: 14,),
-              Flexible(child: Image.asset("assets/images/ic_video.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_video.webp",width: 26,height: 26),),
             ],
           ),
           const SizedBox(height: 12,),
@@ -82,7 +82,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
               // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
               const SizedBox(width: 8,),
               Container(
@@ -216,7 +216,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
               const SizedBox(width: 14,),
               Container( margin: EdgeInsets.only(top: 4),
                   child: Text(leave.startDate+" - "+leave.duration.toString()+" MIN",style: grayTextColorStyleMedium(17),)),
@@ -227,7 +227,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Image.asset("assets/images/ic_place.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_place.webp",width: 26,height: 26),),
               const SizedBox(width: 8,),
               Flexible(child: Container(
                   margin: EdgeInsets.only(top: 4),
@@ -235,7 +235,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
                     style: grayTextColorStyleMedium(17),)),),
 
               const SizedBox(width: 14,),
-              Flexible(child: Image.asset("assets/images/ic_video.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_video.webp",width: 26,height: 26),),
             ],
           ),
           const SizedBox(height: 12,),
@@ -243,7 +243,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
               // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
               const SizedBox(width: 8,),
               Container(
@@ -378,7 +378,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
               const SizedBox(width: 14,),
               Container( margin: EdgeInsets.only(top: 4),
                   child: Text(leave.startDate+" - "+leave.duration.toString()+" MIN",style: grayTextColorStyleMedium(17),)),
@@ -389,7 +389,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Image.asset("assets/images/ic_place.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_place.webp",width: 26,height: 26),),
               const SizedBox(width: 8,),
               Flexible(child: Container(
                   margin: EdgeInsets.only(top: 4),
@@ -397,7 +397,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
                     style: grayTextColorStyleMedium(17),)),),
 
               const SizedBox(width: 14,),
-              Flexible(child: Image.asset("assets/images/ic_video.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_video.webp",width: 26,height: 26),),
             ],
           ),
           const SizedBox(height: 12,),
@@ -405,7 +405,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
               // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
               const SizedBox(width: 8,),
               Container(
@@ -544,21 +544,33 @@ Widget leaveRowForTalkingpoints(BuildContext context,Talkingpoints leave,int ind
             children: [
               Text(leave.title,style: blueColorBoldStyle(16),),
               // const SizedBox(width: 14,),
-              Container(
-                margin: EdgeInsets.only(left: 4,right: 4),
-                height: 30,
-                width: 30,
-                child: CircleAvatar(
-                  radius: 30.0,
-                  backgroundImage:
-                  NetworkImage(leave.meeting!=null?
-                  leave.meeting.members[0].user!=null?
-                  leave.meeting.members[0].user.image
-                      :"https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"
-                      :"https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
-                  backgroundColor: Colors.transparent,
+              SizedBox(
+                height: 60,
+                // width: 400,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemCount: leave.meeting.members.length>=3?3:leave.meeting.members.length,
+                  itemBuilder: (context, index) {
+                    return leaveRowForMembers(leave.meeting.members[index],index);
+                  },
                 ),
               ),
+              // Container(
+              //   margin: EdgeInsets.only(left: 4,right: 4),
+              //   height: 30,
+              //   width: 30,
+              //   child: CircleAvatar(
+              //     radius: 30.0,
+              //     backgroundImage:
+              //     NetworkImage(leave.meeting!=null?
+              //     leave.meeting.members[0].user!=null?
+              //     leave.meeting.members[0].user.image
+              //         :"https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"
+              //         :"https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
+              //     backgroundColor: Colors.transparent,
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 12,),
@@ -673,20 +685,32 @@ Widget leaveRowForDecisions(BuildContext context,Decision leave,int index) {
             children: [
               Text(leave.title,style: blueColorBoldStyle(16),),
               // const SizedBox(width: 14,),
-              Container(
-                margin: EdgeInsets.only(left: 4,right: 4),
-                height: 30,
-                width: 30,
-                child: CircleAvatar(
-                  radius: 30.0,
-                  backgroundImage:
-                  NetworkImage(leave.meeting!=null?
-                  leave.meeting.members[0].user!=null?leave.meeting.members[0].user.image:
-                  "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg":
-                  "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
-                  backgroundColor: Colors.transparent,
+              SizedBox(
+                height: 60,
+                // width: 400,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemCount: leave.meeting.members.length>=3?3:leave.meeting.members.length,
+                  itemBuilder: (context, index) {
+                    return leaveRowForMembers(leave.meeting.members[index],index);
+                  },
                 ),
-              ),
+              )
+              // Container(
+              //   margin: EdgeInsets.only(left: 4,right: 4),
+              //   height: 30,
+              //   width: 30,
+              //   child: CircleAvatar(
+              //     radius: 30.0,
+              //     backgroundImage:
+              //     NetworkImage(leave.meeting!=null?
+              //     leave.meeting.members[0].user!=null?leave.meeting.members[0].user.image:
+              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg":
+              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
+              //     backgroundColor: Colors.transparent,
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 12,),
@@ -801,20 +825,32 @@ Widget leaveRowForActions(BuildContext context,ActionResponse leave,int index) {
             children: [
               Text(leave.title,style: blueColorBoldStyle(16),),
               // const SizedBox(width: 14,),
-              Container(
-                margin: EdgeInsets.only(left: 4,right: 4),
-                height: 30,
-                width: 30,
-                child: CircleAvatar(
-                  radius: 30.0,
-                  backgroundImage:
-                  NetworkImage(leave.meeting!=null?
-                  leave.meeting.members[0].user!=null?leave.meeting.members[0].user.image:
-                  "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg":
-                  "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
-                  backgroundColor: Colors.transparent,
+              SizedBox(
+                height: 60,
+                // width: 400,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemCount: leave.meeting.members.length>=3?3:leave.meeting.members.length,
+                  itemBuilder: (context, index) {
+                    return leaveRowForMembers(leave.meeting.members[index],index);
+                  },
                 ),
-              ),
+              )
+              // Container(
+              //   margin: EdgeInsets.only(left: 4,right: 4),
+              //   height: 30,
+              //   width: 30,
+              //   child: CircleAvatar(
+              //     radius: 30.0,
+              //     backgroundImage:
+              //     NetworkImage(leave.meeting!=null?
+              //     leave.meeting.members[0].user!=null?leave.meeting.members[0].user.image:
+              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg":
+              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
+              //     backgroundColor: Colors.transparent,
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: 12,),
@@ -1251,7 +1287,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                         crossAxisAlignment: CrossAxisAlignment.center,
                         // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+                          Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
                           const SizedBox(width: 14,),
                           Container( margin: EdgeInsets.only(top: 4),
                               child: Text(leave.startDate+" - "+leave.duration.toString()+" MIN",style: grayTextColorStyleMedium(17),)),
@@ -1262,7 +1298,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                         crossAxisAlignment: CrossAxisAlignment.center,
                         // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Flexible(child: Image.asset("assets/images/ic_place.png",width: 26,height: 26),),
+                          Flexible(child: Image.asset("assets/images/ic_place.webp",width: 26,height: 26),),
                           const SizedBox(width: 8,),
                           Flexible(child: Container(
                               margin: EdgeInsets.only(top: 4),
@@ -1270,7 +1306,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                                 style: grayTextColorStyleMedium(17),)),),
 
                           const SizedBox(width: 14,),
-                          Flexible(child: Image.asset("assets/images/ic_video.png",width: 26,height: 26),),
+                          Flexible(child: Image.asset("assets/images/ic_video.webp",width: 26,height: 26),),
                         ],
                       ),),
                       const SizedBox(height: 16,),
@@ -1278,7 +1314,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                         crossAxisAlignment: CrossAxisAlignment.center,
                         // mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+                          Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
                           // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
                           const SizedBox(width: 8,),
                           Container(

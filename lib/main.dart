@@ -781,12 +781,12 @@ Future<void> configLoading() async {
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..textColor=whiteColor
-    ..progressColor = whiteColor
-    ..backgroundColor = yellowColor
-    ..indicatorColor = whiteColor
-    ..textColor = whiteColor
+    ..progressColor = Colors.black
+    ..backgroundColor = Colors.white
+    ..indicatorColor = Colors.black
+    ..textColor = Colors.black
     ..maskColor = Colors.blue.withOpacity(0.5)
-    ..userInteractions = true
+    ..userInteractions = false
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
 
@@ -805,10 +805,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
+    // SystemChrome.setPreferredOrientations([
+    //   DeviceOrientation.landscapeRight,
+    //   DeviceOrientation.landscapeLeft,
+    // ]);
 
     return BlocProvider(
       create: (BuildContext context) => AppCubit()

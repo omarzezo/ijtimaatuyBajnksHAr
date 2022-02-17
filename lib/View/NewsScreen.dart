@@ -9,6 +9,7 @@ import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:itimaaty/View/NewsDetailsScreen.dart';
 import 'package:intl/intl.dart';
 
+import '../VideoExample.dart';
 import 'DrawerWidget.dart';
 import 'FontsStyle.dart';
 import 'SignInScreen.dart';
@@ -48,33 +49,51 @@ class NewsScreenState extends State<NewsScreen> {
     });
   }
 
+  void getNewsData2(String token){
+    // load();
+    newsRepository=NewsRepository();
+    Future<List<NewsResponseModel>> newsData = newsRepository.getNewsData(token);
+    newsData.then((value) {
+      if(value!=null) {
+        // showSuccess();
+        setState(() {
+          newsList = value;
+        });
+      }else{
+        // showError();
+        if(value==null){
+          navigateAndFinish(context, SignInScreen());
+        }
+      }
+    });
+  }
   void makeLike(String token,id){
-    load();
+    // load();
     newsRepository=NewsRepository();
     Future<LikedResponseModel> like = newsRepository.makeLike(token,id);
     like.then((value) {
       setState(() {
        if(value!=null){
-         showSuccess();
-         getNewsData(token);
+         // showSuccess();
+         getNewsData2(token);
        }else{
-         showError();
+         // showError();
        }
       });
     });
   }
 
   void makeDisLike(String token,id){
-    load();
+    // load();
     newsRepository=NewsRepository();
     Future<LikedResponseModel> like = newsRepository.makeDisLike(token,id);
     like.then((value) {
       setState(() {
         if(value!=null){
-          showSuccess();
-          getNewsData(token);
+          // showSuccess();
+          getNewsData2(token);
         }else{
-          showError();
+          // showError();
         }
       });
     });
@@ -107,9 +126,24 @@ class NewsScreenState extends State<NewsScreen> {
   }
 
   Widget myRow(NewsResponseModel model){
+
+    String img='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png';
+    if(model.imageUrl!=null&&!model.imageUrl.contains('.mp4')){
+      img=model.imageUrl;
+    }else{
+      if(model.gallery!=null&&model.gallery.isNotEmpty){
+        for(int i=0;i<model.gallery.length;i++){
+          if(model.gallery[i].image!=null&&!model.gallery[i].image.contains('.mp4')){
+            img=model.gallery[i].image;
+            break;
+          }
+        }
+      }
+    }
     return InkWell(
       onTap: () {
         navigateTo(context, NewsDetailsScreen(model.id));
+        // navigateTo(context,  ChewieDemo());
       },
       child: Container(
           width: 200,
@@ -125,9 +159,12 @@ class NewsScreenState extends State<NewsScreen> {
               children:  [
 
                 Image(image:  NetworkImage
-                  (model.imageUrl!=null?
-                model.imageUrl:
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
+                  (img),
+                //     model.imageUrl!=null?
+                //     !model.imageUrl.contains('mp4')?model.imageUrl:
+                //     model.gallery!=null&&model.gallery.isNotEmpty?model.gallery[1].image:
+                // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"),
                   width: double.infinity,height: 245,fit: BoxFit.cover,),
                 const SizedBox(height: 25),
                 Padding(

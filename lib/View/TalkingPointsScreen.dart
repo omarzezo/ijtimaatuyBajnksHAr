@@ -7,6 +7,7 @@ import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/AddCommentRequestModel.dart';
 import 'package:itimaaty/Models/AddCommentResponseModel.dart';
 import 'package:itimaaty/Models/AttendenceModel.dart';
+import 'package:itimaaty/Models/DeleteCommentResponse.dart';
 import 'package:itimaaty/Models/UsersAndComments.dart';
 import 'package:itimaaty/Models/add_note_request_model.dart';
 import 'package:itimaaty/Models/add_note_response_model.dart';
@@ -77,13 +78,13 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
 
   
   void getDescisionData(String token) {
-    load();
+    // load();
     meetingRepository = new MeetingRepository();
     Future<TalkingPointsResponseModel> allList = meetingRepository.getTalikingPointsData(token,widget.meetingId,widget.decisionId);
     allList.then((value) {
       setState(() {
         if (value != null) {
-          showSuccess();
+          // showSuccess();
           userAndCommentsList.clear();
           decisonResponseModel = value;
 
@@ -94,6 +95,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
               // print("commentsIs>>"+ decisonResponseModel.comments[i].user_name.toString());
               userAndCommentsList.add(TalkingPointsComments(
                   comment: decisonResponseModel.comments[i].comment,
+                  id:decisonResponseModel.comments[i].id ,
                   // img: i<decisonResponseModel.participants.length?decisonResponseModel.participants[i].user.image:"",
                   user_image: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
                   user_name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
@@ -109,7 +111,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
           }
           print("dfdfdfdfdfdfdfdfd");
         }else{
-          showError();
+          // showError();
           if(value==null){
             navigateAndFinish(context, SignInScreen());
           }
@@ -139,6 +141,117 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
         }
       });
     });
+  }
+
+  void deleteComment(String token, int id) {
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(id,token);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+
+          showSuccessMsg("Deleted Successfully");
+          getDescisionData(userToken);
+         
+        }else{
+          showError();
+          if(value==null){
+            showErrorWithMsg('this item not deleted');
+            // navigateAndFinish(context, SignInScreen());
+          }
+        }
+      });
+    });
+  }
+  
+  Widget makeBodyForTalkingPointsComments(BuildContext context, List<TalkingPointsComments> activityList,int lenght){
+    return activityList!=null&&activityList.isNotEmpty?
+    ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: activityList.length,
+      itemBuilder: (context, index) {
+        return leaveRowForTalkingPointsComments(context,activityList[index],index);
+      },
+    ):Container();
+  }
+
+  Widget leaveRowForTalkingPointsComments(BuildContext context,TalkingPointsComments leave,int index) {
+    return InkWell(
+      onTap: () {
+
+        print(""+leave.id.toString());
+      },
+      child: Container(
+        margin: EdgeInsets.only(top: 10),
+        child:Container(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              ClipOval(
+                  child:
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.red,
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundImage: NetworkImage(
+                          leave.user_image==null?
+                          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                          leave.user_image
+                        // leave.img!=null?!leave.img.contains(".html")?leave.img:
+                        // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                        // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+                      ),
+                    ),
+                  )
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 14,right: 14),
+                padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
+                decoration: BoxDecoration(
+                    color:Color(0xffF7F7F8),
+                    borderRadius: new BorderRadius.circular(14.0),
+                    border: Border.all(
+                        color: Color(0xffF7F7F8),// set border color
+                        width: 2.0
+                    )
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(leave.user_name!=null?leave.user_name:"",style: blueColorBoldStyle(18),),
+                        // Text("",style: blueColorBoldStyle(18),),
+                        const SizedBox(width: 12,),
+                        Container(height: 20,width: 1,color: grayTextColor,),
+                        const SizedBox(width: 12,),
+                        Text(leave.createdAt!=null?getFormattedDate(stringToDateTime(leave.createdAt)):"",style: blueColorStyleMedium(16),),
+                      ],
+                    ),
+                    const SizedBox(height: 6,),
+                    Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
+                    const SizedBox(height: 10,),
+                    InkWell(
+                      onTap: () {
+                        deleteComment(userToken, leave.id);
+                      },
+                      child:Text(AppLocalizations.of(context).lblDelete,style: blueColorBoldStyle(16),) ,
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -185,7 +298,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                           },
                           child: Icon(Icons.chevron_left,color: Colors.black,size: 40,)),
 
-                      Image.asset("assets/images/ic_talkingpoint.png",width: 24,height: 24,color: Colors.black,),
+                      Image.asset("assets/images/ic_talkingpoint.webp",width: 24,height: 24,color: Colors.black,),
 
                       Container(
                         child: Text(
@@ -413,7 +526,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                                       const SizedBox(height: 14,),
 
                                       decisonResponseModel.attachments!=null?
-                                      makeBodyForAttachmentsTalkingPoints(context, decisonResponseModel.attachments, 0):Container()
+                                      makeBodyForAttachmentsTalkingPoints("talking",widget.meetingId,widget.decisionId,context, decisonResponseModel.attachments, 0):Container()
                                     ],
                                   ),
                                 ],

@@ -8,6 +8,8 @@ import 'package:itimaaty/network/end_points.dart';
 import 'package:itimaaty/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 
+import '../Models/DeleteCommentResponse.dart';
+
 class NewsRepository {
   DioHelper _helper = DioHelper();
 
@@ -85,5 +87,18 @@ class NewsRepository {
       print("kkkkkkkkkkkkkk"+e.toString());
     }
     return response==null?null:AddCommentResponseModel.fromJson(response);
+  }
+
+  Future<DeleteCommentResponse> deleteComment(int id,String token) async {
+    var response ;
+    print("UrlIs>>"+BASE_URL + DELETE_COMMENT+id.toString());
+    try{
+      Map<String, String> headers = {"Content-type": "application/json",
+        'token': token};
+      response = await DioHelper.deleteWithToken(DELETE_COMMENT+"/"+id.toString(),token);
+    }catch (e){
+      print("kkkkkkkkkkkkkk"+e.toString());
+    }
+    return response==null?null:DeleteCommentResponse.fromJson(response);
   }
 }

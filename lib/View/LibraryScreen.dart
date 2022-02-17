@@ -109,13 +109,13 @@ class LibraryScreenState extends State<LibraryScreen> {
     List<DataCell>dtsList=[];
     String icon='';
     if(cells.name.contains('pdf')){
-      icon="assets/images/ic_pdf.png";
+      icon="assets/images/ic_pdf.webp";
     }else if(cells.name.contains('docx')){
-      icon="assets/images/ic_word.png";
+      icon="assets/images/ic_word.webp";
     }else if(cells.name.contains('pot')){
-      icon="assets/images/ic_power_point.png";
+      icon="assets/images/ic_power_point.webp";
     }else{
-      icon="assets/images/ic_folder.png";
+      icon="assets/images/ic_folder.webp";
     }
       dtsList.add(DataCell(Row(
         // mainAxisAlignment: MainAxisAlignment.,
@@ -137,13 +137,13 @@ class LibraryScreenState extends State<LibraryScreen> {
     List<DataCell>dtsList=[];
     String icon='';
     if(files.name.contains('pdf')){
-      icon="assets/images/ic_pdf.png";
+      icon="assets/images/ic_pdf.webp";
     }else if(files.name.contains('docx')||files.name.contains('doc')){
-      icon="assets/images/ic_word.png";
+      icon="assets/images/ic_word.webp";
     }else if(files.name.contains('pot')){
-      icon="assets/images/ic_power_point.png";
+      icon="assets/images/ic_power_point.webp";
     }else{
-      icon="assets/images/ic_folder.png";
+      icon="assets/images/ic_folder.webp";
     }
     dtsList.add(DataCell(Row(
       mainAxisAlignment: MainAxisAlignment.start,

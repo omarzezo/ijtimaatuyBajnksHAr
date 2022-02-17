@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/ActionsScreen.dart';
-import 'package:itimaaty/Models/UsersAndComments.dart';
 import 'package:itimaaty/Models/actions_response_model.dart';
 import 'package:itimaaty/Models/decison_response_model.dart';
 import 'package:itimaaty/Models/metting_details_response_model.dart';
@@ -13,7 +11,7 @@ import 'package:itimaaty/View/DecisionsScreen.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/View/MeetingDetailsScreen.dart';
 import 'package:itimaaty/View/TalkingPointsScreen.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 Widget leaveRowForMembers(MeetingDetailsResponseModelMembers leave,int index) {
   return
@@ -90,10 +88,10 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
               const SizedBox(width: 14,),
               Container( margin: EdgeInsets.only(top: 4),
-                  child: Text((leave.startDate!=null?leave.startDate:"")+" - "+leave.duration.toString()+" MIN",style: grayTextColorStyleMedium(18),)),
+                  child: Text((leave.startDate!=null?leave.startDate:"")+" - "+(leave.duration!=null?leave.duration.toString():"")+" MIN",style: grayTextColorStyleMedium(18),)),
             ],
           ),
           const SizedBox(height: 12,),
@@ -101,7 +99,7 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Flexible(child: Image.asset("assets/images/ic_place.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_place.webp",width: 26,height: 26),),
               const SizedBox(width: 8,),
               Flexible(child: Container(
                   margin: EdgeInsets.only(top: 4),
@@ -109,7 +107,7 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
                     style: grayTextColorStyleMedium(18),)),),
 
               const SizedBox(width: 14,),
-              Flexible(child: Image.asset("assets/images/ic_video.png",width: 26,height: 26),),
+              Flexible(child: Image.asset("assets/images/ic_video.webp",width: 26,height: 26),),
             ],
           ),
           const SizedBox(height: 12,),
@@ -117,7 +115,7 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
             crossAxisAlignment: CrossAxisAlignment.center,
             // mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+              Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
               // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
               const SizedBox(width: 8,),
               Container(
@@ -202,7 +200,9 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
   );
 }
 
-Widget decisionsForMeetingDetailsForTalkingPoint(BuildContext context,int meetingId,int index, String stauss,MeetingDetailsResponseModelDecisions leave) {
+
+Widget decisionsForMeetingDetailsForTalkingPoint(int userId,BuildContext context,int meetingId,int index, String stauss,List<MeetingDetailsResponseModelDecisions> desisionssList) {
+
   // print("statusIs111111>>"+leave.stauss);
   // if(leave.stauss!=null) {
   //   if (leave.stauss == "Approved" || leave.stauss == "Approve") {
@@ -216,291 +216,343 @@ Widget decisionsForMeetingDetailsForTalkingPoint(BuildContext context,int meetin
   //   }
   // }
 
-  int num=0;
-  if(leave.voters!=null&&leave.voters.isNotEmpty){
-    if(leave.voters.length>4){
-      num=leave.voters.length-3;
-    }
-  }
 
-  String getFormattedDateNew(DateTime day) {
-    // print("")
-    String formattedDate1 = DateFormat('yyyy-MM-dd kk:mm a','en').format(day);
-    // String formattedDate1 = DateFormat('yyyy-MM-ddTkk:mm').format(day);
-    // print("")
-    String formattedDate =
-        getDoubleDigit(day.day.toString()) + " " +
-            getDoubleDigit(monthNames[day.month-1]) + " " +
-            getDoubleDigit(day.year.toString())+" "+formattedDate1;
 
-    return formattedDate1;
-  }
-  DateTime stringToDateTimeNew(String dateString){
-    DateTime dateTime = DateTime.parse(dateString);
-    return dateTime;
-  }
-  Color colorStatus=Colors.green;
-  return InkWell(
-    onTap: () async {
-      // Navigator.pop(context);
-      // String  test = await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>DecisionsScreen(leave.meetingId,leave.id,leave.stauss)));
-      String  test = await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>DecisionsScreen(meetingId,leave.id,"Approved")));
-      if(test!=null){
-        // setState(() {
-        //   status=test;
-        //   // leave.setStauss=test;
-        //   // leave.stauss=test;
-        //   print("testIs>>"+test.toString());
-        // });
-      }
-      // navigateTo(context, DecisionsScreen(leave.meetingId,leave.id,leave.stauss));
-    },
 
-    child: Container(
-      margin: EdgeInsets.only(top: 20),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: new BorderRadius.circular(14.0),
-          border: Border.all(
-              color: grayRoundedColor,// set border color
-              width: 2.0
-          )
-      ),
-      child:Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        // mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    // width: 30,
-                    // height: 30,
-                    padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom:6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        stops: [0.1, 0.9],
-                        colors: [
-                          Color(0xffFEC20E).withOpacity(0.1),
-                          Color(0xffFEC20E).withOpacity(0.1),
-                        ],
-                      ),
-                    ),
-                    child: Center(child: Text(index.toString()+".1", style: yellowColorStyleBold(22),)),
-                  ),
-                  const SizedBox(width: 6,),
-                  Container(
-                    // width: 250,
-                    padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 8),
-                    decoration: BoxDecoration(
-                        color: Color(0xffe8eaed),
-                        border: Border.all(
-                          color: Color(0xffe8eaed),
-                        ),
-                        borderRadius: BorderRadius.circular(20)
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset("assets/images/ic_decisions.png",width: 24,height: 24,color: Colors.black,),
-                        const SizedBox(width: 14,),
-                        Container( margin: EdgeInsets.only(top: 4),
-                            child: Text(AppLocalizations.of(context).lblDesisions,style: grayTextColorStyleMedium(20),)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: Image.asset("assets/images/ic_drag.png",width: 30,height: 30)),
-            ],
-          ),
-          const SizedBox(height: 20,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 12,right: 12,top: 8,bottom: 2),
-                decoration: BoxDecoration(
-                    color: colorStatus.withOpacity(0.1),
-                    border: Border.all(
-                      color: colorStatus.withOpacity(0.1),
-                    ),
-                    borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
-                ),
-                child: Text((leave.deadline!=null?getFormattedDateNew(stringToDateTimeNew(leave.deadline)):""),style:  TextStyle(
-                  color: colorStatus ,
-                  fontFamily: "black",
-                  fontSize: 20,
-                ),),
-                // child: Text(("leave.deadline"),style: grayTextColorStyleMedium(20),),
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    height: 60,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemCount:leave.voters.length>3?3: leave.voters.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.only(left: 2,right: 2),
-                          child: ClipOval(
-                              child:
-                              CircleAvatar(
-                                radius: 26,
-                                backgroundColor: Colors.red,
-                                child: CircleAvatar(
-                                  radius: 26,
-                                  backgroundImage: NetworkImage(
-                                    leave.voters!=null&&leave.voters[index].user!=null?
-                                    leave.voters[index].user.image!=null?leave.voters[index].user.image:
-                                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-                                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-                                  ),
-                                ),
-                              )
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  num<4 ?Container():Container(
-                    // width: 30,
-                    // height: 30,
-                    padding: EdgeInsets.only(left: 12,right: 12,top: 16,bottom:12),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        stops: [0.1, 0.9],
-                        colors: [
-                          Color(0xffFEC20E),
-                          Color(0xffFEC20E),
-                        ],
-                      ),
-                    ),
-                    child: Center(child: Text("+"+num.toString(), style: TextStyle(
-                      color: Colors.white ,
-                      fontFamily: "black",
-                      fontSize: 20,
-                      // fontWeight: FontWeight.bold
-                    ),)),
+  return desisionssList!=null&&desisionssList.isNotEmpty?
+  SizedBox(
+    // height: 60,
+    // width: 200,
+      child:ListView.builder(
+        scrollDirection: Axis.vertical,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: desisionssList.length,
+        itemBuilder: (context, index) {
+          MeetingDetailsResponseModelDecisions leave=desisionssList[index];
+          String status;
+          int num=0;
+          if(leave.voters!=null&&leave.voters.isNotEmpty){
+            if(leave.voters.length>4){
+              num=leave.voters.length-3;
+            }
+          }
+          print("userId>>>"+userId.toString());
+          if(leave.voters!=null&&leave.voters.isNotEmpty){
+            for(int i=0;i<leave.voters.length;i++){
+              if(userId==leave.voters[i].userId){
+                status=leave.voters[i].vote;
+                break;
+              }else{
+              }
+            }
+          }
+          if(status==null){
+            status=leave.voters[0].vote;
+          }
+          Color colorStatus=Colors.green;
+          if (status == "Approved") {
+            status=AppLocalizations.of(context).lblApproved;
+            colorStatus = Colors.green;
+          } else if (status == "Abstained") {
+            status=AppLocalizations.of(context).lblAbstained;
+            colorStatus = Color(0xff0C64F9);
+          } else if (status == "Denied" || status == "Rejected") {
+            status=AppLocalizations.of(context).lblRejected;
+            colorStatus = Color(0xffFF6A81);
+          } else if (status == "Pending") {
+            status=AppLocalizations.of(context).lblPendingS;
+            colorStatus = Color(0xffFEC20E);
+          }
+
+          String getFormattedDateNew(DateTime day) {
+            // print("")
+            String formattedDate1 = DateFormat('yyyy-MM-dd kk:mm a','en').format(day);
+            // String formattedDate1 = DateFormat('yyyy-MM-ddTkk:mm').format(day);
+            // print("")
+            String formattedDate =
+                getDoubleDigit(day.day.toString()) + " " +
+                    getDoubleDigit(monthNames[day.month-1]) + " " +
+                    getDoubleDigit(day.year.toString())+" "+formattedDate1;
+
+            return formattedDate1;
+          }
+          DateTime stringToDateTimeNew(String dateString){
+            DateTime dateTime = DateTime.parse(dateString);
+            return dateTime;
+          }
+
+          return InkWell(
+            onTap: () async {
+              // Navigator.pop(context);
+              // String  test = await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>DecisionsScreen(leave.meetingId,leave.id,leave.stauss)));
+              String  test = await Navigator.of(context).push(MaterialPageRoute(builder: (context) =>DecisionsScreen(meetingId,leave.id,"Approved")));
+              if(test!=null){
+                // setState(() {
+                //   status=test;
+                //   // leave.setStauss=test;
+                //   // leave.stauss=test;
+                //   print("testIs>>"+test.toString());
+                // });
+              }
+              // navigateTo(context, DecisionsScreen(leave.meetingId,leave.id,leave.stauss));
+            },
+
+            child: Container(
+              margin: EdgeInsets.only(top: 20),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.circular(14.0),
+                  border: Border.all(
+                      color: grayRoundedColor,// set border color
+                      width: 2.0
                   )
+              ),
+              child:Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            // width: 30,
+                            // height: 30,
+                            padding: EdgeInsets.only(left: 14,right: 14,top: 10,bottom:6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              gradient: LinearGradient(
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
+                                stops: [0.1, 0.9],
+                                colors: [
+                                  Color(0xffFEC20E).withOpacity(0.1),
+                                  Color(0xffFEC20E).withOpacity(0.1),
+                                ],
+                              ),
+                            ),
+                            child: Center(child: Text("1."+(index+1).toString(), style: yellowColorStyleBold(22),)),
+                          ),
+                          const SizedBox(width: 6,),
+                          Container(
+                            // width: 250,
+                            padding: EdgeInsets.only(left: 16,right: 16,top: 10,bottom: 8),
+                            decoration: BoxDecoration(
+                                color: Color(0xffe8eaed),
+                                border: Border.all(
+                                  color: Color(0xffe8eaed),
+                                ),
+                                borderRadius: BorderRadius.circular(20)
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset("assets/images/ic_decisions.webp",width: 24,height: 24,color: Colors.black,),
+                                const SizedBox(width: 14,),
+                                Container( margin: EdgeInsets.only(top: 4),
+                                    child: Text(AppLocalizations.of(context).lblDesisions,style: grayTextColorStyleMedium(20),)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                          margin: EdgeInsets.only(bottom: 10),
+                          child: Image.asset("assets/images/ic_drag.webp",width: 30,height: 30)),
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(left: 12,right: 12,top: 8,bottom: 2),
+                        decoration: BoxDecoration(
+                            color: colorStatus.withOpacity(0.1),
+                            border: Border.all(
+                              color: colorStatus.withOpacity(0.1),
+                            ),
+                            borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
+                        ),
+                        child: Text((leave.deadline!=null?getFormattedDateNew(stringToDateTimeNew(leave.deadline)):""),style:  TextStyle(
+                          color: colorStatus ,
+                          fontFamily: "black",
+                          fontSize: 20,
+                        ),),
+                        // child: Text(("leave.deadline"),style: grayTextColorStyleMedium(20),),
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            height: 60,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              itemCount:leave.voters.length>3?3: leave.voters.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: EdgeInsets.only(left: 2,right: 2),
+                                  child: ClipOval(
+                                      child:
+                                      CircleAvatar(
+                                        radius: 26,
+                                        backgroundColor: Colors.red,
+                                        child: CircleAvatar(
+                                          radius: 26,
+                                          backgroundImage: NetworkImage(
+                                            leave.voters!=null&&leave.voters[index].user!=null?
+                                            leave.voters[index].user.image!=null?leave.voters[index].user.image:
+                                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                                            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+                                          ),
+                                        ),
+                                      )
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          num<4 ?Container():Container(
+                            // width: 30,
+                            // height: 30,
+                            padding: EdgeInsets.only(left: 12,right: 12,top: 16,bottom:12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              gradient: LinearGradient(
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
+                                stops: [0.1, 0.9],
+                                colors: [
+                                  Color(0xffFEC20E),
+                                  Color(0xffFEC20E),
+                                ],
+                              ),
+                            ),
+                            child: Center(child: Text("+"+num.toString(), style: TextStyle(
+                              color: Colors.white ,
+                              fontFamily: "black",
+                              fontSize: 20,
+                              // fontWeight: FontWeight.bold
+                            ),)),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 20,),
+                  Text(leave.title!=null?leave.title:"",
+                    style: blueColorBoldStyle(20),),
+                  const SizedBox(height: 10,),
+                  Text(leave.description!=null?leave.description:"",
+                    style: blueColorStyleMedium(18),),
+
+                  const SizedBox(height: 20,),
+                  leave.attachments!=null&&leave.attachments.isNotEmpty? SizedBox(
+                      height: 60,
+                      // width: 200,
+                      child:ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
+                        itemCount: leave.attachments.length,
+                        itemBuilder: (context, index) {
+                          return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
+                        },
+                      )
+                  ):Container(),
+
+                  const SizedBox(height: 20,),
+                  // leave.subpoints!=null&&leave.subpoints.isNotEmpty?
+                  // SizedBox(
+                  //   // height: 60,
+                  //   // width: 200,
+                  //     child:ListView.builder(
+                  //       scrollDirection: Axis.vertical,
+                  //       shrinkWrap: true,
+                  //       physics: const NeverScrollableScrollPhysics(),
+                  //       itemCount: leave.subpoints.length,
+                  //       itemBuilder: (context, index) {
+                  //         return leaveRowForSubPoints(leave.subpoints[index],index,index,context);
+                  //       },
+                  //     )
+                  // ):Container(),
+                  //
+                  // leave.subpoints!=null&&leave.subpoints.isNotEmpty?  const SizedBox(height: 20,):const SizedBox(height: 0,),
+
+                  status!=null?
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 13,
+                                height: 13,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: colorStatus),
+                              ),
+                              const SizedBox(width: 10,),
+                              Container(
+                                margin: EdgeInsets.only(top: 4),
+
+                                child: Text(status!=null?status:"",style: TextStyle(
+                                // child: Text("",style: TextStyle(
+                                  color: colorStatus ,
+                                  fontFamily: "black",
+                                  // fontWeight: FontWeight.bold,
+                                  fontSize: 22,
+                                )),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4,),
+                          Container(
+                              child: Text(("My Decision"),style: grayTextColorStyleMedium(20),))
+                        ],
+                      ),
+                      InkWell(
+                        onTap: () {
+                          // openBottomSheetChangeVote("date", leave.id);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(left: 60,right: 60,top: 24,bottom: 20),
+                          decoration: BoxDecoration(
+                              color: Color(0xffe8eaed),
+                              border: Border.all(
+                                color: Color(0xffe8eaed),
+                              ),
+                              borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
+                          ),
+                          child: Text(AppLocalizations.of(context).lblChange,style: grayTextColorStyleBlack(22),),
+                        ),
+                      )
+                    ],
+                  )
+                      : const SizedBox(height: 1,),
+
                 ],
-              )
-            ],
-          ),
-          const SizedBox(height: 20,),
-          Text(leave.title!=null?leave.title:"",
-            style: blueColorBoldStyle(20),),
-          const SizedBox(height: 10,),
-          Text(leave.description!=null?leave.description:"",
-            style: blueColorStyleMedium(18),),
+              ),
+            ),
+          );
+        },
+      )
+  ):Container();
 
-          const SizedBox(height: 20,),
-          leave.attachments!=null&&leave.attachments.isNotEmpty? SizedBox(
-              height: 60,
-              // width: 200,
-              child:ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: leave.attachments.length,
-                itemBuilder: (context, index) {
-                  return leaveRowForAttachments(leave.attachments[index],index,context);
-                },
-              )
-          ):Container(),
 
-          const SizedBox(height: 20,),
-          // leave.subpoints!=null&&leave.subpoints.isNotEmpty?
-          // SizedBox(
-          //   // height: 60,
-          //   // width: 200,
-          //     child:ListView.builder(
-          //       scrollDirection: Axis.vertical,
-          //       shrinkWrap: true,
-          //       physics: const NeverScrollableScrollPhysics(),
-          //       itemCount: leave.subpoints.length,
-          //       itemBuilder: (context, index) {
-          //         return leaveRowForSubPoints(leave.subpoints[index],index,index,context);
-          //       },
-          //     )
-          // ):Container(),
-          //
-          // leave.subpoints!=null&&leave.subpoints.isNotEmpty?  const SizedBox(height: 20,):const SizedBox(height: 0,),
 
-          // leave.stauss!=null? Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   crossAxisAlignment: CrossAxisAlignment.center,
-          //   children: [
-          //     Column(
-          //       children: [
-          //         Row(
-          //           crossAxisAlignment: CrossAxisAlignment.center,
-          //           children: [
-          //             Container(
-          //               width: 13,
-          //               height: 13,
-          //               decoration: BoxDecoration(
-          //                   shape: BoxShape.circle,
-          //                   color: colorStatus),
-          //             ),
-          //             const SizedBox(width: 10,),
-          //             Container(
-          //               margin: EdgeInsets.only(top: 4),
-          //               child: Text(leave.stauss!=null?leave.stauss:"",style: TextStyle(
-          //                 color: colorStatus ,
-          //                 fontFamily: "black",
-          //                 // fontWeight: FontWeight.bold,
-          //                 fontSize: 22,
-          //               )),
-          //             ),
-          //           ],
-          //         ),
-          //         const SizedBox(height: 4,),
-          //         Container(
-          //             child: Text(("My Decision"),style: grayTextColorStyleMedium(20),))
-          //       ],
-          //     ),
-          //     InkWell(
-          //       onTap: () {
-          //         // openBottomSheetChangeVote("date", leave.id);
-          //       },
-          //       child: Container(
-          //         padding: EdgeInsets.only(left: 60,right: 60,top: 24,bottom: 20),
-          //         decoration: BoxDecoration(
-          //             color: Color(0xffe8eaed),
-          //             border: Border.all(
-          //               color: Color(0xffe8eaed),
-          //             ),
-          //             borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
-          //         ),
-          //         child: Text(AppLocalizations.of(context).lblChange,style: grayTextColorStyleBlack(22),),
-          //       ),
-          //     )
-          //   ],
-          // ): const SizedBox(height: 1,),
-
-        ],
-      ),
-    ),
-  );
 }
 
 // Widget taikingPointsForMeetingDetails(BuildContext context,MeetingDetailsResponseModelTalkingpoints leave,int parentIndex) {
-Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData leave,int parentIndex) {
+Widget taikingPointsForMeetingDetails(int userId,int id,BuildContext context,AgendasData leave,int parentIndex) {
   return InkWell(
     onTap: () {
       print("kkkkkk");
@@ -564,7 +616,7 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Image.asset("assets/images/ic_talkingpoint.png",width: 24,height: 24,color: Colors.black,),
+                            Image.asset("assets/images/ic_talkingpoint.webp",width: 24,height: 24,color: Colors.black,),
                             const SizedBox(width: 14,),
                             Container( margin: EdgeInsets.only(top: 4),
                                 // child: Text(AppLocalizations.of(context).lblTalkingPoints,style: grayTextColorStyleMedium(20),)),
@@ -576,7 +628,7 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
                   ),
                   Container(
                       margin: EdgeInsets.only(bottom: 10),
-                      child: Image.asset("assets/images/ic_drag.png",width: 30,height: 30)),
+                      child: Image.asset("assets/images/ic_drag.webp",width: 30,height: 30)),
                 ],
               ),
               const SizedBox(height: 20,),
@@ -595,10 +647,15 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
               Text(leave.title!=null?leave.title:"",
                 style: blueColorBoldStyle(20),),
               const SizedBox(height: 10,),
-              Text(leave.description!=null?leave.description:"",
-                style: blueColorStyleMedium(18),),
 
-              const SizedBox(height: 20,),
+              Container(
+                width: MediaQuery.of(context).size.width/2,
+                child: Text(leave.description!=null?leave.description:"",
+                  style: blueColorStyleMedium(18),),
+              ),
+
+              leave.attachments!=null&&leave.attachments.isNotEmpty?
+              const SizedBox(height: 20,):const SizedBox(height: 0,),
 
               leave.attachments!=null&&leave.attachments.isNotEmpty? SizedBox(
                 height: 60,
@@ -608,7 +665,7 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
                   shrinkWrap: true,
                   itemCount: leave.attachments.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForAttachments(leave.attachments[index],index,context);
+                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
                   },
                 )
               ):Container(),
@@ -616,6 +673,7 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
               const SizedBox(height: 20,),
 
               leave.subpoints!=null&&leave.subpoints.isNotEmpty?
+
               SizedBox(
                   // height: 60,
                   // width: 200,
@@ -625,7 +683,8 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: leave.subpoints.length,
                     itemBuilder: (context, index) {
-                      return leaveRowForSubPoints(leave.subpoints[index],parentIndex,index,context);
+                      // leave.subpoints[0].
+                      return leaveRowForSubPoints(leave.meetingId,leave.subpoints[index],parentIndex,index,context);
                     },
                   )
               ):Container()
@@ -635,7 +694,9 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
         ),
 
         leave.decisions!=null&&leave.decisions.isNotEmpty?
-        decisionsForMeetingDetailsForTalkingPoint(context,leave.meetingId, parentIndex+1, "stauss", leave.decisions[0]):
+//            لانتلا
+        // decisionsForMeetingDetailsForTalkingPoint(context,leave.meetingId, parentIndex+1, "stauss", leave.decisions[0]):
+        decisionsForMeetingDetailsForTalkingPoint(userId,context,leave.meetingId, parentIndex+1, "stauss", leave.decisions):
             Container()
       ],
     ),
@@ -643,7 +704,7 @@ Widget taikingPointsForMeetingDetails(int id,BuildContext context,AgendasData le
 }
 
 // Widget makeBodyTaikingPointsForMeetingDetails(BuildContext context,List<MeetingDetailsResponseModelTalkingpoints> desisionssList){
-Widget makeBodyTaikingPointsForMeetingDetails(int id, BuildContext context,List<AgendasData> desisionssList){
+Widget makeBodyTaikingPointsForMeetingDetails(int userId,int id, BuildContext context,List<AgendasData> desisionssList){
   return desisionssList!=null&&desisionssList.isNotEmpty?
   SizedBox(
     // height: 60,
@@ -654,41 +715,44 @@ Widget makeBodyTaikingPointsForMeetingDetails(int id, BuildContext context,List<
         physics: const NeverScrollableScrollPhysics(),
         itemCount: desisionssList.length,
         itemBuilder: (context, index) {
-          return taikingPointsForMeetingDetails(id,context,desisionssList[index],index);
+          return taikingPointsForMeetingDetails(userId,id,context,desisionssList[index],index);
         },
       )
   ):Container();
 }
 
-Widget leaveRowForAttachments(MeetingDetailsResponseModelMembersAttachments leave,int index,BuildContext context) {
+Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachments leave,int index,BuildContext context) {
   String url;
   // print("fileUrl>>"+leave.);
-  String icon="assets/images/ic_word.png";
+  String icon="assets/images/ic_word.webp";
   if(leave.library!=null&&leave.library.name!=null) {
     print("fileUrl>>"+"http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString()+'&e=1');
      url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
-      icon = "assets/images/ic_pdf.png";
+      icon = "assets/images/ic_pdf.webp";
     } else if (leave.library.name.contains('docx')) {
-      icon = "assets/images/ic_word.png";
+      icon = "assets/images/ic_word.webp";
     } else if (leave.library.name.contains('pot')) {
-      icon = "assets/images/ic_power_point.png";
+      icon = "assets/images/ic_power_point.webp";
     } else {
-      icon = "assets/images/ic_folder.png";
+      icon = "assets/images/ic_pdf.webp";
+      // icon = "assets/images/ic_folder.webp";
     }
   }
   return leave.library!=null?InkWell(
     onTap: () {
-      print("UrlL>"+url.toString());
-      print("UrlL>"+leave.library.fileUrl.toString());
+      print("UrlhhhL>"+leave.library.name);
+      // print("UrlLhhh>"+leave.library.id.toString());
+      // print("UrlLhhh>"+leave.library.fileUrl.toString());
       // launch(url);
-      // showDocument(leave.library.fileUrl.toString(),context);
+      // Navigator.pop(context);
+      showDocument("meeting",0,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
 
     },
     child: Container(
         margin: EdgeInsets.only(left: 10,right: 10),
-      // width: 340,
-        padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
+        // width: 200,
+        padding: EdgeInsets.only(top: 10,bottom: 10,left: 20,right: 40),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: new BorderRadius.circular(14.0),
@@ -701,7 +765,7 @@ Widget leaveRowForAttachments(MeetingDetailsResponseModelMembersAttachments leav
         Image.asset(icon,width: 26,height: 26),
         const SizedBox(width: 14,),
         Container(
-            margin: EdgeInsets.only(top: 6),
+            margin: EdgeInsets.only(top: 4),
             child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),))
       ],
     ),
@@ -714,7 +778,7 @@ Widget leaveRowForAttachments(MeetingDetailsResponseModelMembersAttachments leav
 // _____________________________________________________________________________
 
 
-Widget leaveRowForSubPoints(MeetingDetailsResponseModelSubpoints leave,int parentIndex,int index,BuildContext context) {
+Widget leaveRowForSubPoints(int meetingId,MeetingDetailsResponseModelSubpoints leave,int parentIndex,int index,BuildContext context) {
   return Container(
     // padding: EdgeInsets.all(16),
     // decoration: BoxDecoration(
@@ -796,7 +860,19 @@ Widget leaveRowForSubPoints(MeetingDetailsResponseModelSubpoints leave,int paren
         ],
       ),
       const SizedBox(height: 4,),
-      Text(leave.description!=null?leave.description:"",style: blueColorStyleregular(20),)
+      Text(leave.description!=null?leave.description:"",style: blueColorStyleregular(20),),
+      leave.attachments!=null&&leave.attachments.isNotEmpty? SizedBox(
+          height: 60,
+          // width: 200,
+          child:ListView.builder(
+            scrollDirection: Axis.horizontal,
+            shrinkWrap: true,
+            itemCount: leave.attachments.length,
+            itemBuilder: (context, index) {
+              return leaveRowForAttachments(meetingId,leave.attachments[index],index,context);
+            },
+          )
+      ):Container()
     ],
   ),
   );
@@ -914,8 +990,11 @@ Widget leaveRowForTalikingPoints(BuildContext context,TalkingPointsResponseModel
           style: blueColorBoldStyle(20),),
         const SizedBox(height: 18,),
 
-        Text(leave.description!=null?leave.description:
-        " description",style: blueColorStyleMedium(18),),
+        Container(
+          width: MediaQuery.of(context).size.width/2,
+          child: Text(leave.description!=null?leave.description:
+          " description",style: blueColorStyleMedium(18),),
+        ),
 
         const SizedBox(height: 12,),
         Container(
@@ -951,7 +1030,7 @@ Widget leaveRowForTalikingPoints(BuildContext context,TalkingPointsResponseModel
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+            Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
             // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
             const SizedBox(width: 8,),
             Container(
@@ -995,7 +1074,7 @@ Widget leaveRowForDecision(BuildContext context,DecisonResponseModel leave,int i
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+            Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
             const SizedBox(width: 14,),
             Container( margin: EdgeInsets.only(top: 4),
                 child: Text((leave.deadline!=null?leave.deadline:"")+" - "+leave.deadline.toString()+" MIN",style: grayTextColorStyleMedium(18),)),
@@ -1022,7 +1101,7 @@ Widget leaveRowForDecision(BuildContext context,DecisonResponseModel leave,int i
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+            Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
             // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
             const SizedBox(width: 8,),
             Container(
@@ -1067,7 +1146,7 @@ Widget leaveRowForActionsDetails(BuildContext context,ActionsResponseModel leave
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/ic_date.png",width: 26,height: 26),
+            Image.asset("assets/images/ic_date.webp",width: 26,height: 26),
             const SizedBox(width: 14,),
             Container( margin: EdgeInsets.only(top: 4),
                 child: Text((leave.openTill!=null?leave.openTill:"")+" - "+leave.openTill.toString()+" MIN",style: grayTextColorStyleMedium(18),)),
@@ -1094,7 +1173,7 @@ Widget leaveRowForActionsDetails(BuildContext context,ActionsResponseModel leave
           crossAxisAlignment: CrossAxisAlignment.center,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/ic_committee.png",width: 26,height: 26),
+            Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
             // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
             const SizedBox(width: 8,),
             Container(
@@ -1110,78 +1189,7 @@ Widget leaveRowForActionsDetails(BuildContext context,ActionsResponseModel leave
   );
 }
 
-Widget makeBodyForUsersComments(BuildContext context, List<UsersAndComments> activityList,int lenght){
-  return activityList!=null&&activityList.isNotEmpty?
-  ListView.builder(
-    scrollDirection: Axis.vertical,
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: activityList.length,
-    itemBuilder: (context, index) {
-      return leaveRowForUsersComments(context,activityList[index],index);
-    },
-  ):Container();
-}
 
-Widget leaveRowForUsersComments(BuildContext context,UsersAndComments leave,int index) {
-  return Container(
-    margin: EdgeInsets.only(top: 10),
-    child:Container(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          ClipOval(
-              child:
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.red,
-                child: CircleAvatar(
-                  radius: 22,
-                  backgroundImage: NetworkImage(
-                    leave.img!=null?!leave.img.contains(".html")?leave.img:
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-                  ),
-                ),
-              )
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 14,right: 14),
-            padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
-            decoration: BoxDecoration(
-                color:Color(0xffF7F7F8),
-                borderRadius: new BorderRadius.circular(14.0),
-                border: Border.all(
-                    color: Color(0xffF7F7F8),// set border color
-                    width: 2.0
-                )
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(leave.name!=null?leave.name:"",style: blueColorBoldStyle(18),),
-                    const SizedBox(width: 12,),
-                    Container(height: 20,width: 1,color: grayTextColor,),
-                    const SizedBox(width: 12,),
-                    Text(leave.date!=null?getFormattedDate(stringToDateTime(leave.date)):"",style: blueColorStyleMedium(16),),
-                  ],
-                ),
-                const SizedBox(height: 6,),
-                Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
-
-              ],
-            ),
-          )
-        ],
-      ),
-    ),
-  );
-}
 
 // ____________________________________________________________
 
@@ -1192,109 +1200,33 @@ Widget leaveRowForUsersComments(BuildContext context,UsersAndComments leave,int 
 
 
 
-Widget makeBodyForTalkingPointsComments(BuildContext context, List<TalkingPointsComments> activityList,int lenght){
-  return activityList!=null&&activityList.isNotEmpty?
-  ListView.builder(
-    scrollDirection: Axis.vertical,
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    itemCount: activityList.length,
-    itemBuilder: (context, index) {
-      return leaveRowForTalkingPointsComments(context,activityList[index],index);
-    },
-  ):Container();
-}
-
-Widget leaveRowForTalkingPointsComments(BuildContext context,TalkingPointsComments leave,int index) {
-  return Container(
-    margin: EdgeInsets.only(top: 10),
-    child:Container(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          ClipOval(
-              child:
-              CircleAvatar(
-                radius: 22,
-                backgroundColor: Colors.red,
-                child: CircleAvatar(
-                  radius: 22,
-                  backgroundImage: NetworkImage(
-                      leave.user_image==null?
-                      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-                          leave.user_image
-                    // leave.img!=null?!leave.img.contains(".html")?leave.img:
-                    // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-                    // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-                  ),
-                ),
-              )
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 14,right: 14),
-            padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
-            decoration: BoxDecoration(
-                color:Color(0xffF7F7F8),
-                borderRadius: new BorderRadius.circular(14.0),
-                border: Border.all(
-                    color: Color(0xffF7F7F8),// set border color
-                    width: 2.0
-                )
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(leave.user_name!=null?leave.user_name:"",style: blueColorBoldStyle(18),),
-                    // Text("",style: blueColorBoldStyle(18),),
-                    const SizedBox(width: 12,),
-                    Container(height: 20,width: 1,color: grayTextColor,),
-                    const SizedBox(width: 12,),
-                    Text(leave.createdAt!=null?getFormattedDate(stringToDateTime(leave.createdAt)):"",style: blueColorStyleMedium(16),),
-                  ],
-                ),
-                const SizedBox(height: 6,),
-                Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
-
-              ],
-            ),
-          )
-        ],
-      ),
-    ),
-  );
-}
-
 
 
 // _______________________________________________________
 
 
 
-Widget leaveRowForAttachmentsTalkingPoints(TalkingPointsAttachments leave,int index,BuildContext context) {
+Widget leaveRowForAttachmentsTalkingPoints(String type,int subId,int id,TalkingPointsAttachments leave,int index,BuildContext context) {
   String url;
   // print("fileUrl>>"+leave.);
-  String icon="assets/images/ic_word.png";
+  String icon="assets/images/ic_word.webp";
   if(leave.library!=null&&leave.library.name!=null) {
     // print("fileUrl>>"+"http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString());
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
-      icon = "assets/images/ic_pdf.png";
+      icon = "assets/images/ic_pdf.webp";
     } else if (leave.library.name.contains('docx')) {
-      icon = "assets/images/ic_word.png";
+      icon = "assets/images/ic_word.webp";
     } else if (leave.library.name.contains('pot')) {
-      icon = "assets/images/ic_power_point.png";
+      icon = "assets/images/ic_power_point.webp";
     } else {
-      icon = "assets/images/ic_folder.png";
+      icon = "assets/images/ic_folder.webp";
     }
   }
   return leave.library!=null?InkWell(
     onTap: () {
-      showDocument(leave.library.fileUrl.toString(),context);
+      // Navigator.pop(context);
+      showDocument(type,subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
       // launch(url);
     },
     child: Container(
@@ -1321,7 +1253,7 @@ Widget leaveRowForAttachmentsTalkingPoints(TalkingPointsAttachments leave,int in
   ):const SizedBox();
 }
 
-Widget makeBodyForAttachmentsTalkingPoints(BuildContext context, List<TalkingPointsAttachments> activityList,int lenght){
+Widget makeBodyForAttachmentsTalkingPoints(String type,int id,int subId,BuildContext context, List<TalkingPointsAttachments> activityList,int lenght){
   return activityList!=null&&activityList.isNotEmpty? SizedBox(
       height: 60,
       width: MediaQuery.of(context).size.width/2+100,
@@ -1330,7 +1262,7 @@ Widget makeBodyForAttachmentsTalkingPoints(BuildContext context, List<TalkingPoi
         shrinkWrap: true,
         itemCount: activityList.length,
         itemBuilder: (context, index) {
-          return leaveRowForAttachmentsTalkingPoints(activityList[index],index,context);
+          return leaveRowForAttachmentsTalkingPoints(type,subId,id,activityList[index],index,context);
         },
       )
   ):Container();
@@ -1339,40 +1271,42 @@ Widget makeBodyForAttachmentsTalkingPoints(BuildContext context, List<TalkingPoi
 
 // ________________________________________________________
 
-Widget makeBodyForAttachmentsDecisions(BuildContext context, List<DecisonResponseModelAttachments> activityList,int lenght){
+Widget makeBodyForAttachmentsDecisions(String type, int subId,int id,BuildContext context, List<DecisonResponseModelAttachments> activityList,int lenght){
   return activityList!=null&&activityList.isNotEmpty? SizedBox(
       height: 60,
+      width: MediaQuery.of(context).size.width/2+100,
       child:ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
         itemCount: activityList.length,
         itemBuilder: (context, index) {
-          return leaveRowForAttachmentsDecisions(activityList[index],index,context);
+          return leaveRowForAttachmentsDecisions("decisions",subId,id,activityList[index],index,context);
         },
       )
   ):Container();
 }
-Widget leaveRowForAttachmentsDecisions(DecisonResponseModelAttachments leave,int index,BuildContext context) {
+Widget leaveRowForAttachmentsDecisions(String type, int subId,int id,DecisonResponseModelAttachments leave,int index,BuildContext context) {
   String url;
   // print("fileUrl>>"+leave.);
-  String icon="assets/images/ic_word.png";
+  String icon="assets/images/ic_word.webp";
   if(leave.library!=null&&leave.library.name!=null) {
     // print("fileUrl>>"+"http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString());
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
-      icon = "assets/images/ic_pdf.png";
+      icon = "assets/images/ic_pdf.webp";
     } else if (leave.library.name.contains('docx')) {
-      icon = "assets/images/ic_word.png";
+      icon = "assets/images/ic_word.webp";
     } else if (leave.library.name.contains('pot')) {
-      icon = "assets/images/ic_power_point.png";
+      icon = "assets/images/ic_power_point.webp";
     } else {
-      icon = "assets/images/ic_folder.png";
+      icon = "assets/images/ic_folder.webp";
     }
   }
   return leave.library!=null?InkWell(
     onTap: () {
       // launch(url);
-      showDocument(leave.library.fileUrl.toString(),context);
+      // Navigator.pop(context);
+      showDocument("decisions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
     },
     child: Container(
       margin: EdgeInsets.only(left: 10,right: 10),
@@ -1453,7 +1387,7 @@ Widget leaveRowForSubPointsForTalkingPoint(TalkingPointsSubpoints leave,int pare
             Row(
               children: [
                 Container(
-                  // width: 30,
+                  // width: 130,
                   // height: 30,
                   padding: EdgeInsets.only(left: 7,right: 7,top: 7,bottom:3),
                   decoration: BoxDecoration(
@@ -1476,10 +1410,12 @@ Widget leaveRowForSubPointsForTalkingPoint(TalkingPointsSubpoints leave,int pare
                     // fontWeight: FontWeight.bold
                   ),)),
                 ),
-                const SizedBox(width: 6,),
+                const SizedBox(width: 16,),
                 Container(
+                  width:MediaQuery.of(context).size.width/3 -200,
                     margin: EdgeInsets.only(top: 10),
-                    child: Text(leave.title!=null?leave.title:"",style: blueColorStyleMedium(22),))
+                    child: Text(leave.title!=null?leave.title:"",style: blueColorStyleMedium(22),
+                    ))
               ],
             ),
           ],
@@ -1517,40 +1453,42 @@ Widget makeBodyForSubPointsTalkingPoints(BuildContext context, List<TalkingPoint
 
 // ________________________________________________________
 
-Widget makeBodyForAttachmentsActions(BuildContext context, List<ActionsResponseModelAttachments> activityList,int lenght){
+Widget makeBodyForAttachmentsActions(String type, int subId,int id,BuildContext context, List<ActionsResponseModelAttachments> activityList,int lenght){
   return activityList!=null&&activityList.isNotEmpty? SizedBox(
       height: 60,
+      width: MediaQuery.of(context).size.width/2+100,
       child:ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
         itemCount: activityList.length,
         itemBuilder: (context, index) {
-          return leaveRowForAttachmentsActions(activityList[index],index,context);
+          return leaveRowForAttachmentsActions("actions",subId,id,activityList[index],index,context);
         },
       )
   ):Container();
 }
-Widget leaveRowForAttachmentsActions(ActionsResponseModelAttachments leave,int index,BuildContext context) {
+Widget leaveRowForAttachmentsActions(String type, int subId,int id,ActionsResponseModelAttachments leave,int index,BuildContext context) {
   String url;
   // print("fileUrl>>"+leave.);
-  String icon="assets/images/ic_word.png";
+  String icon="assets/images/ic_word.webp";
   if(leave.library!=null&&leave.library.name!=null) {
     // print("fileUrl>>"+"http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString());
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
-      icon = "assets/images/ic_pdf.png";
+      icon = "assets/images/ic_pdf.webp";
     } else if (leave.library.name.contains('docx')) {
-      icon = "assets/images/ic_word.png";
+      icon = "assets/images/ic_word.webp";
     } else if (leave.library.name.contains('pot')) {
-      icon = "assets/images/ic_power_point.png";
+      icon = "assets/images/ic_power_point.webp";
     } else {
-      icon = "assets/images/ic_folder.png";
+      icon = "assets/images/ic_folder.webp";
     }
   }
   return leave.library!=null?InkWell(
     onTap: () {
       // launch(url);
-      showDocument(leave.library.fileUrl.toString(),context);
+      // Navigator.pop(context);
+      showDocument("actions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
     },
     child: Container(
       margin: EdgeInsets.only(left: 10,right: 10),

@@ -39,3 +39,6 @@ const CALENDER = 'calender';
 const AUTH_VERIFICATION = 'auth_verification';
 const TWO_AUTH_FACTOR = 'two_auth_factor';
 const String GOOGLE_MAPS_API_KEY = "AIzaSyDh_fIvktqV36c8vbnByoxqxGpLLvBtzYU";
+// const String UPDATE_FILE = "library/update";
+const String UPDATE_FILE = "library/edited_file";
+const String DELETE_COMMENT = "deleteComment";

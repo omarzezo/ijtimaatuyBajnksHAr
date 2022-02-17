@@ -14,6 +14,11 @@ class AllStatusResponse {
   String get bgcolor => _bgcolor;
   String get color => _color;
 
+
+  set name(String value) {
+    _name = value;
+  }
+
   AllStatusResponse({
       int id, 
       String name, 

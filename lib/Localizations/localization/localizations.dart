@@ -343,8 +343,15 @@ String get lblChange{
     return Intl.message('lbDidNot', name: 'lbDidNot');
   }String get lbCheckYourSpam{
     return Intl.message('lbCheckYourSpam', name: 'lbCheckYourSpam');
+  }String get lblAll{
+    return Intl.message('lblAll', name: 'lblAll');
+  }String get lblDelete{
+    return Intl.message('lblDelete', name: 'lblDelete');
+  }String get lblMonth{
+    return Intl.message('lblMonth', name: 'lblMonth');
+  }String get lblYear{
+    return Intl.message('lblYear', name: 'lblYear');
   }
-
 }
 
 class SpecificLocalizationDelegate

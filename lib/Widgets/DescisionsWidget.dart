@@ -34,7 +34,8 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
   int userId=0;
   MeetingRepository meetingRepository;
   String status;
-  List<String> votesList =["Approved","Pending","Rejected","Abstained"];
+  // List<String> votesList =["Approved","Pending","Rejected","Abstained"];
+  List<String> votesList=[] ;
   String votesValue;
   var voteControler= TextEditingController();
   Color colorStatus=Colors.green;
@@ -166,7 +167,7 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset("assets/images/ic_decisions.png",width: 24,height: 24,color: Colors.black,),
+                          Image.asset("assets/images/ic_decisions.webp",width: 24,height: 24,color: Colors.black,),
                           const SizedBox(width: 14,),
                           Container( margin: EdgeInsets.only(top: 4),
                               child: Text(AppLocalizations.of(context).lblDesisions,style: grayTextColorStyleMedium(20),)),
@@ -177,7 +178,7 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                 ),
                 Container(
                     margin: EdgeInsets.only(bottom: 10),
-                    child: Image.asset("assets/images/ic_drag.png",width: 30,height: 30)),
+                    child: Image.asset("assets/images/ic_drag.webp",width: 30,height: 30)),
               ],
             ),
             const SizedBox(height: 20,),
@@ -275,7 +276,7 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                   shrinkWrap: true,
                   itemCount: leave.attachments.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForAttachments(leave.attachments[index],index,context);
+                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
                   },
                 )
             ):Container(),
@@ -291,13 +292,14 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: leave.subpoints.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForSubPoints(leave.subpoints[index],parentIndex,index,context);
+                    return leaveRowForSubPoints(leave.meetingId,leave.subpoints[index],parentIndex,index,context);
                   },
                 )
             ):Container(),
             leave.subpoints!=null&&leave.subpoints.isNotEmpty?  const SizedBox(height: 20,):const SizedBox(height: 0,),
 
-            leave.stauss!=null? Row(
+            leave.stauss!=null?
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -332,7 +334,7 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                 ),
                 InkWell(
                   onTap: () {
-                    openBottomSheetChangeVote("date", leave.id);
+                    openBottomSheetChangeVote("date", leave.id,context);
                   },
                   child: Container(
                     padding: EdgeInsets.only(left: 60,right: 60,top: 24,bottom: 20),
@@ -347,7 +349,8 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
                   ),
                 )
               ],
-            ): const SizedBox(height: 1,),
+            )
+                : const SizedBox(height: 1,),
 
           ],
         ),
@@ -421,235 +424,486 @@ class DescisionsWidgetScreenState extends State<DescisionsWidgetScreen> {
     });
   }
 
-  void openBottomSheetChangeVote(String date, int decisionId){
+  void openBottomSheetChangeVote(String date, int decisionId,BuildContext _context){
+    votesValue=null;
+    voteControler.text="";
     showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
-        context: context,
+        context: _context,
         backgroundColor: Colors.transparent,
         builder: (BuildContext bc) {
           return StatefulBuilder( builder: (BuildContext context, StateSetter setStateee /*You can rename this!*/) {
             return Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(_context).size.height,
+              width: MediaQuery.of(_context).size.width,
               color: Colors.transparent,
-              child: Padding(
-                padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*(2/3)),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.white,
-                  width: MediaQuery.of(context).size.width - 200,
-                  child:
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(height:40 ,),
-                      Container(
-                        margin:EdgeInsets.only(left: 20,right: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                                child:Text("Decisions",style: TextStyle(
-                                  color: blueColor ,
-                                  fontFamily: "black",
-                                  fontSize: 24,
-                                  // fontWeight: FontWeight.bold
-                                ),)
-                            ),
-                            InkWell(
-                                onTap:(){
-                                  Navigator.pop(context);
-                                },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 14),
-                        height: 0.3,color: grayTextColor,),
-
-                      Container(
-                          margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
-                          child: Text("My Decision",style: blueColorStyleMedium(18),)),
-
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.only(left: 20,right: 20),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: new BorderRadius.circular(10.0),
-                            border: Border.all(
-                                color: grayRoundedColor,// set border color
-                                width: 3.0
-                            )
-                        ),
-                        // height: 56,
-                        padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
-                        child:DropdownButton<String>(
-                          isExpanded: true,
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                          iconSize: 22,
-                          elevation: 16,
-                          style: blueColorStyleMedium(20),
-                          underline: Container(
-                            height: 0,
-                            color: Colors.transparent,
-                          ),
-                          onChanged: (String value) {
-                            setStateee(() {
-                              votesValue=value;
-                              // committeeId=value.id.toString();
-                            });
-                          },
-                          value: votesValue,
-                          items: votesList.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.only(left: 4,right: 4),
-                                    width: 13,
-                                    height: 13,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: value=="Approved"?Colors.green:value=="Rejected"?Colors.red:
-                                        value=="Pending"?yellowColor:value=="Abstained"?Colors.blueAccent:Colors.green
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4,),
-                                  Container(
-                                      margin: EdgeInsets.only(top: 10),
-                                      child: Text(value)),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-
-                      Container(
-                          margin:EdgeInsets.only(left: 20,right: 20,top:30),
-                          child: Text("Reason",style: blueColorStyleMedium(18),)),
-
-
-                      Container(
-                        height: 120,
-                        margin:EdgeInsets.only(left: 20,right: 20,top:10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: new BorderRadius.circular(18.0),
-                            border: Border.all(
-                                color: grayRoundedColor,// set border color
-                                width: 3.0
-                            )
-                        ),
-                        child: TextField(
-                            controller: voteControler,
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            style: blueColorStyleMedium(20),
-                            decoration: new InputDecoration(
-                              border: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              errorBorder: InputBorder.none,
-                              disabledBorder: InputBorder.none,
-                              contentPadding:
-                              EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                            )
-                        ) ,
-                      ),
-
-                      Expanded(
-                          child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child:Container(
-                                margin: EdgeInsets.only(bottom: 20),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.only(top: 10,bottom: 3),
-                                          height:50,
-                                          width: 180,
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: blueColor,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14))
-                                          ),
-                                          child: Center(
-                                            child: Text("cancel",style: blueColorStyleMedium(18),),
-                                          )
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10,),
-                                    InkWell(
-                                      onTap: () {
-                                        if(votesValue!=null) {
-                                          if(voteControler!=null&&voteControler.text.isNotEmpty) {
-                                            changeVote(decisionId,userToken,votesValue, voteControler.text != null ? voteControler.text : "",
-                                            );
-                                          }else{
-                                            if(votesValue=="Approved"){
-                                              changeVote(decisionId,userToken,votesValue, voteControler.text != null ? voteControler.text : "",
-                                              );
-                                            }else{
-                                              showErrorWithMsg("Please Enter Reason");
-                                            }
-                                          }
-                                        }else{
-                                          showErrorWithMsg("Please Choose Vote");
-                                        }
-                                      },
-                                      child: Container(
-                                          padding: EdgeInsets.only(top: 10,bottom: 3),
-                                          height:50,
-                                          width: 180,
-                                          decoration: BoxDecoration(
-                                              color: yellowColor,
-                                              border: Border.all(
-                                                color: yellowColor,
-                                              ),
-                                              borderRadius: BorderRadius.all(Radius.circular(14))
-                                          ),
-                                          child: Center(
-                                            child: Text("Confirm",style: TextStyle(
-                                              color: Colors.white ,
-                                              fontFamily: "medium",
-                                              fontSize: 18,
-                                              // fontWeight: FontWeight.bold
-                                            ),),
-                                          )
-                                      ),
-                                    ),
-                                  ],
+              child:  Row(
+                children: [
+                  Expanded(flex:4,child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(color: Colors.transparent,))),
+                  Expanded(
+                    flex:2,
+                    child: Container(
+                      // height: MediaQuery.of(context).size.height,
+                      color: Colors.white,
+                      // width: MediaQuery.of(context).size.width - 200,
+                      child:
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(height:40 ,),
+                          Container(
+                            margin:EdgeInsets.only(left: 20,right: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                    child:Text(AppLocalizations.of(_context).lblDecisions,style: TextStyle(
+                                      color: blueColor ,
+                                      fontFamily: "black",
+                                      fontSize: 24,
+                                      // fontWeight: FontWeight.bold
+                                    ),)
                                 ),
-                              )
-                          )),
-                    ],
-                  ),
+                                InkWell(
+                                    onTap:(){
+                                      Navigator.pop(context);
+                                    },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(top: 14),
+                            height: 0.3,color: grayTextColor,),
 
-                ),
+                          Container(
+                              margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
+                              child: Text(AppLocalizations.of(_context).lblMyDecision,style: blueColorStyleMedium(18),)),
+
+                          Container(
+                            width: MediaQuery.of(_context).size.width,
+                            margin: EdgeInsets.only(left: 20,right: 20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(10.0),
+                                border: Border.all(
+                                    color: grayRoundedColor,// set border color
+                                    width: 3.0
+                                )
+                            ),
+                            // height: 56,
+                            padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
+                            child:DropdownButton<String>(
+                              isExpanded: true,
+                              icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                              iconSize: 22,
+                              elevation: 16,
+                              style: blueColorStyleMedium(20),
+                              underline: Container(
+                                height: 0,
+                                color: Colors.transparent,
+                              ),
+                              onChanged: (String value) {
+                                setStateee(() {
+                                  votesValue=value;
+                                });
+                              },
+                              value: votesValue,
+                              items: votesList.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(left: 4,right: 4,top: 6),
+                                        width: 13,
+                                        height: 13,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: value==AppLocalizations.of(_context).lblApproved?Colors.green:
+                                            value==AppLocalizations.of(_context).lblRejected?Colors.red:
+                                            value==AppLocalizations.of(_context).lblPendingS?yellowColor:
+                                            value==AppLocalizations.of(_context).lblAbstained?Colors.blueAccent:Colors.green
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4,),
+                                      Container(
+                                          margin: EdgeInsets.only(top: 0),
+                                          child: Text(value)),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+                          Container(
+                              margin:EdgeInsets.only(left: 20,right: 20,top:30),
+                              child: Text(AppLocalizations.of(_context).lblReason,style: blueColorStyleMedium(18),)),
+
+
+                          Container(
+                            height: 120,
+                            margin:EdgeInsets.only(left: 20,right: 20,top:10),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(18.0),
+                                border: Border.all(
+                                    color: grayRoundedColor,// set border color
+                                    width: 3.0
+                                )
+                            ),
+                            child: TextField(
+                                controller: voteControler,
+                                maxLines: null,
+                                keyboardType: TextInputType.multiline,
+                                style: blueColorStyleMedium(20),
+                                decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  contentPadding:
+                                  EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                                )
+                            ) ,
+                          ),
+
+                          Expanded(
+                              child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child:Container(
+                                    margin: EdgeInsets.only(bottom: 20),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              height:50,
+                                              width: 180,
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: blueColor,
+                                                  ),
+                                                  borderRadius: BorderRadius.all(Radius.circular(14))
+                                              ),
+                                              child: Center(
+                                                child: Text(AppLocalizations.of(_context).lblCancel,style: blueColorStyleMedium(18),),
+                                              )
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10,),
+                                        InkWell(
+                                          onTap: () {
+                                            String votesValue2;
+                                            if (votesValue == AppLocalizations.of(_context).lblApproved) {
+                                              votesValue2="Approved";
+                                            } else if (votesValue == AppLocalizations.of(_context).lblAbstained) {
+                                              votesValue2="Abstained";
+                                            } else if (votesValue == AppLocalizations.of(_context).lblPendingS) {
+                                              votesValue2="Pending";
+                                            }else if (votesValue == AppLocalizations.of(_context).lblRejected) {
+                                              votesValue2="Rejected";
+                                            }
+                                            if(votesValue!=null) {
+                                              if(voteControler!=null&&voteControler.text.isNotEmpty) {
+                                                changeVote(decisionId,userToken,votesValue2, voteControler.text != null ? voteControler.text : "",
+                                                );
+                                              }else{
+                                                if(votesValue2=="Approved"){
+                                                  changeVote(decisionId,userToken,votesValue2, voteControler.text != null ? voteControler.text : "",
+                                                  );
+                                                }else{
+                                                  showErrorWithMsg("Please Enter Reason");
+                                                }
+                                              }
+                                            }else{
+                                              showErrorWithMsg("Please Choose Vote");
+                                            }
+                                          },
+                                          child: Container(
+                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              height:50,
+                                              width: 180,
+                                              decoration: BoxDecoration(
+                                                  color: yellowColor,
+                                                  border: Border.all(
+                                                    color: yellowColor,
+                                                  ),
+                                                  borderRadius: BorderRadius.all(Radius.circular(14))
+                                              ),
+                                              child: Center(
+                                                child: Text(AppLocalizations.of(_context).lblConfirm,style: TextStyle(
+                                                  color: Colors.white ,
+                                                  fontFamily: "medium",
+                                                  fontSize: 18,
+                                                  // fontWeight: FontWeight.bold
+                                                ),),
+                                              )
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              )),
+                        ],
+                      ),
+
+                    ),
+                  ),
+                ],
               ),
             );
           },);
         });
   }
+  // void openBottomSheetChangeVote(String date, int decisionId){
+  //   showModalBottomSheet(
+  //       isScrollControlled: true,
+  //       isDismissible: false,
+  //       context: context,
+  //       backgroundColor: Colors.transparent,
+  //       builder: (BuildContext bc) {
+  //         return StatefulBuilder( builder: (BuildContext context, StateSetter setStateee /*You can rename this!*/) {
+  //           return Container(
+  //             height: MediaQuery.of(context).size.height,
+  //             width: MediaQuery.of(context).size.width,
+  //             color: Colors.transparent,
+  //             child: Padding(
+  //               padding: EdgeInsets.only(left: MediaQuery.of(context).size.width*(2/3)),
+  //               child: Container(
+  //                 height: MediaQuery.of(context).size.height,
+  //                 color: Colors.white,
+  //                 width: MediaQuery.of(context).size.width - 200,
+  //                 child:
+  //                 Column(
+  //                   mainAxisAlignment: MainAxisAlignment.start,
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     Container(height:40 ,),
+  //                     Container(
+  //                       margin:EdgeInsets.only(left: 20,right: 20),
+  //                       child: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         crossAxisAlignment: CrossAxisAlignment.center,
+  //                         children: [
+  //                           Container(
+  //                               child:Text("Decisions",style: TextStyle(
+  //                                 color: blueColor ,
+  //                                 fontFamily: "black",
+  //                                 fontSize: 24,
+  //                                 // fontWeight: FontWeight.bold
+  //                               ),)
+  //                           ),
+  //                           InkWell(
+  //                               onTap:(){
+  //                                 Navigator.pop(context);
+  //                               },child: Icon(Icons.clear,size: 30,color: grayTextColor,)),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     Container(
+  //                       margin: EdgeInsets.only(top: 14),
+  //                       height: 0.3,color: grayTextColor,),
+  //
+  //                     Container(
+  //                         margin:EdgeInsets.only(left: 20,right: 20,top:30,bottom: 20),
+  //                         child: Text("My Decision",style: blueColorStyleMedium(18),)),
+  //
+  //                     Container(
+  //                       width: MediaQuery.of(context).size.width,
+  //                       margin: EdgeInsets.only(left: 20,right: 20),
+  //                       decoration: BoxDecoration(
+  //                           color: Colors.white,
+  //                           borderRadius: new BorderRadius.circular(10.0),
+  //                           border: Border.all(
+  //                               color: grayRoundedColor,// set border color
+  //                               width: 3.0
+  //                           )
+  //                       ),
+  //                       // height: 56,
+  //                       padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
+  //                       child:DropdownButton<String>(
+  //                         isExpanded: true,
+  //                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
+  //                         iconSize: 22,
+  //                         elevation: 16,
+  //                         style: blueColorStyleMedium(20),
+  //                         underline: Container(
+  //                           height: 0,
+  //                           color: Colors.transparent,
+  //                         ),
+  //                         onChanged: (String value) {
+  //                           setStateee(() {
+  //                             votesValue=value;
+  //                             // committeeId=value.id.toString();
+  //                           });
+  //                         },
+  //                         value: votesValue,
+  //                         items: votesList.map((String value) {
+  //                           return DropdownMenuItem<String>(
+  //                             value: value,
+  //                             child: Row(
+  //                               mainAxisAlignment: MainAxisAlignment.start,
+  //                               crossAxisAlignment: CrossAxisAlignment.center,
+  //                               children: [
+  //                                 Container(
+  //                                   margin: EdgeInsets.only(left: 4,right: 4),
+  //                                   width: 13,
+  //                                   height: 13,
+  //                                   decoration: BoxDecoration(
+  //                                       shape: BoxShape.circle,
+  //                                       color: value=="Approved"?Colors.green:value=="Rejected"?Colors.red:
+  //                                       value=="Pending"?yellowColor:value=="Abstained"?Colors.blueAccent:Colors.green
+  //                                   ),
+  //                                 ),
+  //                                 const SizedBox(width: 4,),
+  //                                 Container(
+  //                                     margin: EdgeInsets.only(top: 10),
+  //                                     child: Text(value)),
+  //                               ],
+  //                             ),
+  //                           );
+  //                         }).toList(),
+  //                       ),
+  //                     ),
+  //
+  //                     Container(
+  //                         margin:EdgeInsets.only(left: 20,right: 20,top:30),
+  //                         child: Text("Reason",style: blueColorStyleMedium(18),)),
+  //
+  //
+  //                     Container(
+  //                       height: 120,
+  //                       margin:EdgeInsets.only(left: 20,right: 20,top:10),
+  //                       decoration: BoxDecoration(
+  //                           color: Colors.white,
+  //                           borderRadius: new BorderRadius.circular(18.0),
+  //                           border: Border.all(
+  //                               color: grayRoundedColor,// set border color
+  //                               width: 3.0
+  //                           )
+  //                       ),
+  //                       child: TextField(
+  //                           controller: voteControler,
+  //                           maxLines: null,
+  //                           keyboardType: TextInputType.multiline,
+  //                           style: blueColorStyleMedium(20),
+  //                           decoration: new InputDecoration(
+  //                             border: InputBorder.none,
+  //                             focusedBorder: InputBorder.none,
+  //                             enabledBorder: InputBorder.none,
+  //                             errorBorder: InputBorder.none,
+  //                             disabledBorder: InputBorder.none,
+  //                             contentPadding:
+  //                             EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+  //                           )
+  //                       ) ,
+  //                     ),
+  //
+  //                     Expanded(
+  //                         child: Align(
+  //                             alignment: Alignment.bottomCenter,
+  //                             child:Container(
+  //                               margin: EdgeInsets.only(bottom: 20),
+  //                               child: Row(
+  //                                 mainAxisAlignment: MainAxisAlignment.center,
+  //                                 crossAxisAlignment: CrossAxisAlignment.center,
+  //                                 children: [
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       Navigator.pop(context);
+  //                                     },
+  //                                     child: Container(
+  //                                         padding: EdgeInsets.only(top: 10,bottom: 3),
+  //                                         height:50,
+  //                                         width: 180,
+  //                                         decoration: BoxDecoration(
+  //                                             border: Border.all(
+  //                                               color: blueColor,
+  //                                             ),
+  //                                             borderRadius: BorderRadius.all(Radius.circular(14))
+  //                                         ),
+  //                                         child: Center(
+  //                                           child: Text("cancel",style: blueColorStyleMedium(18),),
+  //                                         )
+  //                                     ),
+  //                                   ),
+  //                                   const SizedBox(width: 10,),
+  //                                   InkWell(
+  //                                     onTap: () {
+  //                                       if(votesValue!=null) {
+  //                                         if(voteControler!=null&&voteControler.text.isNotEmpty) {
+  //                                           changeVote(decisionId,userToken,votesValue, voteControler.text != null ? voteControler.text : "",
+  //                                           );
+  //                                         }else{
+  //                                           if(votesValue=="Approved"){
+  //                                             changeVote(decisionId,userToken,votesValue, voteControler.text != null ? voteControler.text : "",
+  //                                             );
+  //                                           }else{
+  //                                             showErrorWithMsg("Please Enter Reason");
+  //                                           }
+  //                                         }
+  //                                       }else{
+  //                                         showErrorWithMsg("Please Choose Vote");
+  //                                       }
+  //                                     },
+  //                                     child: Container(
+  //                                         padding: EdgeInsets.only(top: 10,bottom: 3),
+  //                                         height:50,
+  //                                         width: 180,
+  //                                         decoration: BoxDecoration(
+  //                                             color: yellowColor,
+  //                                             border: Border.all(
+  //                                               color: yellowColor,
+  //                                             ),
+  //                                             borderRadius: BorderRadius.all(Radius.circular(14))
+  //                                         ),
+  //                                         child: Center(
+  //                                           child: Text("Confirm",style: TextStyle(
+  //                                             color: Colors.white ,
+  //                                             fontFamily: "medium",
+  //                                             fontSize: 18,
+  //                                             // fontWeight: FontWeight.bold
+  //                                           ),),
+  //                                         )
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             )
+  //                         )),
+  //                   ],
+  //                 ),
+  //
+  //               ),
+  //             ),
+  //           );
+  //         },);
+  //       });
+  // }
 
 
   @override
   void initState() {
+    Future.delayed(Duration.zero,() {
+      votesList=[AppLocalizations.of(context).lblApproved,AppLocalizations.of(context).lblPendingS,
+        AppLocalizations.of(context).lblRejected,AppLocalizations.of(context).lblAbstained];
+    });
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
       getUser().then((value) {

@@ -110,7 +110,7 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: InkWell(
-                                  child: Image.asset("assets/images/back.png",fit: BoxFit.cover,width: 26,),
+                                  child: Image.asset("assets/images/back.webp",fit: BoxFit.cover,width: 26,),
                                   onTap: () {
                                     Navigator.pop(context);
                                   },),

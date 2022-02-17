@@ -72,7 +72,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "lblHeadOffice" : MessageLookupByLibrary.simpleMessage("Head Office"),
     "lblDevelopment" : MessageLookupByLibrary.simpleMessage("Development"),
     "lblTalkingPoints" : MessageLookupByLibrary.simpleMessage("Talking Points"),
-    "lblDesisions" : MessageLookupByLibrary.simpleMessage("Desisions"),
+    "lblDesisions" : MessageLookupByLibrary.simpleMessage("Decisions"),
     "lblActions" : MessageLookupByLibrary.simpleMessage("Actions"),
     "lblApprovals" : MessageLookupByLibrary.simpleMessage("Approvals"),
     "lblScheduled" : MessageLookupByLibrary.simpleMessage("Scheduled"),
@@ -182,6 +182,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "lbTwoFactor" : MessageLookupByLibrary.simpleMessage("Two Factor Authentication"),
     "lbDidNot" : MessageLookupByLibrary.simpleMessage("Didn\'t receive the email ?"),
     "lbCheckYourSpam" : MessageLookupByLibrary.simpleMessage("Check your spam folder or Resend the link"),
-
+    "lblAll" : MessageLookupByLibrary.simpleMessage("All"),
+    "lblDelete" : MessageLookupByLibrary.simpleMessage("Delete"),
+    "lblMonth" : MessageLookupByLibrary.simpleMessage("Month"),
+    "lblYear" : MessageLookupByLibrary.simpleMessage("Year"),
   };
 }
