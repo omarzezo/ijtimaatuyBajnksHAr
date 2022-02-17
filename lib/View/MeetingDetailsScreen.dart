@@ -114,6 +114,16 @@ String attendanceStatus='';
 
             if(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.currentMember!=null&& meetingDetailsResponseModel.currentMember.attendanceStatus!=null){
               attendanceStatus= meetingDetailsResponseModel.currentMember.attendanceStatus;
+
+              if(attendanceStatus=="Going"){
+                attendanceStatus=AppLocalizations.of(context).lblGoingS;
+              }else if(attendanceStatus=="Not Going"||attendanceStatus=="Not going"){
+                attendanceStatus=AppLocalizations.of(context).lblNotGoingS;
+              }else if(attendanceStatus=="Pending"){
+                attendanceStatus=AppLocalizations.of(context).lblPendingS;
+              }else if(attendanceStatus=="Maybe"){
+                attendanceStatus=AppLocalizations.of(context).lblMayBeS;
+              }
             }
 
 
@@ -494,16 +504,28 @@ String attendanceStatus='';
         if (value != null) {
           openTellUs=false;
           if(selectedPos==1){
-            attendanceStatus="Going";
+            // attendanceStatus="Going";
+            attendanceStatus=AppLocalizations.of(context).lblGoingS;
+            textColor=Color(0xff04D182);
+            bgColor=Color(0xff04D182).withOpacity(0.1);
           }else if(selectedPos==2){
-            attendanceStatus="Not Going";
+            // attendanceStatus="Not Going";
+            attendanceStatus=AppLocalizations.of(context).lblNotGoingS;
+            textColor=Color(0xffFF6A81);
+            bgColor=Color(0xffFF6A81).withOpacity(0.1);
             setState(() {
               tellUsControler.text="";
             });
           }else if(selectedPos==3){
-            attendanceStatus="Pending";
+            // attendanceStatus="Pending";
+            textColor=Color(0xffFEC20E);
+            bgColor=Color(0xffFEC20E).withOpacity(0.1);
+            attendanceStatus=AppLocalizations.of(context).lblPendingS;
           }else if(selectedPos==4){
-            attendanceStatus="Maybe";
+            // attendanceStatus="Maybe";
+            textColor=Color(0xff7F8FA4);
+            bgColor=Color(0xff7F8FA4).withOpacity(0.1);
+            attendanceStatus=AppLocalizations.of(context).lblMayBeS;
           }
 
           showSuccess();
@@ -728,8 +750,12 @@ String attendanceStatus='';
                                               const SizedBox(width: 10,),
                                               Column(
                                                 children: [
+
                                                   Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.currentMember!=null&&meetingDetailsResponseModel.currentMember.user!=null?
                                                   meetingDetailsResponseModel.currentMember.user.name+" ( You )":"",style: blueColorStyleMedium(20), ),
+                                                  // Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.currentMember!=null&& meetingDetailsResponseModel.currentMember.statusReason!=null?
+                                                  // meetingDetailsResponseModel.currentMember.statusReason:"",style: blueColorStyleregular(20), ),
+
                                                   Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.currentMember!=null&& meetingDetailsResponseModel.currentMember.statusReason!=null?
                                                   meetingDetailsResponseModel.currentMember.statusReason:"",style: blueColorStyleregular(20), ),
                                                 ],
@@ -755,7 +781,7 @@ String attendanceStatus='';
                                               child: Text((attendanceStatus),style: TextStyle(
                                                 color: textColor ,
                                                 fontFamily: "medium",
-                                                fontSize: 20,
+                                                fontSize: 18,
                                               ),),
                                             ),
                                           ),
@@ -783,23 +809,35 @@ String attendanceStatus='';
                                     Color two=Color(0xff04D182).withOpacity(0.1);
                                     if( meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.members!=null&&
                                         meetingDetailsResponseModel.members[index].attendanceStatus!=null){
+
                                       if(meetingDetailsResponseModel.members[index].attendanceStatus=="Going"){
-                                        one=Color(0xff04D182);
-                                        two=Color(0xff04D182).withOpacity(0.1);
+                                        // one=Color(0xff04D182);
+                                        // two=Color(0xff04D182).withOpacity(0.1);
+                                        meetingDetailsResponseModel.members[index].attendanceStatus=AppLocalizations.of(context).lblGoingS;
+                                        meetingDetailsResponseModel.members[index].color="0xff04D182";
                                       }else if(meetingDetailsResponseModel.members[index].attendanceStatus=="Not Going"||
                                           meetingDetailsResponseModel.members[index].attendanceStatus=="Not going"){
-                                        one=Color(0xffFF6A81);
-                                        two=Color(0xffFF6A81).withOpacity(0.1);
+                                        // one=Color(0xffFF6A81);
+                                        // two=Color(0xffFF6A81).withOpacity(0.1);
+                                        meetingDetailsResponseModel.members[index].color="0xffFF6A81";
+                                        meetingDetailsResponseModel.members[index].attendanceStatus=AppLocalizations.of(context).lblNotGoingS;
                                       }else if(meetingDetailsResponseModel.members[index].attendanceStatus=="Maybe"){
-                                        one=Color(0xff7F8FA4);
-                                        two=Color(0xff7F8FA4).withOpacity(0.1);
+                                        // one=Color(0xff7F8FA4);
+                                        // two=Color(0xff7F8FA4).withOpacity(0.1);
+                                        meetingDetailsResponseModel.members[index].color="0xff7F8FA4";
+                                        meetingDetailsResponseModel.members[index].attendanceStatus=AppLocalizations.of(context).lblMayBeS;
                                       }else if(meetingDetailsResponseModel.members[index].attendanceStatus=="Pending"){
-                                        one=Color(0xffFEC20E);
-                                        two=Color(0xffFEC20E).withOpacity(0.1);
+                                        // one=Color(0xffFEC20E);
+                                        // two=Color(0xffFEC20E).withOpacity(0.1);
+                                        meetingDetailsResponseModel.members[index].color="0xffFEC20E";
+                                        meetingDetailsResponseModel.members[index].attendanceStatus=AppLocalizations.of(context).lblPendingS;
                                       }else{
-                                        one=Color(0xff04D182);
-                                        two=Color(0xff04D182).withOpacity(0.1);
+                                        // meetingDetailsResponseModel.members[index].color="0xff04D182";
+                                        // one=Color(0xff04D182);
+                                        // two=Color(0xff04D182).withOpacity(0.1);
                                       }
+                                    }else{
+
                                     }
                                     return Container(
                                       margin: EdgeInsets.only(bottom: 20),
@@ -831,8 +869,8 @@ String attendanceStatus='';
                                                 children: [
                                                   Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.members!=null&&meetingDetailsResponseModel.members[index].user!=null?
                                                   meetingDetailsResponseModel.members[index].user.name:"",style: blueColorStyleMedium(18), ),
-                                                  Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.members!=null&& meetingDetailsResponseModel.members[index].statusReason!=null?
-                                                  meetingDetailsResponseModel.members[index].statusReason:"",style: blueColorStyleregular(16), ),
+                                                  // Text(meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.members!=null&& meetingDetailsResponseModel.members[index].statusReason!=null?
+                                                  // meetingDetailsResponseModel.members[index].statusReason:"",style: blueColorStyleregular(16), ),
                                                 ],
                                               )
                                             ],
@@ -840,17 +878,17 @@ String attendanceStatus='';
                                           Container(
                                             padding: EdgeInsets.only(left:22,right: 22,top: 6,bottom: 2),
                                             decoration: BoxDecoration(
-                                                color: two,
+                                                color: Color(int.parse(meetingDetailsResponseModel.members[index].color)).withOpacity(0.1),
                                                 border: Border.all(
-                                                  color: two,
+                                                  color: Color(int.parse(meetingDetailsResponseModel.members[index].color)).withOpacity(0.1),
                                                 ),
                                                 borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
                                             ),
                                             child: Text((meetingDetailsResponseModel!=null&& meetingDetailsResponseModel.members!=null&& meetingDetailsResponseModel.members[index].attendanceStatus!=null?
                                             meetingDetailsResponseModel.members[index].attendanceStatus:""),style: TextStyle(
-                                              color: one ,
+                                              color: Color(int.parse(meetingDetailsResponseModel.members[index].color)) ,
                                               fontFamily: "medium",
-                                              fontSize: 20,
+                                              fontSize: 18,
                                             ),),
                                           )
                                         ],
@@ -1024,9 +1062,9 @@ String attendanceStatus='';
                                     setState(() {
                                       openTellUs=false;
                                       selectedPos=1;
-                                      attendanceStatus="Going";
-                                      textColor=Color(0xff04D182);
-                                      bgColor=Color(0xff04D182).withOpacity(0.1);
+                                      // attendanceStatus="Going";
+                                      // textColor=Color(0xff04D182);
+                                      // bgColor=Color(0xff04D182).withOpacity(0.1);
                                       changeUserStatus(userToken,"Going","");
                                     });
                                   },
@@ -1051,10 +1089,10 @@ String attendanceStatus='';
                                   onTap: () {
                                     setState(() {
                                       selectedPos=2;
-                                      attendanceStatus="Not Going";
+                                      // attendanceStatus="Not Going";
                                       openTellUs=true;
-                                      textColor=Color(0xffFF6A81);
-                                      bgColor=Color(0xffFF6A81).withOpacity(0.1);
+                                      // textColor=Color(0xffFF6A81);
+                                      // bgColor=Color(0xffFF6A81).withOpacity(0.1);
                                       // changeMeetingStatus(userToken);
                                     });
                                   },
@@ -1080,9 +1118,9 @@ String attendanceStatus='';
                                     setState(() {
                                       selectedPos=3;
                                       openTellUs=false;
-                                      attendanceStatus="Pending";
-                                      textColor=Color(0xffFEC20E);
-                                      bgColor=Color(0xffFEC20E).withOpacity(0.1);
+                                      // attendanceStatus="Pending";
+                                      // textColor=Color(0xffFEC20E);
+                                      // bgColor=Color(0xffFEC20E).withOpacity(0.1);
                                       changeUserStatus(userToken,"Pending","");
                                     });
                                   },
@@ -1108,9 +1146,10 @@ String attendanceStatus='';
                                     setState(() {
                                       selectedPos=4;
                                       openTellUs=false;
-                                      attendanceStatus="Maybe";
-                                      textColor=Color(0xff7F8FA4);
-                                      bgColor=Color(0xff7F8FA4).withOpacity(0.1);
+
+                                      // attendanceStatus="Maybe";
+                                      // textColor=Color(0xff7F8FA4);
+                                      // bgColor=Color(0xff7F8FA4).withOpacity(0.1);
                                       changeUserStatus(userToken,"Maybe","");
                                     });
                                   },

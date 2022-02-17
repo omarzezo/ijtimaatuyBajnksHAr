@@ -1820,6 +1820,7 @@ class MeetingDetailsResponseModelMembers {
   String _statusReason;
   User _user;
   String _type;
+  String _color;
 
   int get id => _id;
   int get meetingId => _meetingId;
@@ -1827,9 +1828,19 @@ class MeetingDetailsResponseModelMembers {
   String get userEmail => _userEmail;
   int get canEdit => _canEdit;
   String get attendanceStatus => _attendanceStatus;
+  String get  color => _color;
   String get statusReason => _statusReason;
   User get user => _user;
   String get type => _type;
+
+
+  set attendanceStatus(String value) {
+    _attendanceStatus = value;
+  }
+
+  set color(String value) {
+    _color = value;
+  }
 
   MeetingDetailsResponseModelMembers({
     int id,

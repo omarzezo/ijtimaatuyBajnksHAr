@@ -50,8 +50,8 @@ class SignInScreenState extends State<SignInScreen> {
     // emailController.text="Ahmed@ijtimaati.com";
     // passwordController.text='Oman@2020';
     //
-    // emailController.text="mazin@ijtimaati.com";
-    // passwordController.text='Oman@1234';
+    emailController.text="mazin@ijtimaati.com";
+    passwordController.text='Oman@1234';
     //
     // emailController.text="zezoomar674@yahoo.com";
     // passwordController.text='123456';
