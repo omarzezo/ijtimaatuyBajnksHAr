@@ -12,6 +12,8 @@ import 'package:itimaaty/View/ProfileScreen.dart';
 import 'package:itimaaty/View/SignInScreen.dart';
 import 'package:itimaaty/Widgets/text_for.dart';
 
+import '../Utils/Constants.dart';
+
 class ChangePassword extends StatefulWidget {
 
   BuildContext mContext;
@@ -31,7 +33,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   var retypePasswordController = TextEditingController();
 
   BuildContext mContext;
-
+String baseUrl="";
   void getChangePassword(String token) {
     load();
     UserRepository userRepository = new UserRepository();
@@ -40,7 +42,7 @@ class _ChangePasswordState extends State<ChangePassword> {
       password: newPasswordController.text
     );
 
-    Future<ChangePasswordResponseModel> allList = userRepository.getChangePassword(token,changePasswordRequestModel);
+    Future<ChangePasswordResponseModel> allList = userRepository.getChangePassword(baseUrl,token,changePasswordRequestModel);
     allList.then((loginModel) {
       setState(() {
         if(loginModel!=null){
@@ -57,6 +59,16 @@ class _ChangePasswordState extends State<ChangePassword> {
     });
   }
 
+  @override
+  void initState() {
+    // TODO: implement initState
+
+      String baseUri= Constants.BASE_URL;
+      setState(() {
+        baseUrl=baseUri;
+      });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     mContext=context;

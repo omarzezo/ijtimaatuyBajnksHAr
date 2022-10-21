@@ -52,6 +52,11 @@ class LoginResponseModel {
   dynamic get committee => _committee;
   Role get role => _role;
 
+
+  set name(String value) {
+    _name = value;
+  }
+
   LoginResponseModel({
       int id, 
       String name, 
@@ -136,6 +141,25 @@ class LoginResponseModel {
     return map;
   }
 
+  set email(String value) {
+    _email = value;
+  }
+
+  set phone(String value) {
+    _phone = value;
+  }
+
+  set birthdate(String value) {
+    _birthdate = value;
+  }
+
+  set image(String value) {
+    _image = value;
+  }
+
+  set position(dynamic value) {
+    _position = value;
+  }
 }
 
 /// id : 1
@@ -196,6 +220,8 @@ Future<bool> saveUser(LoginResponseModel user) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("id", user.id);
     await prefs.setString("name", user.name);
+    await prefs.setString("image", user.image);
+    await prefs.setString("email", user.email);
     return true ;
   }catch(Excption){
     print("save to shared faild   :  $Excption");
@@ -209,6 +235,8 @@ Future<LoginResponseModel > getUser () async{
   return new LoginResponseModel(
     id: prefs.getInt("id"),
     name: prefs.getString("name"),
+    image: prefs.getString("image"),
+    email: prefs.getString("email"),
   );
 }
 

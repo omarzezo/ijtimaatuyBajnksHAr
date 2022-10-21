@@ -269,15 +269,21 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
                                       ],
                                     ),
                                   ),
-                                  child: FlatButton(
+                                  child: ElevatedButton(
                                     child: Text(
                                       AppLocalizations.of(context).lblResetPassword,
                                       style: whiteColorStyle(width<600?16:22),
                                     ),
-                                    textColor: Colors.white,
-                                    color: Colors.transparent,
-                                    shape:
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                    style: ButtonStyle(
+                                        foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                        backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30),
+                                                side: BorderSide(color: yellowColor)
+                                            )
+                                        )
+                                    ),
                                     onPressed: () {
 
                                     },

@@ -9,15 +9,15 @@ import 'network/remote/AppException.dart';
 class ApiBaseHelper {
 
 
-  Future<dynamic> getWithToken(String url) async {
+  Future<dynamic> getWithToken(String baseUrl,String url) async {
     print('Api Get, url $url');
     var responseJson;
     try {
       Map<String, String> headers = {"Content-type": "application/json",
         'token': 'de37abd34d77843c28ae7e1ed7b7c2b6'};
-      final response = await http.get(Uri.parse(Constants.BASE_URL + url + url),headers: headers);
+      final response = await http.get(Uri.parse(baseUrl + url + url),headers: headers);
       print("My Url");
-      print(Constants.BASE_URL + url);
+      // print(Constants.BASE_URL + url);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -27,13 +27,13 @@ class ApiBaseHelper {
     return responseJson;
   }
 
-  Future<dynamic> get(String url) async {
+  Future<dynamic> get(String baseUrl,String url) async {
     print('Api Get, url $url');
     var responseJson;
     try {
-      final response = await http.get(Uri.parse(Constants.BASE_URL + url));
+      final response = await http.get(Uri.parse(baseUrl + url));
       print("My Url");
-      print(Constants.BASE_URL + url);
+      // print(Constants.BASE_URL + url);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -43,14 +43,14 @@ class ApiBaseHelper {
     return responseJson;
   }
 
-  Future<dynamic> post(String url, dynamic body) async {
+  Future<dynamic> post(String baseUrl,String url, dynamic body) async {
     // print('Api Post, url $url');
     var responseJson;
     try {
       Map<String, String> headers = {"Content-type": "application/json"};
-      print("UrlNOwIs>>"+Constants.BASE_URL + url);
+      // print("UrlNOwIs>>"+Constants.BASE_URL + url);
       print(body);
-      final response = await http.post(Uri.parse(Constants.BASE_URL + url),headers: headers, body: body);
+      final response = await http.post(Uri.parse(baseUrl+ url),headers: headers, body: body);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -62,11 +62,11 @@ class ApiBaseHelper {
     return responseJson;
   }
 
-  Future<dynamic> put(String url, dynamic body) async {
+  Future<dynamic> put(String baseUrl,String url, dynamic body) async {
     print('Api Put, url $url');
     var responseJson;
     try {
-      final response = await http.put(Uri.parse(Constants.BASE_URL + url), body: body);
+      final response = await http.put(Uri.parse(baseUrl + url), body: body);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -77,11 +77,11 @@ class ApiBaseHelper {
     return responseJson;
   }
 
-  Future<dynamic> delete(String url) async {
+  Future<dynamic> delete(String baseUrl,String url) async {
     print('Api delete, url $url');
     var apiResponse;
     try {
-      final response = await http.delete(Uri.parse(Constants.BASE_URL + url));
+      final response = await http.delete(Uri.parse(baseUrl + url));
       apiResponse = _returnResponse(response);
     } on SocketException {
       print('No net');

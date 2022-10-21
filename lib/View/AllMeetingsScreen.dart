@@ -1,8 +1,10 @@
-// import 'package:dropdown_date_picker/dropdown_date_picker.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_linear_datepicker/flutter_datepicker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:itimaaty/LocalDb/OfflineDataLocalModel.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/AttendenceModel.dart';
@@ -20,7 +22,8 @@ import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/Widgets/HomeWidgets.dart';
 import 'package:itimaaty/cubit/Home/HomeCubit.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
-
+import '../LocalDb/DbHelper.dart';
+import '../Models/LoginResponseModel.dart';
 import 'SignInScreen.dart';
 
 
@@ -38,8 +41,8 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
   var emailController = TextEditingController();
   DashboardResponseModel dashboardResponseModel;
 
-  List<AllMeetingsResponse> allMeetingList = new List<AllMeetingsResponse>();
-  List<AllMeetingsResponse> allFilterdMeetingList = new List<AllMeetingsResponse>();
+  List<AllMeetingsResponseData> allMeetingList = new List<AllMeetingsResponseData>();
+  List<AllMeetingsResponseData> allFilterdMeetingList = new List<AllMeetingsResponseData>();
   DateTime selectedDate;
   String selectedDateString;
   final now = DateTime.now();
@@ -55,6 +58,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
   String statusValue;
   List<bool> _isChecked = [];
   List<String> _isCheckedItems = [];
+  List<int> _isCheckedItemsStatusIntegers = [];
   bool isStatusExpanded = false;
 
   List<CommitteeResponseModelData> allCommitteList = [];
@@ -62,96 +66,205 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
   String committeValue;
   List<bool> _isCheckedCommitte = [];
   List<String> _isCheckedItemsCommitte = [];
+  List<int> _isCheckedItemsCommitteIntegers = [];
   bool isCommitteExpanded = false;
-
   List<AttendenceModel> allAttendenceList = [];
   List<AttendenceModel> newAttendenceList = [];
   String attendenceValue;
-  List<bool> _isCheckedAttendence = [];
-  List<String> _isCheckedItemsAttendence = [];
   bool isAttendenceExpanded = false;
   String userToken="";
+  var dateCurrent = DateTime.now();
+  var dbHelper = DbHelper();
+  bool isFiltered=false;
+  int page=1;
+  int listLength=0;
+  List<int> listedIntegers=[];
+  String attendance,committee,meeting_status_id,role="";
 
-  void getAllMeetings(String token,String selectedDateString) {
-    load();
-    allProductsRepository = new MeetingRepository();
-    Future<List<AllMeetingsResponse>> allList = allProductsRepository.getAllMeetings2(token,selectedDateString);
-    allList.then((value) {
-      setState(() {
-        if (value != null) {
-          showSuccess();
-          allMeetingList = value;
-          allFilterdMeetingList = allMeetingList;
+  Future getOfflineMeetings() async {
+    // var orgainzationsFuture = dbHelper.getOfflineData();
+    var orgainzationsFuture = dbHelper.getAllMeetingsColumn(baseUrl+Constants.MEETINGS+selectedDateString);
+    orgainzationsFuture.then((data) {
+      setState(()  {
+        // this.offlineMeetings = data;
+        for(int i=0;i<data.length;i++){
+          OfflineDataLocalModel localModel =data[i];
+          if(localModel.url==baseUrl+Constants.MEETINGS+selectedDateString) {
+            AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(localModel.allMeetings));
+            // List<AllMeetingsResponseData> value = (json.decode(localModel.allMeetings) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
+            allMeetingList = value.data;
+            allFilterdMeetingList = allMeetingList;
+            break;
+          }
+        }
+      });
+    });
+  }
 
-          // allProductsRepository.getAllStatus(token).then((value) {
-          //   if (value != null) {
+  Future addOrUpdateOfflineMeetings(String string) async {
+    var orgainzationsFuture = dbHelper.getAllMeetingsColumn(baseUrl+Constants.MEETINGS+selectedDateString);
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      // setState(()  async {
+        // this.offlineMeetings = data;
+        for(int i=0;i<data.length;i++){
+          OfflineDataLocalModel localModel =data[i];
+          if(localModel.url==baseUrl+Constants.MEETINGS+selectedDateString) {
+            m=true;
+            break;
+          }else{
+            m=false;
+            // inserst
+          }
+        }
+      // });
+    }).then((value) async {
+      if(m) {
+        print("updateupdate");
+        // update
+        var result = await dbHelper.updateWithNameOfflineData(baseUrl+Constants.MEETINGS+selectedDateString,string);
+      }else{
+        var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
+          url: baseUrl+Constants.MEETINGS+selectedDateString,
+          allMeetings: string,
+        ));
+        print("inserstinserst");
+        // inserst
+      }
+    });
+  }
 
+  void getAllMeetings(String token,String selectedDateString,int page) {
+    // allMeetingList=[];
+    // listedIntegers=[];
+        load();
+        allProductsRepository = new MeetingRepository();
+        Future<String> allList = allProductsRepository.getAllMeetings2(baseUrl,token,selectedDateString,page,
+        attendance,committee,meeting_status_id,role);
+        allList.then((string) async{
+          allMeetingList=[];
+          if (string != null) {
+              showSuccess();
+              AllMeetingsResponse val =  AllMeetingsResponse.fromJson(json.decode(string));
+              allMeetingList = val.data;
+              print("len>>"+val.data.length.toString());
+              setState(() {});
+
+                listLength = val.lastPage;
+              listedIntegers = new List<int>.generate(listLength, (i) => i + 1);
+
+              // for(int i=0;i<listLength;i=listLength-1){
+              //     listedIntegers.add(i);
+              // }
+              // allFilterdMeetingList = allMeetingList;
+              addOrUpdateOfflineMeetings(string);
+
+              if(allStatusList.isEmpty){
               List<AllStatusResponse>list=[];
-          AllStatusResponse allStat1 =new AllStatusResponse();
-          AllStatusResponse allStat2 =new AllStatusResponse();
-          AllStatusResponse allStat3 =new AllStatusResponse();
-          AllStatusResponse allStat4 =new AllStatusResponse();
-          AllStatusResponse allStat5 =new AllStatusResponse();
-                allStat1.name=AppLocalizations.of(context).lblDraft;
-                allStat2.name=AppLocalizations.of(context).lblScheduled;
-                allStat3.name=AppLocalizations.of(context).lblLive;
-                allStat4.name=AppLocalizations.of(context).lblCanceled;
-                allStat5.name=AppLocalizations.of(context).lblArchived;
-          list.add(allStat1);
-          list.add(allStat2);
-          list.add(allStat3);
-          list.add(allStat4);
-          list.add(allStat5);
-                allStatusList = list;
+              AllStatusResponse allStat1 =new AllStatusResponse();
+              AllStatusResponse allStat2 =new AllStatusResponse();
+              AllStatusResponse allStat3 =new AllStatusResponse();
+              AllStatusResponse allStat4 =new AllStatusResponse();
+              AllStatusResponse allStat5 =new AllStatusResponse();
+              allStat1.name=AppLocalizations.of(context).lblDraft;
+              allStat1.id=1;
+              allStat2.name=AppLocalizations.of(context).lblScheduled;
+              allStat2.id=2;
+              allStat3.name=AppLocalizations.of(context).lblLive;
+              allStat3.id=3;
+              allStat4.name=AppLocalizations.of(context).lblCanceled;
+              allStat4.id=4;
+              allStat5.name=AppLocalizations.of(context).lblArchived;
+              allStat5.id=5;
+              list.add(allStat1);
+              list.add(allStat2);
+              list.add(allStat3);
+              list.add(allStat4);
+              list.add(allStat5);
+              allStatusList = list;
               _isChecked = List<bool>.filled(allStatusList.length, false);
               _isCheckedItems = List<String>.filled(allStatusList.length, '');
-              print("_isCheckedListIS>>" + _isChecked.toString());
+              _isCheckedItemsStatusIntegers = List<int>.filled(allStatusList.length, -1);
+              // print("_isCheckedListIS>>" + _isChecked.toString());
               getAllCommites(token);
-          //   }
-          // });
-        }else{
-          showError();
-          if(value==null){
-            navigateAndFinish(context, SignInScreen());
-          }
-        }
-      });
-    });
+              }
+
+            }else{
+              showError();
+            }
+        });
   }
 
-  void getAllMeetingsafter(String token,String selectedDateString) {
+  void getAllMeetingsafter(String token,String selectedDateString,int page) {
     load();
     allProductsRepository = new MeetingRepository();
-    Future<List<AllMeetingsResponse>> allList = allProductsRepository.getAllMeetings2(token,selectedDateString);
-    allList.then((value) {
+    Future<String> allList = allProductsRepository.getAllMeetings2(baseUrl,token,selectedDateString,page,
+        attendance,committee,meeting_status_id,role);
+    // Future<List<AllMeetingsResponse>> allList = allProductsRepository.getAllMeetings2(baseUrl,token,selectedDateString);
+    allList.then((string) {
       setState(() {
+        // List<AllMeetingsResponse> value = (json.decode(string) as List).map((i) => AllMeetingsResponse.fromJson(i)).toList();
+        AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(string));
+        // List<AllMeetingsResponseData> value =  (json.decode(string) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
+
         if (value != null) {
           showSuccess();
-          allMeetingList = value;
-          allFilterdMeetingList = allMeetingList;
-
+          // print("value>>"+value.toString());
+          // isFiltered=true;
+          allMeetingList = value.data;
+          allFilterdMeetingList = value.data;
         }else{
           showError();
           if(value==null){
-            navigateAndFinish(context, SignInScreen());
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
     });
   }
 
+  void getAllCommiteOffline(){
+    SharedPreferencesHelper.getAllCommite().then((string) {
+      if(string!=null) {
+        CommitteeResponseModel value = CommitteeResponseModel.fromJson(json.decode(string));
+        if (value.data != null) {
+          allCommitteList = value.data;
+          SharedPreferencesHelper.setAllCommite(string);
+          _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
+          _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
+          _isCheckedItemsCommitteIntegers = List<int>.filled(allCommitteList.length, -1);
+        }
+      }
+    });
+  }
+  
   void getAllCommites(String token) {
     load();
     allProductsRepository = new MeetingRepository();
-    Future<CommitteeResponseModel> allList = allProductsRepository.getAllCommittes(token);
-    allList.then((value) {
+    Future<String> allList = allProductsRepository.getAllCommittes(baseUrl,token);
+    allList.then((string) {
       setState(() {
-        if (value != null) {
+        if (string != null) {
           showSuccess();
-          allCommitteList = value.data;
-          _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
-          _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
-          // print("_isCheckedListIS>>" + _isChecked.toString());
+          CommitteeResponseModel value =  CommitteeResponseModel.fromJson(json.decode(string));
+          if(value.data!=null) {
+            for(int i=0;i<value.data.length;i++){
+              if(value.data[i].admins!=null){
+                var product = value.data[i].admins.firstWhere((product) => product.id == userId, orElse: () => null);
+                // var product2 = value.data[i].users.firstWhere((product) => product.id == userId, orElse: () => null);
+                if(product!=null){
+                  allCommitteList.add(value.data[i]);
+                  _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
+                  _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
+                  _isCheckedItemsCommitteIntegers = List<int>.filled(allCommitteList.length, -1);
+                }
+              }
+            }
+            // allCommitteList = value.data;
+            // SharedPreferencesHelper.setAllCommite(string);
+            // _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
+            // _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
+          }
         }else{
           showError();
         }
@@ -178,7 +291,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
       //
       //   }
       // }
-
+      isFiltered=true;
       List<AttendenceModel> newAttendenceList2 = [];
       for(int index=0;index<newAttendenceList.length;index++){
         if(newAttendenceList[index].name==AppLocalizations.of(context).lblAll){
@@ -187,11 +300,13 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
         }else if(newAttendenceList[index].name==AppLocalizations.of(context).lblGoingS){
           AttendenceModel allStatusResponse= new AttendenceModel('Going');
           newAttendenceList2.add(allStatusResponse);
-        }else if(newAttendenceList[index].name==AppLocalizations.of(context).lblNotGoingS){
-          AttendenceModel allStatusResponse= new AttendenceModel('Not Going');
+        }else if(newAttendenceList[index].name==AppLocalizations.of(context).lblNotGoingS
+        ||newAttendenceList[index].name=="Not going"){
+          AttendenceModel allStatusResponse= new AttendenceModel('Not going');
           newAttendenceList2.add(allStatusResponse);
-        }else if(newAttendenceList[index].name==AppLocalizations.of(context).lblMayBeS){
-          AttendenceModel allStatusResponse= new AttendenceModel('May be');
+        }else if(newAttendenceList[index].name.contains(AppLocalizations.of(context).lblMayBeS)||
+            newAttendenceList[index].name=="Maybe"){
+          AttendenceModel allStatusResponse= new AttendenceModel('Maybe');
           newAttendenceList2.add(allStatusResponse);
         }else if(newAttendenceList[index].name==AppLocalizations.of(context).lblPendingS){
           AttendenceModel allStatusResponse= new AttendenceModel('Pending');
@@ -225,13 +340,19 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
           newAllStatusList2.add(allStatusResponse);
         }
       }
-
-      print("allMeetingListSize>>"+allMeetingList.length.toString());
+      allMeetingList.forEach((element) {
+        print("elementName>>"+element.attendanceStatus.toString());
+      });
+      // allMeetingList.forEach((element) {
+      //   print("elementName>>"+element.attendanceStatus.toString());
+      // });
           allFilterdMeetingList = allMeetingList.where(
                   (x) =>
-                  (newAttendenceList2.isNotEmpty?newAttendenceList2.any((element) => element.name == x.attendanceStatus):true) &&
+                  (newAttendenceList2.isNotEmpty?newAttendenceList2.any((element) =>
+                  element.name==AppLocalizations.of(context).lblAll?true:element.name == x.attendanceStatus):true) &&
                   (newAllStatusList2.isNotEmpty?newAllStatusList2.any((element) => element.name == x.status.name):true) &&
-                  (x.committee!=null?newAllCommitteList.isNotEmpty? newAllCommitteList.any((element) => element.name == x.committee.name):true:true)
+                  (x.committee!=null?newAllCommitteList.isNotEmpty? newAllCommitteList.any((element) => element.name == x.committee.name):true:true)&&
+                  ( newAllCommitteList.any((element) => element.name == x.committee.name))
           ).toList();
 
           print("allFilterdMeetingList>>"+allFilterdMeetingList.toString());
@@ -280,9 +401,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                           Container(
                             margin: EdgeInsets.only(bottom: 20,left: 16,right: 16,top: 30),
                             child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Container(
                                   margin:
@@ -329,16 +448,9 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                           right: 10,
                                           top: 12,
                                           bottom: 12),
-                                      width: MediaQuery.of(
-                                          _context)
-                                          .size
-                                          .width,
+                                      width: MediaQuery.of(_context).size.width,
                                       decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: grayTextColor
-                                                  .withOpacity(
-                                                  0.6),
-                                              width: 0.6),
+                                          border: Border.all(color: grayTextColor.withOpacity(0.6), width: 0.6),
                                           borderRadius: BorderRadius
                                               .all(Radius
                                               .circular(
@@ -390,6 +502,8 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                             InkWell(
                                                                 onTap: () {
                                                                   setState(() {
+                                                                    print("attendanceattendance");
+                                                                    attendance='';
                                                                     newAttendenceList.clear();
 
                                                                   });
@@ -489,8 +603,8 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                         ),),
                                                     ),
                                                     onTap: () {
-                                                      setState(
-                                                            () {
+                                                      setState(() {
+                                                        attendance=allAttendenceList[index].name;
                                                           isAttendenceExpanded=false;
                                                           attendenceValue=allAttendenceList[index].name;
                                                           newAttendenceList.clear();
@@ -593,6 +707,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                         newAllCommitteList.removeAt(index);
                                                                         _isCheckedCommitte[i]=false;
                                                                         _isCheckedItemsCommitte[i]='';
+                                                                        _isCheckedItemsCommitteIntegers[i]=-1;
                                                                         break;
                                                                         print("Intsdid");
                                                                       }else{
@@ -700,13 +815,12 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                         _isCheckedCommitte[index] = val;
                                                         if (val) {
                                                           _isCheckedItemsCommitte[index]=allCommitteList[index].name;
+                                                          _isCheckedItemsCommitteIntegers[index]=allCommitteList[index].id;
                                                         }else{
                                                           _isCheckedItemsCommitte[index]='';
+                                                          _isCheckedItemsCommitteIntegers[index]=-1;
                                                         }
-                                                        print("checkelength>>" + _isCheckedCommitte.length.toString());
-                                                        print("isCheckeIs>>" + _isCheckedCommitte.toString());
-                                                        print("isCheckeIs>>" + _isCheckedItemsCommitte.toString());
-                                                        print("nameIs>>" + allCommitteList[index].name.toString());
+
                                                         if(val){
                                                           setState(() {
                                                             newAllCommitteList.add(CommitteeResponseModelData(name:allCommitteList[index].name));
@@ -753,30 +867,18 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                         },
                                         child:  Container(height: 20,)),
                                     Text(
-                                      AppLocalizations.of(
-                                          _context)
-                                          .lblStatus, style: grayTextColorStyleBlack(20),),
+                                      AppLocalizations.of(_context).lblStatus, style: grayTextColorStyleBlack(20),),
                                     const SizedBox(
                                       height: 4,
                                     ),
                                     Container(
-                                      padding:
-                                      EdgeInsets.only(
-                                          left: 10,
-                                          right: 10,
-                                          top: 12,
-                                          bottom: 12),
-                                      width: MediaQuery.of(
-                                          _context)
-                                          .size
-                                          .width,
+                                      padding: EdgeInsets.only(left: 10, right: 10, top: 12, bottom: 12),
+                                      // margin: EdgeInsets.only(top: 2,bottom: 2),
+                                      width: MediaQuery.of(_context).size.width,
                                       // height: 40,
                                       decoration: BoxDecoration(
                                           border: Border.all(
-                                              color: grayTextColor
-                                                  .withOpacity(
-                                                  0.6),
-                                              width: 0.6),
+                                              color: grayTextColor.withOpacity(0.6), width: 0.8),
                                           borderRadius: BorderRadius
                                               .all(Radius
                                               .circular(
@@ -846,6 +948,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                         newAllStatusList.removeAt(index);
                                                                         _isChecked[i]=false;
                                                                         _isCheckedItems[i]='';
+                                                                        _isCheckedItemsStatusIntegers[i]=-1;
                                                                         break;
                                                                         print("Intsdid");
                                                                       }else{
@@ -952,38 +1055,15 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                           () {
                                                         _isChecked[index] = val;
                                                         if (val) {
-                                                          // if(allStatusList[index].name==AppLocalizations.of(context).lblDraft){
-                                                          //   _isCheckedItems[index]='Draft';
-                                                          // }else if(allStatusList[index].name==AppLocalizations.of(context).lblScheduled){
-                                                          //   _isCheckedItems[index]='Scheduled';
-                                                          // }else if(allStatusList[index].name==AppLocalizations.of(context).lblLive){
-                                                          //   _isCheckedItems[index]='Live';
-                                                          // }else if(allStatusList[index].name==AppLocalizations.of(context).lblCanceled){
-                                                          //   _isCheckedItems[index]='Canceled';
-                                                          // }else if(allStatusList[index].name==AppLocalizations.of(context).lblArchived){
-                                                          //   _isCheckedItems[index]='Archived';
-                                                          // }
                                                           _isCheckedItems[index]=allStatusList[index].name;
+                                                          _isCheckedItemsStatusIntegers[index]=allStatusList[index].id;
                                                         }else{
                                                           _isCheckedItems[index]='';
+                                                          _isCheckedItemsStatusIntegers[index]=-1;
                                                         }
-                                                        print("checkelength>>" + _isChecked.length.toString());
-                                                        print("isCheckeIs>>" + _isChecked.toString());
-                                                        print("isCheckeIs>>" + _isCheckedItems.toString());
-                                                        print("nameIs>>" + allStatusList[index].name.toString());
+
                                                         if(val){
                                                           setState(() {
-                                                            // if(allStatusList[index].name==AppLocalizations.of(context).lblDraft){
-                                                            //   newAllStatusList.add(AllStatusResponse(name:'Draft'));
-                                                            // }else if(allStatusList[index].name==AppLocalizations.of(context).lblScheduled){
-                                                            //   newAllStatusList.add(AllStatusResponse(name:'Scheduled'));
-                                                            // }else if(allStatusList[index].name==AppLocalizations.of(context).lblLive){
-                                                            //   newAllStatusList.add(AllStatusResponse(name:'Live'));
-                                                            // }else if(allStatusList[index].name==AppLocalizations.of(context).lblCanceled){
-                                                            //   newAllStatusList.add(AllStatusResponse(name:'Canceled'));
-                                                            // }else if(allStatusList[index].name==AppLocalizations.of(context).lblArchived){
-                                                            //   newAllStatusList.add(AllStatusResponse(name:'Archived'));
-                                                            // }
                                                             newAllStatusList.add(AllStatusResponse(name:allStatusList[index].name));
                                                           },
                                                           );
@@ -1016,6 +1096,47 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                         ),
                                       ),
                                     ) : Container(),
+
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      child: Text(
+                                        AppLocalizations.of(_context).lblRole, style: grayTextColorStyleBlack(20),),
+                                    ),
+                                    const SizedBox(
+                                      height: 4,
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      // width: ,
+                                      child: ListView(
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          children: getRoleList(context).map((e) {
+                                            return InkWell(
+                                              onTap: () {
+                                                setState(() {role = e['name'];},);
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.fromLTRB(20, 8, 20, 4),
+                                                decoration:
+                                                BoxDecoration(
+                                                    color: Colors.transparent,
+                                                    border: Border.all(
+                                                        color:e['name']==role?yellowColor: Colors.grey.shade400, width: 1.2),
+                                                    borderRadius: BorderRadius.all(Radius.circular(9))),
+                                                child: Center(child: Text(e['name']
+                                                  ,style:TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 14,
+                                                    color: e['name']==role?yellowColor:Colors.black
+                                                  ) ,)),
+                                              ),
+                                            );
+                                          }).toList()
+                                      ),
+                                    ),
+
+
                                     InkWell(
                                         onTap: () {
                                           setState(() {
@@ -1036,21 +1157,32 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                           InkWell(
                                             onTap: () {
                                               setState((){
+                                                listedIntegers=[];
+                                                allMeetingList=[];
+                                                role=null;
+                                                attendance=null;
+                                                committee=null;
+                                                meeting_status_id=null;
+                                                isFiltered=false;
                                                 Navigator.pop(context);
                                                 newAttendenceList.clear();
                                                 newAllStatusList.clear();
                                                 newAllCommitteList.clear();
                                                 _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
                                                 _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
+                                                _isCheckedItemsCommitteIntegers = List<int>.filled(allCommitteList.length, -1);
                                                 _isChecked = List<bool>.filled(allStatusList.length, false);
                                                 _isCheckedItems = List<String>.filled(allStatusList.length, '');
-                                                clearFilteredData();
+                                                _isCheckedItemsStatusIntegers = List<int>.filled(allStatusList.length, -1);
+                                                selectedDateString=DateTime.now().year.toString();
+                                                getAllMeetings(userToken, DateTime.now().year.toString(), 1);
                                               });
                                             },
                                             child: Container(
-                                                padding: EdgeInsets.only(top: 10),
+                                                padding: EdgeInsets.only(top: 5),
+                                                // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                                 height:50,
-                                                width: 180,
+                                                width: MediaQuery.of(context).size.width/8,
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
                                                       color: blueColor,
@@ -1070,15 +1202,25 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                 isCommitteExpanded=false;
                                                 isAttendenceExpanded=false;
                                               });
-
+                                              committee=convetIntList(_isCheckedItemsCommitteIntegers);
+                                              meeting_status_id=convetIntList(_isCheckedItemsStatusIntegers);
+                                              // if(convetIntList(_isCheckedItemsCommitteIntegers).isNotEmpty){
+                                              //   print("jjjjjj>>"+convetIntList(_isCheckedItemsCommitteIntegers));
+                                              // }
                                               Navigator.pop(context);
-                                              print("Hereeeee");
-                                              filterFunc();
+                                              getAllMeetings(userToken, selectedDateString, page);
+                                              // print("Hereeeeez"+_isCheckedItemsCommitteIntegers.toList().toString());
+                                              // print("Hereeeeez"+_isCheckedItemsStatusIntegers.toList().toString());
+                                              // filterFunc();
                                             },
                                             child: Container(
-                                                padding: EdgeInsets.only(top: 10),
+                                                // padding: EdgeInsets.only(top: 10),
+                                                // height:50,
+                                                // width: 180,
+                                                padding: EdgeInsets.only(top: 5),
+                                                // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                                 height:50,
-                                                width: 180,
+                                                width: MediaQuery.of(context).size.width/8,
                                                 decoration: BoxDecoration(
                                                     color: yellowColor,
                                                     border: Border.all(
@@ -1118,35 +1260,83 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
         });
   }
 
+  int userId;
+  String baseUrl="";
+  ScrollController scrollController = ScrollController(
+    initialScrollOffset: 1, // or whatever offset you wish
+    keepScrollOffset: true,
+  );
+
   @override
   void initState() {
+
     selectedDate = now;
-    selectedDateString=selectedDate.year.toString()+"/"+selectedDate.month.toString();
+    selectedDateString=now.year.toString();
     Constants.draweItem="AllMeetingsScreen";
+    getUser().then((value) {
+      userId=value.id;
+    });
+
+    String baseUri= Constants.BASE_URL;
+    setState(() {
+      baseUrl=baseUri;
+    });
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
-      // allAttendenceList.add(new AttendenceModel("All"));
-      // allAttendenceList.add(new AttendenceModel("Going"));
-      // allAttendenceList.add(new AttendenceModel("Not going"));
-      // allAttendenceList.add(new AttendenceModel("Maybe"));
-      // allAttendenceList.add(new AttendenceModel("Pending"));
-      // allAttendenceList.add(new AttendenceModel("Admin"));
       allAttendenceList.add(new AttendenceModel(AppLocalizations.of(context).lblAll));
       allAttendenceList.add(new AttendenceModel(AppLocalizations.of(context).lblGoingS));
       allAttendenceList.add(new AttendenceModel(AppLocalizations.of(context).lblNotGoingS));
       allAttendenceList.add(new AttendenceModel(AppLocalizations.of(context).lblMayBeS));
       allAttendenceList.add(new AttendenceModel(AppLocalizations.of(context).lblPendingS));
-      // allAttendenceList.add(new AttendenceModel("Admin"));
-      _isCheckedAttendence = List<bool>.filled(allAttendenceList.length, false);
-      _isCheckedItemsAttendence = List<String>.filled(allAttendenceList.length, '');
 
-      getAllMeetings(value,selectedDateString);
+
+      hasNetwork().then((hasNet) {
+        if(hasNet){
+          print("Net exist");
+          getAllMeetings(value,selectedDateString.substring(0,4),1);
+        }else{
+          getOfflineMeetings().then((value) {
+            List<AllStatusResponse>list=[];
+            AllStatusResponse allStat1 =new AllStatusResponse();
+            AllStatusResponse allStat2 =new AllStatusResponse();
+            AllStatusResponse allStat3 =new AllStatusResponse();
+            AllStatusResponse allStat4 =new AllStatusResponse();
+            AllStatusResponse allStat5 =new AllStatusResponse();
+            allStat1.name=AppLocalizations.of(context).lblDraft;
+            allStat1.id=1;
+            allStat2.name=AppLocalizations.of(context).lblScheduled;
+            allStat2.id=2;
+            allStat3.name=AppLocalizations.of(context).lblLive;
+            allStat3.id=3;
+            allStat4.name=AppLocalizations.of(context).lblCanceled;
+            allStat4.id=4;
+            allStat5.name=AppLocalizations.of(context).lblArchived;
+            allStat5.id=5;
+            list.add(allStat1);
+            list.add(allStat2);
+            list.add(allStat3);
+            list.add(allStat4);
+            list.add(allStat5);
+            allStatusList = list;
+            _isChecked = List<bool>.filled(allStatusList.length, false);
+            _isCheckedItems = List<String>.filled(allStatusList.length, '');
+            _isCheckedItemsStatusIntegers = List<int>.filled(allStatusList.length, -1);
+            getAllCommiteOffline();
+          });
+          print("No Net exist");
+        }
+      });
+
+
     });
+
   }
 
 
   @override
   Widget build(BuildContext context) {
+    print("width"+MediaQuery.of(context).size.width.toString());
+    print("height"+MediaQuery.of(context).size.height.toString());
     return BlocProvider(
       create: (BuildContext context) => HomeCubit(),
       child: BlocConsumer<HomeCubit, HomeStates>(
@@ -1228,11 +1418,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                           return StatefulBuilder(builder: (BuildContext
                                           context, StateSetter setState /*You can rename this!*/) {
                                             return Container(
-                                              height: (MediaQuery.of(context)
-                                                  .size
-                                                  .height /
-                                                  2) +
-                                                  100,
+                                              height: (MediaQuery.of(context).size.height / 2) + 100,
                                               margin: EdgeInsets.only(
                                                   left: 16, right: 16),
                                               child: Container(
@@ -1284,14 +1470,17 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                           InkWell(
                                                             onTap: () {
                                                               setState((){
+                                                                isFiltered=false;
                                                                 Navigator.pop(context);
                                                                 newAttendenceList.clear();
                                                                 newAllStatusList.clear();
                                                                 newAllCommitteList.clear();
                                                                 _isCheckedCommitte = List<bool>.filled(allCommitteList.length, false);
                                                                 _isCheckedItemsCommitte = List<String>.filled(allCommitteList.length, '');
+                                                                _isCheckedItemsCommitteIntegers = List<int>.filled(allCommitteList.length, -1);
                                                                 _isChecked = List<bool>.filled(allStatusList.length, false);
                                                                 _isCheckedItems = List<String>.filled(allStatusList.length, '');
+                                                                _isCheckedItemsStatusIntegers = List<int>.filled(allStatusList.length, -1);
                                                                 clearFilteredData();
                                                               });
                                                             },
@@ -1308,18 +1497,9 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                   bottom: 6),
                                                               decoration:
                                                               BoxDecoration(
-                                                                  color: Color(
-                                                                      0xffeaeaea),
-                                                                  // color: Colors.red,
-                                                                  border: Border.all(
-                                                                      color: Color(
-                                                                          0xffeaeaea),
-                                                                      width:
-                                                                      0.6),
-                                                                  borderRadius:
-                                                                  BorderRadius.all(
-                                                                      Radius.circular(
-                                                                          9))),
+                                                                  color: Color(0xffeaeaea),
+                                                                  border: Border.all(color: Color(0xffeaeaea), width: 0.6),
+                                                                  borderRadius: BorderRadius.all(Radius.circular(9))),
                                                               child: Center(
                                                                 child: Text(
                                                                   AppLocalizations.of(
@@ -1410,19 +1590,9 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                                   InkWell(
                                                                                       onTap: () {
                                                                                         setState(() {
+                                                                                          // print("attendanceattendance");
+                                                                                          // attendance=null;
                                                                                           newAttendenceList.clear();
-                                                                                          // for(int i=0;i<_isCheckedItemsAttendence.length;i++){
-                                                                                          //   if(newAttendenceList[index].name==_isCheckedItemsAttendence[i]||
-                                                                                          //       newAttendenceList[index].name==' '+_isCheckedItemsAttendence[i]){
-                                                                                          //     newAttendenceList.removeAt(index);
-                                                                                          //     _isCheckedAttendence[i]=false;
-                                                                                          //     _isCheckedItemsAttendence[i]='';
-                                                                                          //     break;
-                                                                                          //     print("Intsdid");
-                                                                                          //   }else{
-                                                                                          //     print("Oustsdid");
-                                                                                          //   }
-                                                                                          // }
                                                                                         });
                                                                                       },
                                                                                       child: Icon(
@@ -1629,6 +1799,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                                                   newAllCommitteList.removeAt(index);
                                                                                                   _isCheckedCommitte[i]=false;
                                                                                                   _isCheckedItemsCommitte[i]='';
+                                                                                                  _isCheckedItemsCommitteIntegers[i]=-1;
                                                                                                   break;
                                                                                                   print("Intsdid");
                                                                                                 }else{
@@ -1746,13 +1917,12 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                                 _isCheckedCommitte[index] = val;
                                                                                 if (val) {
                                                                                   _isCheckedItemsCommitte[index]=allCommitteList[index].name;
+                                                                                  _isCheckedItemsCommitteIntegers[index]=allCommitteList[index].id;
                                                                                 }else{
                                                                                   _isCheckedItemsCommitte[index]='';
+                                                                                  _isCheckedItemsCommitteIntegers[index]=-1;
                                                                                 }
-                                                                                print("checkelength>>" + _isCheckedCommitte.length.toString());
-                                                                                print("isCheckeIs>>" + _isCheckedCommitte.toString());
-                                                                                print("isCheckeIs>>" + _isCheckedItemsCommitte.toString());
-                                                                                print("nameIs>>" + allCommitteList[index].name.toString());
+
                                                                                 if(val){
                                                                                   setState(() {
                                                                                     newAllCommitteList.add(CommitteeResponseModelData(name:allCommitteList[index].name));
@@ -1791,19 +1961,13 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                               height: 20,
                                                             ),
                                                             Text(
-                                                              AppLocalizations.of(
-                                                                  context)
-                                                                  .lblStatus, style: grayTextColorStyleBlack(20),),
+                                                              AppLocalizations.of(context).lblStatus, style: grayTextColorStyleBlack(20),),
                                                             const SizedBox(
                                                               height: 4,
                                                             ),
                                                             Container(
-                                                              padding:
-                                                              EdgeInsets.only(
-                                                                  left: 10,
-                                                                  right: 10,
-                                                                  top: 12,
-                                                                  bottom: 12),
+                                                              padding: EdgeInsets.only(left: 10, right: 10, top: 12, bottom: 12),
+                                                              // margin: EdgeInsets.only(top: 10),
                                                               width: MediaQuery.of(
                                                                   context)
                                                                   .size
@@ -1864,6 +2028,7 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                                                   newAllStatusList.removeAt(index);
                                                                                                   _isChecked[i]=false;
                                                                                                   _isCheckedItems[i]='';
+                                                                                                  _isCheckedItemsStatusIntegers[i]=-1;
                                                                                                   break;
                                                                                                   print("Intsdid");
                                                                                                 }else{
@@ -1980,13 +2145,12 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                                 _isChecked[index] = val;
                                                                                 if (val) {
                                                                                   _isCheckedItems[index]=allStatusList[index].name;
+                                                                                  _isCheckedItemsStatusIntegers[index]=allStatusList[index].id;
                                                                                 }else{
                                                                                   _isCheckedItems[index]='';
+                                                                                  _isCheckedItemsStatusIntegers[index]=-1;
                                                                                 }
-                                                                                print("checkelength>>" + _isChecked.length.toString());
-                                                                                print("isCheckeIs>>" + _isChecked.toString());
-                                                                                print("isCheckeIs>>" + _isCheckedItems.toString());
-                                                                                print("nameIs>>" + allStatusList[index].name.toString());
+
                                                                                 if(val){
                                                                                   setState(() {
                                                                                     newAllStatusList.add(AllStatusResponse(name:allStatusList[index].name));
@@ -2090,24 +2254,21 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                                                                   ],
                                                                 ),
                                                               ),
-                                                              child: FlatButton(
+                                                              child: ElevatedButton(
                                                                 child: Text(
-                                                                  AppLocalizations.of(
-                                                                      context)
-                                                                      .lblFilter,
-                                                                  style:
-                                                                  whiteColorStyle(
-                                                                      21),
+                                                                  AppLocalizations.of(context).lblFilter,
+                                                                  style: whiteColorStyle(21),
                                                                 ),
-                                                                textColor:
-                                                                Colors.white,
-                                                                color: Colors
-                                                                    .transparent,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                        30.0)),
+                                                                style: ButtonStyle(
+                                                                    foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                                                    backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                                                        RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(30),
+                                                                            side: BorderSide(color: yellowColor)
+                                                                        )
+                                                                    )
+                                                                ),
                                                                 onPressed: () {
                                                                   // setState((){
                                                                   Navigator.pop(context);
@@ -2194,10 +2355,59 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                               //   lastDate: ValidDate(year: now.year, month: now.month, day: now.month),
                               //   underLine: Text("kkkkkkkk"),
                               // ),
-                              makeBodyForAllmeetings(context, allMeetingList),
+                            allMeetingList.isNotEmpty?  makeBodyForAllmeetings(context, allMeetingList):
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Image.asset("assets/images/no_data.png"),
+                                    const SizedBox(height: 10,),
+                                    Text(AppLocalizations.of(context).lblNoData,style: blueColorBoldStyle(14),)
+                                  ],
+                                ),
+                              ),
                               const SizedBox(
                                 height: 30,
                               ),
+                              // SizedBox(
+                              //   height: 40,
+                              //   child: ListView.builder(
+                              //     scrollDirection: Axis.horizontal,
+                              //     itemCount: listLength,
+                              //     shrinkWrap: true,
+                              //     physics: NeverScrollableScrollPhysics(),
+                              //     padding: EdgeInsets.zero,
+                              //     itemBuilder: (BuildContext context, int index) =>
+                              //         InkWell(
+                              //           onTap: () {
+                              //             getAllMeetings(userToken, selectedDateString);
+                              //           },
+                              //           child: Container(
+                              //             margin: EdgeInsets.only(left: 3,right: 3),
+                              //             padding: EdgeInsets.only(left: 7,right: 7,bottom: 6),
+                              //             child: Center(
+                              //               child: Text((index.toString()).toString(),
+                              //                 style: TextStyle(
+                              //                     fontSize: 16,fontFamily: 'regular',color:
+                              //                 page==index+1?Colors.white:Colors.black
+                              //                 ),),
+                              //             ),
+                              //             decoration: BoxDecoration(
+                              //               borderRadius: BorderRadius.circular(30.0),
+                              //               gradient: LinearGradient(
+                              //                 begin: Alignment.topRight,
+                              //                 end: Alignment.bottomLeft,
+                              //                 stops: [0.1, 0.9],
+                              //                 colors: [
+                              //                   page==index+1?Color(0xffFEC20E):Colors.transparent,
+                              //                   page==index+1?Color(0xffFEC20E):Colors.transparent,
+                              //                 ],
+                              //               ),
+                              //             ),
+                              //           ),
+                              //         ),
+                              //
+                              //   ),
+                              // ),
                               const SizedBox(
                                 height: 30,
                               ),
@@ -2246,25 +2456,30 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                             children: [
                               Align(
                                 alignment: Alignment.centerRight,
-                                child:Container(
-                                  width: 160,
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: new BorderRadius.circular(10.0),
-                                      border: Border.all(
-                                          color: Colors.blue,// set border color
-                                          width: 1.0
-                                      )
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      TextButton(child: Text(selectedDateString,style: blueColorBoldStyle(22),),
-                                        onPressed: () {
-                                          showDateDialog(context);
-                                        },),
-                                      Icon(Icons.arrow_drop_down_rounded,size: 30,)
-                                    ],
+                                child:InkWell(
+                                  onTap:  () {
+                                    showDateDialog(context);
+                                  },
+                                  child: Container(
+                                    width: 160,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: new BorderRadius.circular(10.0),
+                                        border: Border.all(
+                                            color: Colors.blue,// set border color
+                                            width: 1.0
+                                        )
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        TextButton(child: Text(selectedDateString,style: blueColorBoldStyle(22),),
+                                          onPressed: () {
+                                            showDateDialog(context);
+                                          },),
+                                        Icon(Icons.arrow_drop_down_rounded,size: 30,)
+                                      ],
+                                    ),
                                   ),
                                 ) ,
                               ),
@@ -2283,54 +2498,135 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
                               const SizedBox(
                                 width: 10,
                               ),
-
-                              // InkWell(
-                              //   onTap: () async{
-                              //     this.check =  await Navigator.of(context).push(
-                              //         MaterialPageRoute(
-                              //             builder: (context) => CreateMeetingScreen()));
-                              //     if (check != null) {
-                              //       getAllMeetings(userToken);
-                              //       print("omarrrrr");
-                              //     }
-                              //   },
-                              //   child: Container(
-                              //     padding: EdgeInsets.only(
-                              //         left: 10, right: 10, top: 6, bottom: 6),
-                              //     decoration: BoxDecoration(
-                              //       borderRadius: BorderRadius.circular(10.0),
-                              //       border: Border.all(
-                              //           color: Color(0xffeaeaea),
-                              //           width: 0.6
-                              //       ),
-                              //       gradient: LinearGradient(
-                              //         begin: Alignment.topRight,
-                              //         end: Alignment.bottomLeft,
-                              //         stops: [0.1, 0.9],
-                              //         colors: [
-                              //           yellowLightColor,
-                              //           yellowLightColor,
-                              //         ],
-                              //       ),
-                              //     ),
-                              //     child: Text(
-                              //       "+",
-                              //       style: yellowColorStyleBold(28),
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                         ],
                       ),
                       const SizedBox(height: 20,),
-
-                      // const SizedBox(height: 20,),
-                      allFilterdMeetingList.isEmpty? Expanded(
+                      allMeetingList!=null&&allMeetingList.isNotEmpty?Expanded(
                         child: makeBodyForAllmeetings(context, allMeetingList),
                       ):Expanded(
-                        child: makeBodyForAllmeetings(context, allFilterdMeetingList),
+                        child: Center(
+                          child: Container(
+                            height: 250,
+                            width: 250,
+                            color: Colors.white,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset("assets/images/no_data.png"),
+                                const SizedBox(height: 10,),
+                                Text(AppLocalizations.of(context).lblNoData,style: blueColorStyleMediumWithColor(18,Colors.black),)
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                      // isFiltered?
+                      // allFilterdMeetingList.isEmpty?
+                      // Expanded(
+                      //   child: Center(
+                      //     child: Container(
+                      //       height: 250,
+                      //       width: 250,
+                      //       color: Colors.white,
+                      //       child: Column(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         crossAxisAlignment: CrossAxisAlignment.center,
+                      //         children: [
+                      //           Image.asset("assets/images/no_data.png"),
+                      //           const SizedBox(height: 10,),
+                      //           Text(AppLocalizations.of(context).lblNoData,style: blueColorStyleMediumWithColor(18,Colors.black),)
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ):Expanded(
+                      //   child: makeBodyForAllmeetings(context, allFilterdMeetingList),
+                      // ):allMeetingList.isNotEmpty?Expanded(
+                      //   child: makeBodyForAllmeetings(context, allMeetingList),
+                      // ):Expanded(
+                      //   child: Center(
+                      //     child: Container(
+                      //       height: 250,
+                      //       width: 250,
+                      //       color: Colors.white,
+                      //       child: Column(
+                      //         mainAxisAlignment: MainAxisAlignment.center,
+                      //         crossAxisAlignment: CrossAxisAlignment.center,
+                      //         children: [
+                      //           Image.asset("assets/images/no_data.png"),
+                      //           const SizedBox(height: 10,),
+                      //           Text(AppLocalizations.of(context).lblNoData,style: blueColorStyleMediumWithColor(18,Colors.black),)
+                      //         ],
+                      //       ),
+                      //     ),
+                      //   ),
+                      // )
+                      ,const SizedBox(height: 20,),
+                      if(allMeetingList!=null&&allMeetingList.isNotEmpty ) SizedBox(
+                        // width: 150,
+                          height: 30,
+                          child:
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  if(page>1) {
+                                    allMeetingList=[];
+                                    page = page - 1;
+                                    getAllMeetings(userToken, selectedDateString, page);
+                                    setState(() {});
+                                  }
+                                },
+                                child: Icon(Icons.arrow_back_ios_outlined,size: 14,),
+                              ),
+                              const SizedBox(width: 6,),
+                             if( listLength==listedIntegers.length ) ListView.builder(
+                                controller: scrollController,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: listLength,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                itemBuilder: (BuildContext context, int index) =>
+                                    InkWell(
+                                      onTap: () {
+                                        allMeetingList=[];
+                                        page=listedIntegers[index];
+                                        getAllMeetings(userToken, selectedDateString,page);
+                                        setState(() {});
+                                      },
+                                      child: CircleAvatar(
+                                        maxRadius: 14,
+                                        backgroundColor: page==index+1?Color(0xffFEC20E):Colors.transparent,
+                                        child: Text(listedIntegers[index].toString(),
+                                          style: TextStyle(
+                                              fontSize: 16,fontFamily: 'regular',color: page==index+1?Colors.white:Colors.black
+                                          ),),
+                                      ),
+                                    ),
+                              ),
+                              const SizedBox(width: 6,),
+                              InkWell(
+                                onTap: () {
+                                  if(page<listLength) {
+                                    allMeetingList=[];
+                                    page = page + 1;
+                                    getAllMeetings(userToken, selectedDateString, page);
+                                    setState(() {});
+                                  }
+                                },
+                                child: Icon(Icons.arrow_forward_ios,size: 14,),
+                              ),
+                            ],
+                          )
+
                       ),
+
                       const SizedBox(height: 20,),
                     ],
                   ),
@@ -2345,70 +2641,37 @@ class AllMeetingsScreenState extends State<AllMeetingsScreen> {
 
   void showDateDialog(BuildContext context) {
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Center(child: Text(AppLocalizations.of(context).lblDate,style: blueColorBoldStyle(18),)),
-          content:Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: new BorderRadius.circular(14.0),
-                border: Border.all(
-                    color: grayRoundedColor,// set border color
-                    width: 2.0
-                )
-            ),
-            child: LinearDatePicker(
-                // startDate: "2004/10/17", //yyyy/mm/dd
-                // endDate: "2020/02/20",
-                // initialDate: selectedDate.year.toString()+"/"+selectedDate.month.toString(),
-                initialDate:selectedDateString,
-                dateChangeListener: (String selectedDate) {
-                  // setState(() {
-                    selectedDateString=selectedDate;
-                    print("selectedDateString>>"+selectedDateString);
-                  // });
-                },
-                showDay: false,  //false -> only select year & month
-                labelStyle: TextStyle(
-                  fontFamily: 'bold',
-                  fontSize: 20.0,
-                  color: Colors.black,
-                ),
-                selectedRowStyle: TextStyle(
-                  fontFamily: 'bold',
-                  fontSize: 18.0,
-                  color: Colors.deepOrange,
-                ),
-                unselectedRowStyle: TextStyle(
-                  fontFamily: 'bold',
-                  fontSize: 16.0,
-                  color: Colors.blueGrey,
-                ),
-                yearText: AppLocalizations.of(context).lblYear,
-                monthText: AppLocalizations.of(context).lblMonth,
-                // dayText: " day",
-                showLabels: true, // to show column captions, eg. year, month, etc.
-                columnWidth: 100,
-                showMonthName: true,
-                isJalaali: false ,
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("اختر السنة",style: TextStyle(fontFamily: 'regular',color: Colors.black),),
+          content: Container( // Need to use container to add size constraint.
+            width: 300,
+            height: 300,
+            child: YearPicker(
+              firstDate: DateTime(DateTime.now().year - 100, 1),
+              lastDate: DateTime(DateTime.now().year + 100, 1),
+              initialDate: DateTime.now(),
+              selectedDate: dateCurrent,
+              onChanged: (DateTime dateTime) {
+                dateCurrent=dateTime;
+                selectedDateString=dateTime.year.toString();
+                page=1;
+                // role="";
+                // attendance="";
+                // committee="";
+                // meeting_status_id="";
+                print("selectedDateString>"+selectedDateString);
+                allMeetingList=[];
+                setState(() {});
+                getAllMeetings(userToken, selectedDateString,page);
+                Navigator.pop(context);
+              },
             ),
           ),
-          actions: [
-            Center(
-              child: TextButton(
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop('dialog');
-                    setState(() {
-                      selectedDateString=selectedDateString;
-                    });
-                    getAllMeetingsafter(userToken,selectedDateString);
-                    // Navigator.pop(context);
-                  },
-                  child: Text(AppLocalizations.of(context).lblConfirm,style: blueColorBoldStyle(22),)),
-            )
-          ],
-        ));
+        );
+      },
+    );
   }
 }
 

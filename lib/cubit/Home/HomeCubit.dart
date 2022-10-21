@@ -11,6 +11,7 @@ import 'package:itimaaty/Models/LoginRequestModel.dart';
 import 'package:itimaaty/Models/LoginResponseModel.dart';
 import 'package:itimaaty/Models/OrganizationResponseModel.dart';
 import 'package:itimaaty/Models/dashboard_response_model.dart';
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
 import 'package:itimaaty/network/end_points.dart';
 import 'package:itimaaty/network/remote/dio_helper.dart';
@@ -24,12 +25,12 @@ class HomeCubit extends Cubit<HomeStates> {
   DashboardResponseModel dashboardResponseModel;
 
 
-  void getDashboardData(String token) {
+  void getDashboardData(String baseUrl ,String token) {
     emit(HomeStatesLoadingState());
     EasyLoading.instance.loadingStyle=EasyLoadingStyle.custom;
     EasyLoading.show(status: 'loading...');
 
-    DioHelper.getWithToken(token, DASHBOARD,).then((value) {
+    DioHelper.getWithToken(baseUrl,token, Constants.DASHBOARD,).then((value) {
       dashboardResponseModel = DashboardResponseModel.fromJson(value);
       emit(HomeStatesSuccessState(dashboardResponseModel));
       // EasyLoading.showSuccess('Success!');

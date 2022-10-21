@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 
- grayTextColorStyleMedium(double fontSize){
-   return TextStyle(
-      color: grayTextColor ,
-      fontFamily: "medium",
-      fontSize: fontSize,
+grayTextColorStyleMedium(double fontSize){
+  return TextStyle(
+    color: grayTextColor ,
+    fontFamily: "medium",
+    fontSize: fontSize,
   );
 }
 grayTextColorStyleBlack(double fontSize){
@@ -15,12 +15,12 @@ grayTextColorStyleBlack(double fontSize){
     fontSize: fontSize,
   );
 }
- blueColorBoldStyle(double fontSize){
+blueColorBoldStyle(double fontSize){
   return TextStyle(
-      color: blueColor ,
-      fontFamily: "black",
-      fontSize: fontSize,
-      // fontWeight: FontWeight.bold
+    color: blueColor ,
+    fontFamily: "black",
+    fontSize: fontSize,
+    // fontWeight: FontWeight.bold
   );
 }
 blueColorStyleMedium(double fontSize){
@@ -50,8 +50,8 @@ blueColorStyleregular(double fontSize){
   );
 }
 
- yellowColorStyleRegular(double fontSize){
-   return TextStyle(
+yellowColorStyleRegular(double fontSize){
+  return TextStyle(
       color: yellowColor ,
       fontFamily: "regular",
       fontSize: fontSize,

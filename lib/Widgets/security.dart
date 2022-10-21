@@ -10,6 +10,8 @@ import 'CustomSwitch.dart';
 
 
 class Security extends StatefulWidget {
+ String baseUrl;
+ Security(this.baseUrl);
 
   @override
   _SecurityState createState() => _SecurityState();
@@ -22,7 +24,7 @@ class _SecurityState extends State<Security> {
     SharedPreferencesHelper.getLoggedToken().then((valueToken) {
       UserRepository userRepository =new UserRepository();
       load();
-      Future<Response> response = userRepository.authFactor(valueToken);
+      Future<Response> response = userRepository.authFactor(widget.baseUrl,valueToken);
       response.then((value) {
         if(value.statusCode==200){
           showSuccess();
@@ -34,6 +36,7 @@ class _SecurityState extends State<Security> {
     });
 
   }
+  String baseUrl;
   @override
   void initState() {
     SharedPreferencesHelper.getTowFactor().then((value) {
@@ -56,21 +59,22 @@ class _SecurityState extends State<Security> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(left:  20.0 , right: 20.0,bottom: 600),
+        padding: const EdgeInsets.only(left:  20.0 , right: 20.0,bottom: 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          // crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: 
             [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 customText(text:AppLocalizations.of(context).lblTwoFactorAuthentication ,size: 18),
                 const SizedBox(height: 10,),
                 customText(text: AppLocalizations.of(context).lblYouWillRecieve,color: Colors.grey),
             ],),
             Container(
+              margin: EdgeInsets.only(top: 30),
               // width: 50,
               // height: 30,
               // decoration: BoxDecoration(

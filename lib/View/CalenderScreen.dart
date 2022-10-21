@@ -1,21 +1,18 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/MyCalenderClass.dart';
 import 'package:itimaaty/Models/calender_response_model.dart';
-import 'package:itimaaty/Models/liked_response_model.dart';
 import 'package:itimaaty/Models/news_response_model.dart';
 import 'package:itimaaty/Repository/CalenderRepository.dart';
-import 'package:itimaaty/Repository/NewsRepository.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/NewsDetailsScreen.dart';
 import 'package:itimaaty/Widgets/HomeWidgets.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+import '../Utils/Constants.dart';
 import 'DrawerWidget.dart';
 import 'FontsStyle.dart';
 import 'SignInScreen.dart';
@@ -44,10 +41,10 @@ class CalenderScreenState extends State<CalenderScreen> {
     return "0" + value;
   }
 
-  Future<List<MyCalenderClass>> getCalender(String token,String date){
+  Future<List<MyCalenderClass>> getCalender(String baseUrl ,String token,String date){
     load();
     calenderRepository=CalenderRepository();
-    Future<CalenderResponseModel> newsData = calenderRepository.getCalennder(token,date);
+    Future<CalenderResponseModel> newsData = calenderRepository.getCalennder(baseUrl,token,date);
     newsData.then((value) {
       if(value!=null) {
         showSuccess();
@@ -62,7 +59,8 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.one[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.two.length;i++){
+          }
+          for(int i=0;i<value.two.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.two[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.two[i].startDate);
@@ -70,7 +68,8 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.two[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.three.length;i++){
+          }
+          for(int i=0;i<value.three.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.three[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.three[i].startDate);
@@ -78,7 +77,8 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.three[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.four.length;i++){
+          }
+          for(int i=0;i<value.four.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.four[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.four[i].startDate);
@@ -86,7 +86,8 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.four[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.five.length;i++){
+          }
+          for(int i=0;i<value.five.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.five[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.five[i].startDate);
@@ -94,7 +95,8 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.five[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.sex.length;i++){
+          }
+          for(int i=0;i<value.sex.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.sex[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.sex[i].startDate);
@@ -102,214 +104,245 @@ class CalenderScreenState extends State<CalenderScreen> {
             myCalenderClass.setColor(checkColor(value.sex[i].attendanceStatus));
             calenderList.add(myCalenderClass);
             print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.seven.length;i++){
+          }
+          for(int i=0;i<value.seven.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.seven[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.seven[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.seven[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.eight.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.eight.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.eight[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.eight[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.eight[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.nine.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.nine.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.nine[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.nine[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.nine[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.ten.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.ten.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.ten[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.ten[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.ten[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.eleven.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.eleven.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.eleven[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.eleven[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.eleven[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweleve.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweleve.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweleve[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweleve[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweleve[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.thirteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.thirteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.thirteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.thirteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.thirteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.fourteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.fourteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.fourteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.fourteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.fourteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.fifteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.fifteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.fifteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.fifteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.fifteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.sixteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.sixteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.sixteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.sixteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.sixteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.seventeen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.seventeen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.seventeen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.seventeen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.seventeen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.eighteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.eighteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.eighteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.eighteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.eighteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.nineteen.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.nineteen.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.nineteen[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.nineteen[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.nineteen[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweenty.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweenty.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweenty[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweenty[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweenty[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyOne.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyOne.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyOne[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyOne[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyOne[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyTwo.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyTwo.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyTwo[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyTwo[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyTwo[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyThree.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyThree.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyThree[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyThree[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyThree[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyFour.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyFour.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyFour[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyFour[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyFour[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyFive.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyFive.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyFive[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyFive[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyFive[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentySix.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentySix.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentySix[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentySix[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentySix[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentySeven.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentySeven.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentySeven[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentySeven[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentySeven[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyEight.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          for(int i=0;i<value.tweentyEight.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyEight[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyEight[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyEight[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.tweentyNine.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          if(value.tweentyNine!=null){
+          for(int i=0;i<value.tweentyNine.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.tweentyNine[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.tweentyNine[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.tweentyNine[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.thirty.length;i++){
-            MyCalenderClass myCalenderClass=new MyCalenderClass();
-            myCalenderClass.settitle(value.thirty[i].title);
-            DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.thirty[i].startDate);
-            myCalenderClass.setDateTime(tempDate);
-            myCalenderClass.setColor(checkColor(value.thirty[i].attendanceStatus));
-            calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
-          }for(int i=0;i<value.thirtyOne.length;i++){
+            // print("tempDateIs>>"+tempDate.toString());
+          }
+          }
+          if(value.thirty!=null&&value.thirty.isNotEmpty) {
+            for (int i = 0; i < value.thirty.length; i++) {
+              MyCalenderClass myCalenderClass = new MyCalenderClass();
+              myCalenderClass.settitle(value.thirty[i].title);
+              DateTime tempDate = new DateFormat("yyyy-MM-dd", 'en').parse(value.thirty[i].startDate);
+              myCalenderClass.setDateTime(tempDate);
+              myCalenderClass.setColor(checkColor(value.thirty[i].attendanceStatus));
+              calenderList.add(myCalenderClass);
+              // print("tempDateIs>>"+tempDate.toString());
+            }
+          }
+          if(value.thirtyOne!=null&&value.thirtyOne.isNotEmpty) {
+          for(int i=0;i<value.thirtyOne.length;i++){
             MyCalenderClass myCalenderClass=new MyCalenderClass();
             myCalenderClass.settitle(value.thirtyOne[i].title);
             DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(value.thirtyOne[i].startDate);
             myCalenderClass.setDateTime(tempDate);
             myCalenderClass.setColor(checkColor(value.thirtyOne[i].attendanceStatus));
             calenderList.add(myCalenderClass);
-            print("tempDateIs>>"+tempDate.toString());
+            // print("tempDateIs>>"+tempDate.toString());
           }
-          print("calenderListSize>>>>"+calenderList.length.toString());
+          }
+          // print("calenderListSize>>>>"+calenderList.length.toString());
           return  calenderList;
         });
       }else{
         showError();
         if(value==null){
-          navigateAndFinish(context, SignInScreen());
+          navigateAndFinish(context, SignInScreen(false));
         }
       }
     });
@@ -424,18 +457,26 @@ class CalenderScreenState extends State<CalenderScreen> {
     }else if(day=="31"){
       list = calenderResponseModel.thirtyOne;
     }
-    for(int i=0;i<list.length;i++){
-      listReturned.add(One.fromJson(jsonDecode(json.encode(list[i]))));
+    if(list!=null) {
+      for (int i = 0; i < list.length; i++) {
+        listReturned.add(One.fromJson(jsonDecode(json.encode(list[i]))));
+      }
     }
 
     return listReturned;
   }
 
+  String baseUrl="";
+
   @override
   void initState() {
     SharedPreferencesHelper.getLoggedToken().then((value) {
       token=value;
-      getCalender(value,"2022/1");
+        String baseUri= Constants.BASE_URL;
+        setState(() {
+          baseUrl=baseUri;
+        });
+        getCalender(baseUrl,token,"2022/2");
     });
     super.initState();
   }
@@ -618,7 +659,9 @@ class CalenderScreenState extends State<CalenderScreen> {
                       List<One> oneList=getList(calendarTapDetails.date.day.toString());
                       DateFormat dateFormat = DateFormat('dd MMMM yyyy','en');
                       String date=  dateFormat.format(calendarTapDetails.date);
-                      openBottomSheet(oneList,date);
+                      if(oneList!=null&&oneList.isNotEmpty) {
+                        openBottomSheet(oneList, date);
+                      }
                       // print("listSizeIs>>"+oneList.length.toString());
 
                     },

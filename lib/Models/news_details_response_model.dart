@@ -47,6 +47,11 @@ class NewsDetailsResponseModel {
   List<NewsDetailsResponseModelLikers> get likers => _likers;
   List<Gallery> get gallery => _gallery;
 
+
+  set liked(bool value) {
+    _liked = value;
+  }
+
   NewsDetailsResponseModel({
       int id, 
       int author, 

@@ -351,7 +351,96 @@ String get lblChange{
     return Intl.message('lblMonth', name: 'lblMonth');
   }String get lblYear{
     return Intl.message('lblYear', name: 'lblYear');
+  }String get lblInvalidCredentials{
+    return Intl.message('lblInvalidCredentials', name: 'lblInvalidCredentials');
+  }String get lblLow{
+    return Intl.message('lblLow', name: 'lblLow');
+  }String get lblHigh{
+    return Intl.message('lblHigh', name: 'lblHigh');
+  }String get lblSaveDocument{
+    return Intl.message('lblSaveDocument', name: 'lblSaveDocument');
+  }String get lblSaveSuccessfuly{
+    return Intl.message('lblSaveSuccessfuly', name: 'lblSaveSuccessfuly');
+  }String get lblAddNewOrganization{
+    return Intl.message('lblAddNewOrganization', name: 'lblAddNewOrganization');
+  }String get lblNoData{
+    return Intl.message('lblNoData', name: 'lblNoData');
+  }String get lblAllApprovals{
+    return Intl.message('lblAllApprovals', name: 'lblAllApprovals');
+  }String get lblActionRequired{
+    return Intl.message('lblActionRequired', name: 'lblActionRequired');
+  }String get lblNoInternet{
+    return Intl.message('lblNoInternet', name: 'lblNoInternet');
+  }String get lblWaitingForOthers{
+    return Intl.message('lblWaitingForOthers', name: 'lblWaitingForOthers');
+  }String get lblCompleted{
+    return Intl.message('lblCompleted', name: 'lblCompleted');
+  }String get lblSubject{
+    return Intl.message('lblSubject', name: 'lblSubject');
+  }String get lblCreatedAt{
+    return Intl.message('lblCreatedAt', name: 'lblCreatedAt');
+  }String get lblLastModified{
+    return Intl.message('lblLastModified', name: 'lblLastModified');
+  }String get lblCompanyContract{
+    return Intl.message('lblCompanyContract', name: 'lblCompanyContract');
+  }String get lblSender{
+    return Intl.message('lblSender', name: 'lblSender');
+  }String get lblYourDecision{
+    return Intl.message('lblYourDecision', name: 'lblYourDecision');
+  }String get lblDocuments{
+    return Intl.message('lblDocuments', name: 'lblDocuments');
+  }String get lblSigningDiagram{
+    return Intl.message('lblSigningDiagram', name: 'lblSigningDiagram');
+  }String get lblSteps{
+    return Intl.message('lblSteps', name: 'lblSteps');
+  }String get lblRecipients{
+    return Intl.message('lblRecipients', name: 'lblRecipients');
+  }String get lblSignInSso{
+    return Intl.message('lblSignInSso', name: 'lblSignInSso');
+  }String get lblVote{
+    return Intl.message('lblVote', name: 'lblVote');
+  }String get lblMyStatus{
+    return Intl.message('lblMyStatus', name: 'lblMyStatus');
+  }String get lblReject{
+    return Intl.message('lblReject', name: 'lblReject');
+  }String get lblSign{
+    return Intl.message('lblSign', name: 'lblSign');
+  }String get lblAddSignature{
+    return Intl.message('lblAddSignature', name: 'lblAddSignature');
+  }String get lblDraw{
+    return Intl.message('lblDraw', name: 'lblDraw');
+  }String get lblImage{
+    return Intl.message('lblImage', name: 'lblImage');
+  }String get lblSignHere{
+    return Intl.message('lblSignHere', name: 'lblSignHere');
+  }String get lblClear{
+    return Intl.message('lblClear', name: 'lblClear');
+  }String get lblSUBMIT{
+    return Intl.message('lblSUBMIT', name: 'lblSUBMIT');
+  }String get lblUploadSignature{
+    return Intl.message('lblUploadSignature', name: 'lblUploadSignature');
+  }String get lblPartlySigned{
+    return Intl.message('lblPartlySigned', name: 'lblPartlySigned');
+  }String get lblFullySigned{
+    return Intl.message('lblFullySigned', name: 'lblFullySigned');
+  }String get lblNew{
+    return Intl.message('lblNew', name: 'lblNew');
+  }String get lblApprovedSignature{
+    return Intl.message('lblApprovedSignature', name: 'lblApprovedSignature');
+  }String get lblNeedToSign{
+    return Intl.message('lblNeedToSign', name: 'lblNeedToSign');
+  }String get lblSearch{
+    return Intl.message('lblSearch', name: 'lblSearch');
+  }String get lblNot{
+    return Intl.message('lblNot', name: 'lblNot');
+  }String get lblOrganizer{
+    return Intl.message('lblOrganizer', name: 'lblOrganizer');
+  }String get lblEditor{
+    return Intl.message('lblEditor', name: 'lblEditor');
+  }String get lblParticipate{
+    return Intl.message('lblParticipate', name: 'lblParticipate');
   }
+
 }
 
 class SpecificLocalizationDelegate

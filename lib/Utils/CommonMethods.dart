@@ -1,14 +1,20 @@
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Utils/Constants.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pspdfkit_flutter/src/main.dart';
 import 'package:http/http.dart' as http;
+import 'package:signature/signature.dart';
 
+import '../Models/AllAprovalsResponseModel.dart';
 import 'AppColors.dart';
 import 'Pdf/pspdfkit_annotations_example.dart';
 // String getDoubleDigit(String value) {
@@ -25,10 +31,81 @@ import 'Pdf/pspdfkit_annotations_example.dart';
 //   return formattedDate;
 // }
 
+Set<Map<String,String>> getRoleList(BuildContext context){
+  var roleList={
+    {
+      "name": AppLocalizations.of(context).lblAll,
+      "value": "All",
+    },
+    {
+      "name": AppLocalizations.of(context).lblOrganizer,
+      "value": "Admin",
+    },
+    {
+      "name": AppLocalizations.of(context).lblEditor,
+      "value": "Editor",
+    },
+    {
+      "name": AppLocalizations.of(context).lblParticipate,
+      "value": "Viewer",
+    },
+  };
+  return roleList;
+}
+
+String convetIntList(List<int>list){
+  List<int>listNew = list.where((spacecraft) => spacecraft != -1).toList();
+   String returenedItem=listNew.join(",");
+  return returenedItem;
+}
+void downloadFileandOpen(BuildContext context, String url, String fileName) async {
+
+  var directory = Platform.isAndroid
+      ? await getExternalStorageDirectory() //FOR ANDROID
+      : await getApplicationSupportDirectory();
+
+  String dir = directory.path;
+
+  File file = new File('$dir/$fileName');
+
+  if (await file.exists()) {
+    // showSuccessMsg(AppLocalizations.of(context).lblSaveSuccessfuly);
+    showSuccessMsg("File Already Downloaded");
+    // OpenFile.open(file.path);
+  } else {
+    load();
+    // Utils.showLoaderDialogwithTitle(context, "Downloading...");
+
+    HttpClient httpClient = new HttpClient();
+
+    try {
+      var request = await httpClient.getUrl(Uri.parse(url));
+      var response = await request.close();
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+
+        var bytes = await consolidateHttpClientResponseBytes(response);
+        print(file.path);
+        await file.writeAsBytes(bytes).then((value) {
+          showSuccess();
+          showSuccessMsg("Successfully Downloaded");
+        });
+      }
+
+      // Navigator.pop(context);
+    } catch (ex) {
+      showError();
+      // Navigator.pop(context);
+      print(ex.toString());
+      // Utils.displayToast(context, ex.toString());
+    } finally {
+      // OpenFile.open(file.path);
+    }
+  }}
 
 
 Future<File> createFileOfPdfUrl(String filename,String url) async {
-  print("filenameIs>>"+filename.toString());
+  // print("filenameIs>>"+url.toString());
   if(filename==null||filename.isEmpty){
     filename="emptyFile";
   }
@@ -44,34 +121,41 @@ Future<File> createFileOfPdfUrl(String filename,String url) async {
   return file;
 }
 
-void showDocument(String type, int subId,int meetingId,int id ,int library_id,String name ,String url,BuildContext context) async {
+void showDocumentForApprovals(AllAprovalsResponseModelData root,String type, int subId,int meetingId,int id ,int library_id,String name ,String url,BuildContext context) async {
   onLoading(context);
   print("urlllll>>"+url.toString());
 
   try {
-    // String newUrl;
-    // if(url.contains('pdf')){
-    //   const end = ".pdf";
-    //   final endIndex = url.indexOf(end);
-    //   newUrl=url.substring(0,endIndex);
-    //   print("newUrlIs>>"+url.substring(0,endIndex).toString()); // brown fox jumps
-    //   // url.substring(0,endIndex);
-    // }
-    // await Pspdfkit.se
-    // await Pspdfkit.setLicenseKeys(Constants.android, Constants.ios);
-    // await Pspdfkit.setLicenseKey(Constants.android);
-
     createFileOfPdfUrl(name,  url).then((value) async {
-      // File(value.path).exists().then((value) {
-      //   print("valueIsssssssss>>"+value.toString());
-      // });
-      // Pspdfkit.
-
-      // final extractedDocument = await extractAsset(_documentPath);
       print("valuevalueIs>>"+value.toString());
       print("pathIs>>"+value.path.toString());
       dismissLoading(context);
+      // Navigator.pop(context);
+      await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
+          builder: (_) => PspdfkitAnnotationsExampleWidget(
+            type: type,
+            subId: subId,
+            documentPath: value.path,
+            meetingId: meetingId,
+            id: id,
+            library_Id: library_id,)));
 
+    });
+
+  } on PlatformException catch (e) {
+    print("Failed to open document: '${e.message}'.");
+  }
+}
+
+void showDocument(String type, int subId,int meetingId,int id ,int library_id,String name ,String url,BuildContext context) async {
+  onLoading(context);
+  print("urllllloooooooooo>>"+url.toString());
+
+  try {
+    createFileOfPdfUrl(name,  url).then((value) async {
+      print("valuevalueIs>>"+value.toString());
+      print("pathIs>>"+value.path.toString());
+      dismissLoading(context);
       Navigator.pop(context);
       await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
           builder: (_) => PspdfkitAnnotationsExampleWidget(
@@ -93,14 +177,17 @@ void onLoading(BuildContext context) {
   showDialog(
     barrierDismissible: false,
     context: context,
-    builder: (context) => Center(
-      child: Padding(
-          padding: const EdgeInsets.all(0.0),
-          child: CircularProgressIndicator(
-            backgroundColor: Colors.grey.shade300,
-            valueColor: AlwaysStoppedAnimation<Color>(grayColor),
-            strokeWidth: 10,
-          )
+    builder: (context) => WillPopScope(
+      onWillPop: () => Future.value(false),
+      child: Center(
+        child: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.grey.shade300,
+              valueColor: AlwaysStoppedAnimation<Color>(grayColor),
+              strokeWidth: 10,
+            )
+        ),
       ),
     ),
   );
@@ -219,6 +306,14 @@ String getDoubleDigit(String value) {
   return "0" + value;
 }
 
+String getFormattedDateForCalender(DateTime day) {
+  String formattedDate =
+      getDoubleDigit(day.year.toString()) + "/" +
+          // getDoubleDigit(monthNames[day.month-1]) ;
+          getDoubleDigit(day.month.toString()) ;
+  return formattedDate;
+}
+
 String getFormattedDate(DateTime day) {
   String formattedDate =
       getDoubleDigit(day.day.toString()) + " " +
@@ -277,3 +372,25 @@ Future<DateTime> selectDateTime(BuildContext context) => showDatePicker(
   firstDate: DateTime.now(),
   lastDate: DateTime(2100),
 );
+
+Future<Uint8List> exportSignature(SignatureController controller) async {
+  final exportController = SignatureController(
+    penStrokeWidth: 2,
+    exportBackgroundColor: Colors.white,
+    penColor: Colors.black,
+    points: controller.points,
+  );
+
+  final signature = exportController.toPngBytes();
+
+  //clean up the memory
+  exportController.dispose();
+
+  return signature;
+}
+
+Future<String> urlImageToBase64(String imageUrl) async {
+  http.Response response = await http.get(Uri.parse(imageUrl));
+  final bytes = response?.bodyBytes;
+  return (bytes != null ? base64Encode(bytes) : null);
+}

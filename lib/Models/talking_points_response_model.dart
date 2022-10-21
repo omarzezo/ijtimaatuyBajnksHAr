@@ -858,6 +858,11 @@ class TalkingPointsComments {
   String get createdAt => _createdAt;
   String get updatedAt => _updatedAt;
 
+
+  set id(int value) {
+    _id = value;
+  }
+
   TalkingPointsComments({
     int id,
     String commentableId,
@@ -917,4 +922,47 @@ class TalkingPointsComments {
     return map;
   }
 
+  set commentableId(String value) {
+    _commentableId = value;
+  }
+
+  set commentableType(String value) {
+    _commentableType = value;
+  }
+
+  set commentedId(String value) {
+    _commentedId = value;
+  }
+
+  set commentedType(String value) {
+    _commentedType = value;
+  }
+
+  set comment(String value) {
+    _comment = value;
+  }
+
+  set user_image(String value) {
+    _user_image = value;
+  }
+
+  set user_name(String value) {
+    _user_name = value;
+  }
+
+  set approved(bool value) {
+    _approved = value;
+  }
+
+  set rate(dynamic value) {
+    _rate = value;
+  }
+
+  set createdAt(String value) {
+    _createdAt = value;
+  }
+
+  set updatedAt(String value) {
+    _updatedAt = value;
+  }
 }

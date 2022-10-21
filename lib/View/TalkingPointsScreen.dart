@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/AddCommentRequestModel.dart';
@@ -36,6 +39,12 @@ import 'package:itimaaty/cubit/Home/HomeCubit.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
 import 'package:itimaaty/Models/change_vote_response_model.dart';
 
+import '../LocalDb/DbHelper.dart';
+import '../LocalDb/DecisionTableOffline.dart';
+import '../LocalDb/OfflineDataLocalModel.dart';
+import '../Models/DeleteCommentsRequestModel.dart';
+import '../Models/LoginResponseModel.dart';
+
 class TalkingPointsScreen extends StatefulWidget {
   int meetingId;
   int decisionId;
@@ -63,12 +72,13 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
   List<String> denied=[];
   List<String> pending =[];
   List<TalkingPointsComments> userAndCommentsList =[];
-  List<String> votesList =["Approved","Pending","Rejected","Abstained"];
-  String votesValue;
   String status='';
   String firstChar='';
   int biggestPercent=0;
   static List<DataForPicChart> data = [];
+  var dbHelper = DbHelper();
+  String userImage;
+  String userName;
 
   String durationToString(int minutes) {
     var d = Duration(minutes:minutes);
@@ -77,43 +87,33 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
   }
 
   
-  void getDescisionData(String token) {
+  void getDescisionData(String baseUrl ,String token) {
     // load();
     meetingRepository = new MeetingRepository();
-    Future<TalkingPointsResponseModel> allList = meetingRepository.getTalikingPointsData(token,widget.meetingId,widget.decisionId);
-    allList.then((value) {
+    // Future<TalkingPointsResponseModel> allList = meetingRepository.getTalikingPointsData(baseUrl,token,widget.meetingId,widget.decisionId);
+    Future<String> allList = meetingRepository.getTalikingPointsData(baseUrl,token,widget.meetingId,widget.decisionId);
+    allList.then((string) {
       setState(() {
-        if (value != null) {
-          // showSuccess();
+        if (string != null) {
           userAndCommentsList.clear();
+          TalkingPointsResponseModel value =  TalkingPointsResponseModel.fromJson(json.decode(string));
+          addOrUpdateOfflineTalkingPoint(string);
           decisonResponseModel = value;
-
           if(decisonResponseModel.comments!=null&&decisonResponseModel.comments.isNotEmpty){
             for(int i=0;i<decisonResponseModel.comments.length;i++) {
-
-              // print("commentsIs>>"+ decisonResponseModel.comments[i].user_image.toString());
-              // print("commentsIs>>"+ decisonResponseModel.comments[i].user_name.toString());
               userAndCommentsList.add(TalkingPointsComments(
                   comment: decisonResponseModel.comments[i].comment,
                   id:decisonResponseModel.comments[i].id ,
-                  // img: i<decisonResponseModel.participants.length?decisonResponseModel.participants[i].user.image:"",
+                  commentedId: decisonResponseModel.comments[i].commentedId,
                   user_image: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
                   user_name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
-                  // name:i<decisonResponseModel.participants.length? decisonResponseModel.participants[i].user.name:"",
                   createdAt: decisonResponseModel.comments[i].createdAt));
-
-              // userAndCommentsList.add(TalkingPointsComments(
-              //     comment: decisonResponseModel.comments[i].comment,
-              //     // img:i<decisonResponseModel.voters.length? decisonResponseModel.voters[i].user.image:"",
-              //     // name:i<decisonResponseModel.voters.length? decisonResponseModel.voters[i].user.name:"",
-              //     createdAt: decisonResponseModel.comments[i].createdAt));
             }
           }
           print("dfdfdfdfdfdfdfdfd");
         }else{
-          // showError();
-          if(value==null){
-            navigateAndFinish(context, SignInScreen());
+          if(string==null){
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
@@ -124,19 +124,19 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
   void addComment(String token,String note) {
     load();
     meetingRepository = new MeetingRepository();
-    Future<List<AddCommentResponseModel>> allList = meetingRepository.addCommentTalkingPoint(token,widget.decisionId,new AddCommentRequestModel(comment: note));
+    Future<List<AddCommentResponseModel>> allList = meetingRepository.addCommentTalkingPoint(baseUrl,token,widget.decisionId,new AddCommentRequestModel(comment: note));
     allList.then((value) {
       setState(() {
         if (value != null) {
           writeCommentControler.text='';
           showSuccess();
-          getDescisionData(userToken);
+          getDescisionData(baseUrl,userToken);
           // meetingDetailsResponseModel = value;
           // Navigator.pop(context);
         }else{
           showError();
           if(value==null){
-            navigateAndFinish(context, SignInScreen());
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
@@ -146,13 +146,13 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
   void deleteComment(String token, int id) {
     load();
     meetingRepository = new MeetingRepository();
-    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(id,token);
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(baseUrl,id,token);
     allList.then((value) {
       setState(() {
         if (value != null) {
 
           showSuccessMsg("Deleted Successfully");
-          getDescisionData(userToken);
+          getDescisionData(baseUrl,userToken);
          
         }else{
           showError();
@@ -179,6 +179,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
   }
 
   Widget leaveRowForTalkingPointsComments(BuildContext context,TalkingPointsComments leave,int index) {
+    // print("commentId>>"+leave.commentedId.toString());
     return InkWell(
       onTap: () {
 
@@ -210,6 +211,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                   )
               ),
               Container(
+                width: MediaQuery.of(context).size.width/2-100,
                 margin: EdgeInsets.only(left: 14,right: 14),
                 padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
                 decoration: BoxDecoration(
@@ -238,12 +240,26 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                     const SizedBox(height: 6,),
                     Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
                     const SizedBox(height: 10,),
+                    userId==int.parse(leave.commentedId)?
                     InkWell(
                       onTap: () {
-                        deleteComment(userToken, leave.id);
+                        hasNetwork().then((value) {
+                          if(value){
+                            deleteComment(userToken, leave.id);
+                          }else{
+                            dbHelper.deleteStoredDecisionComment(whereArgs: [leave.id]).then((value) {
+                              print("ValIss>>"+value.toString());
+                              print("commentIs>>"+leave.comment);
+                              print("idIs>>"+leave.id.toString());
+                              print("indexIs>>"+index.toString());
+                              fillDeleteComments(index, leave.id,leave.comment,value);
+                            });
+                          }
+                        });
                       },
                       child:Text(AppLocalizations.of(context).lblDelete,style: blueColorBoldStyle(16),) ,
                     )
+                        :Container()
                   ],
                 ),
               )
@@ -254,20 +270,248 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
     );
   }
 
+  int userId=0;
+  String baseUrl="";
+
   @override
   void initState() {
-    SharedPreferencesHelper.getLoggedToken().then((value) {
-      userToken=value;
-      SharedPreferencesHelper.getLoggedUserName().then((valueSecond) {
-        SharedPreferencesHelper.getUserImageUrl().then((value) {
-          // firstChar=valueSecond.split(" ");
-          for(int i=0;i<valueSecond.split(" ").length ;i++){
-            firstChar+=valueSecond.split(" ")[i][0];
-          }
-          getDescisionData(userToken);
+    getUser().then((value) {
+      userId=value.id;
+      userImage=value.image!=null?value.image:"";
+      userName=value.name!=null?value.name:"";
+      SharedPreferencesHelper.getLoggedToken().then((value) {
+        userToken=value;
+        SharedPreferencesHelper.getLoggedUserName().then((valueSecond) {
+          SharedPreferencesHelper.getUserImageUrl().then((value) {
+            // firstChar=valueSecond.split(" ");
+            for(int i=0;i<valueSecond.split(" ").length ;i++){
+              firstChar+=valueSecond.split(" ")[i][0];
+            }
+              String baseUri= Constants.BASE_URL;
+              setState(() {
+                baseUrl=baseUri;
+                hasNetwork().then((hasNet) {
+                  if(hasNet){
+                    // getDescisionData(baseUrl,userToken);
+                    getOfflineComments();
+                  }else{
+                    getOfflineTalkingPoint();
+                  }
+                });
+              });
 
+          });
         });
       });
+    });
+  }
+
+  Future getOfflineTalkingPoint() async {
+    var orgainzationsFuture = dbHelper.getTalkingPointColumn(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString());
+    orgainzationsFuture.then((data) {
+      setState(()  {
+        // this.offlineMeetings = data;
+        for(int i=0;i<data.length;i++){
+          OfflineDataLocalModel localModel =data[i];
+          if(localModel.url==baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString()) {
+            setState(() {
+              TalkingPointsResponseModel value =  TalkingPointsResponseModel.fromJson(json.decode(localModel.talkingPoint));
+              decisonResponseModel = value;
+              if(decisonResponseModel.comments!=null&&decisonResponseModel.comments.isNotEmpty){
+                for(int i=0;i<decisonResponseModel.comments.length;i++) {
+                  userAndCommentsList.add(TalkingPointsComments(
+                      comment: decisonResponseModel.comments[i].comment,
+                      id:decisonResponseModel.comments[i].id ,
+                      commentedId: decisonResponseModel.comments[i].commentedId,
+                      user_image: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
+                      user_name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
+                      createdAt: decisonResponseModel.comments[i].createdAt));
+                }
+              }
+            });
+            break;
+          }
+          // allFilterdMeetingList = allMeetingList;
+        }
+      });
+    });
+  }
+
+  Future<bool> addOrUpdateOfflineTalkingPoint(String string) async {
+    // var orgainzationsFuture = dbHelper.getOfflineData();
+    var orgainzationsFuture = dbHelper.getTalkingPointColumn(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString());
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      for(int i=0;i<data.length;i++){
+        OfflineDataLocalModel localModel =data[i];
+        if(localModel.url==baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString()) {
+          m =true;
+          break;
+        }else{
+          m=false;
+        }
+      }
+    }).then((value) async {
+      print("inserstinserst>>"+m.toString());
+      if(m){
+        var result = await dbHelper.updateTalkingPoint(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString(),string);
+      }else{
+        var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
+          url: baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.TALIKIN_POINTS+widget.decisionId.toString(),
+          talkingPoint: string,
+        ));
+      }
+    });
+  }
+
+  //For Add Comment << __________________________________________________________
+
+  Future<int> addOfflineComment(String comment) async {
+    var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+      url: baseUrl+"talkingpoints/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments,
+      addDecisionComment: comment,
+    ));
+    print("result>>"+result.toString());
+    return result;
+  }
+
+  Future<bool> addOfflineCommentToAPi(List<AddCommentRequestModel> model) {
+    bool m = false ;
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<List<AddCommentResponseModel>> allList = meetingRepository.addMultipleTalkingPointComments(baseUrl,userToken,widget.decisionId,model);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          dbHelper.deleteAllDecisionComments(whereArgs: [baseUrl+"talkingpoints/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments]);
+          showSuccess();
+          m=true;
+          // return m;
+        }else{
+          m=false;
+          showError();
+          if(value==null){
+            navigateAndFinish(context, SignInScreen(false));
+          }
+        }
+      });
+    }).then((value) {
+      if(m){
+        getOfflineDeleteComments();
+      }
+    });
+  }
+
+  Future<bool> getOfflineComments() async {
+    var orgainzationsFuture = dbHelper.getDecisionComment(baseUrl+"talkingpoints/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments);
+    orgainzationsFuture.then((data) async {
+      print("lemgth>>"+data.toString());
+      if(data.isNotEmpty) {
+        await addOfflineCommentToAPi(data);
+      }else{
+        getOfflineDeleteComments();
+      }
+    }).then((value) {
+    });
+  }
+
+
+  // __________________________________________________________ >>
+
+  //For Delete Comment << __________________________________________________________
+
+  Future<bool> addDeleteOfflineComment(int commentId) async {
+    var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+      url: baseUrl+Constants.DeleteMultipleComments+"talkingpoints/"+widget.decisionId.toString(),
+      deleteDecisionComment: commentId,
+    ));
+    print("resultmmmm>"+result.toString());
+  }
+
+  Future<bool> getOfflineDeleteComments() async {
+    var orgainzationsFuture = dbHelper.getDeleteDecisionComment(baseUrl+Constants.DeleteMultipleComments+"talkingpoints/"+widget.decisionId.toString());
+    orgainzationsFuture.then((data) async {
+      print("lemgthHere>>"+data.toString());
+      if(data.isNotEmpty) {
+        await deleteOfflineCommentToAPi(userToken,data);
+      }else{
+        // getOfflineVote();
+        getDescisionData(baseUrl,userToken);
+      }
+    }).then((value) {
+    });
+    //
+  }
+
+  Future<bool> deleteOfflineCommentToAPi(String token,List<DeleteCommentsRequestModel> model) {
+    bool m = false ;
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteMultipleComment(baseUrl,token,model);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          dbHelper.deleteAllDecisionComments(whereArgs: [baseUrl+Constants.DeleteMultipleComments+"talkingpoints/"+widget.decisionId.toString()]);
+          showSuccess();
+          m=true;
+        }else{
+          m=false;
+          showError();
+          if(value==null){
+            showErrorWithMsg('this item not deleted');
+            // navigateAndFinish(context, SignInScreen());
+          }
+        }
+      });
+    }).then((value) {
+      if(m){
+        // getOfflineVote();
+        getDescisionData(baseUrl,userToken);
+      }
+    });
+  }
+
+  // __________________________________________________________ >>
+  fillComments(String comment,int id) {
+    setState(() {
+      DateFormat dateFormat;
+      if (AppLocalizations.of(context).locale == "en") {
+        dateFormat = DateFormat('yyyy-MM-dd hh:mm', 'en');
+      } else {
+        dateFormat = DateFormat('yyyy-MM-dd hh:mm', 'ar');
+      }
+      String date = dateFormat.format(DateTime.now());
+      TalkingPointsComments modelComments = new TalkingPointsComments();
+      modelComments.id = id;
+      // modelComments.id = null;
+      modelComments.user_image = userImage;
+      modelComments.comment = comment;
+      modelComments.user_name = userName;
+      modelComments.createdAt = date;
+      modelComments.commentedId = userId.toString();
+      decisonResponseModel.comments.add(modelComments);
+      userAndCommentsList.add(TalkingPointsComments(
+          comment: modelComments.comment,
+          id: modelComments.id,
+          commentedId: modelComments.commentedId,
+          user_image:  modelComments.user_image != null ? modelComments.user_image : "",
+          user_name:  modelComments.user_name != null ? modelComments.user_name : "",
+          createdAt: modelComments.createdAt));
+      writeCommentControler.text="";
+      String dataString= json.encode(decisonResponseModel.toJson());
+      addOrUpdateOfflineTalkingPoint(dataString);
+    });
+  }
+
+  fillDeleteComments(int index,int id,String comment,int num) {
+    setState(() {
+      decisonResponseModel.comments.removeWhere((item) => item.id == id);
+      userAndCommentsList.removeAt(index);
+      String dataString= json.encode(decisonResponseModel.toJson());
+      addOrUpdateOfflineTalkingPoint(dataString);
+      if(num==0){
+        addDeleteOfflineComment(id);
+      }
     });
   }
 
@@ -302,7 +546,8 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
 
                       Container(
                         child: Text(
-                          AppLocalizations.of(context).lblTalkingPoints,
+                          // AppLocalizations.of(context).lblTalkingPoints,
+                          AppLocalizations.of(context).lblAgenda,
                           style: blueColorBoldStyle(26),
                         ),margin: EdgeInsets.only(top: 8,left: 16,right: 16),
                       ),
@@ -460,7 +705,7 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                                       crossAxisAlignment:CrossAxisAlignment.start,
                                       children: [
                                         Text(AppLocalizations.of(context).lblDuration, style: blueColorBoldStyle(22),),
-                                        const SizedBox(height: 20,),
+                                        const SizedBox(height: 12,),
                                         // Text(decisonResponseModel.deadline!=null?
                                         // getFormattedDate(stringToDateTime(decisonResponseModel.deadline)):"2021 oct ",style:
                                         // grayTextColorStyleMedium(18),)
@@ -628,8 +873,15 @@ class TalkingPointsScreenState extends State<TalkingPointsScreen> {
                                         InkWell(
                                           onTap: () {
                                             setState(() {
-
-                                              addComment(userToken, writeCommentControler.text==null?"": writeCommentControler.text);
+                                              hasNetwork().then((value){
+                                                if(value){
+                                                  addComment(userToken, writeCommentControler.text==null?"": writeCommentControler.text);
+                                                }else{
+                                                  addOfflineComment(writeCommentControler.text==null?"": writeCommentControler.text).then((value) {
+                                                    fillComments(writeCommentControler.text==null?"": writeCommentControler.text,value);
+                                                  });
+                                                }
+                                              });
                                             });
                                           },
                                           child: Container(

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/network/end_points.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,12 +12,13 @@ import 'AppException.dart';
 class DioHelper {
 
   static Future<dynamic> getForOrganization(String domain) async {
-    print('Api Get, url $domain');
+    // print('Api Get, url $domain');
+    // print('Api Get, url>>'+Constants.URL_ORGANIZATION1+domain+Constants.URL_ORGANIZATION2);
     var responseJson;
     try {
-      final response = await http.get(Uri.parse(URL_ORGANIZATION1+domain+URL_ORGANIZATION2));
-      print("My UrlIs>>"+URL_ORGANIZATION1+domain+URL_ORGANIZATION2);
-      responseJson = _returnResponse(response);
+      // final response = await http.get(Uri.parse(Constants.URL_ORGANIZATION1+domain+Constants.URL_ORGANIZATION2));
+      // print("My UrlIs>>"+Constants.URL_ORGANIZATION1+domain+Constants.URL_ORGANIZATION2);
+      // responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
       throw FetchDataException('No Internet connection');
@@ -25,7 +27,7 @@ class DioHelper {
     return responseJson;
   }
 
- static Future<dynamic> getWithToken(String token ,String url) async {
+ static Future<dynamic> getWithToken(String baseUrl, String token ,String url) async {
     print('Api Get, url $url');
 
     var responseJson;
@@ -33,9 +35,9 @@ class DioHelper {
       print("TokenIS>>>"+token);
       Map<String, String> headers = {"Content-type": "application/json",
         'token': token};
-      final response = await http.get(Uri.parse(BASE_URL + url),headers: headers);
+      final response = await http.get(Uri.parse(baseUrl + url),headers: headers);
       print("My Url");
-      print(BASE_URL + url);
+      print(baseUrl + url);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -45,13 +47,13 @@ class DioHelper {
     return responseJson;
   }
 
-  static Future<dynamic> get(String url) async {
+  static Future<dynamic> get(String baseUrl ,String url) async {
     print('Api Get, url $url');
     var responseJson;
     try {
-      final response = await http.get(Uri.parse(BASE_URL + url));
+      final response = await http.get(Uri.parse(baseUrl + url));
       print("My Url");
-      print(BASE_URL + url);
+      print(baseUrl + url);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -61,14 +63,14 @@ class DioHelper {
     return responseJson;
   }
 
-  static Future<dynamic> postWithToken(String url, dynamic body,String token) async {
+  static Future<dynamic> postWithToken(String baseUrl ,String url, dynamic body,String token) async {
     // print('Api Post, url $url');
     var responseJson;
     try {
       Map<String, String> headers = {"Content-type": "application/json",'token': token};
-      print("UrlNOwIs>>"+BASE_URL + url);
+      print("UrlNOwIs>>"+baseUrl + url);
       print(body);
-      final response = await http.post(Uri.parse(BASE_URL + url),headers: headers, body: body);
+      final response = await http.post(Uri.parse(baseUrl + url),headers: headers, body: body);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -80,14 +82,14 @@ class DioHelper {
     return responseJson;
   }
 
- static Future<dynamic> post(String url, dynamic body) async {
+ static Future<dynamic> post(String baseUrl,String url, dynamic body) async {
     // print('Api Post, url $url');
     var responseJson;
     try {
       Map<String, String> headers = {"Content-type": "application/json",};
-      print("UrlNOwIs>>"+BASE_URL + url);
+      print("UrlNOwIsssssssss>>"+baseUrl + url);
       print(body);
-      final response = await http.post(Uri.parse(BASE_URL + url),headers: headers, body: body);
+      final response = await http.post(Uri.parse(baseUrl + url),headers: headers, body: body);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -99,11 +101,11 @@ class DioHelper {
     return responseJson;
   }
 
- static Future<dynamic> put(String url, dynamic body) async {
+ static Future<dynamic> put(String baseUrl,String url, dynamic body) async {
     print('Api Put, url $url');
     var responseJson;
     try {
-      final response = await http.put(Uri.parse(BASE_URL + url), body: body);
+      final response = await http.put(Uri.parse(baseUrl + url), body: body);
       responseJson = _returnResponse(response);
     } on SocketException {
       print('No net');
@@ -114,26 +116,26 @@ class DioHelper {
     return responseJson;
   }
 
- static Future<dynamic> delete(String url) async {
-    print('Api delete, url $url');
-    var apiResponse;
-    try {
-      final response = await http.delete(Uri.parse(BASE_URL + url));
-      apiResponse = _returnResponse(response);
-    } on SocketException {
-      print('No net');
-      throw FetchDataException('No Internet connection');
-    }
-    print('api delete.');
-    return apiResponse;
-  }
-  static Future<dynamic> deleteWithToken(String url,String token) async {
+ // static Future<dynamic> delete(String url) async {
+ //    print('Api delete, url $url');
+ //    var apiResponse;
+ //    try {
+ //      final response = await http.delete(Uri.parse(Constants.BASE_URL + url));
+ //      apiResponse = _returnResponse(response);
+ //    } on SocketException {
+ //      print('No net');
+ //      throw FetchDataException('No Internet connection');
+ //    }
+ //    print('api delete.');
+ //    return apiResponse;
+ //  }
+  static Future<dynamic> deleteWithToken(String baseUrl,String url,String token) async {
     Map<String, String> headers = {"Content-type": "application/json",'token': token};
-    print("UrlNOwIs>>"+BASE_URL + url);
+    print("UrlNOwIs>>"+baseUrl + url);
     print('Api delete, url $url');
     var apiResponse;
     try {
-      final response = await http.delete(Uri.parse(BASE_URL + url),headers: headers);
+      final response = await http.delete(Uri.parse(baseUrl + url),headers: headers);
       apiResponse = _returnResponse(response);
     } on SocketException {
       print('No net');

@@ -1,6 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/all_meetings_response.dart';
 import 'package:itimaaty/Models/calender_response_model.dart';
@@ -9,22 +8,41 @@ import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/View/MeetingDetailsScreen.dart';
-import 'package:itimaaty/View/NotGoingScreen.dart';
-import 'package:itimaaty/View/TalkingPointsScreen.dart';
+
 
 Widget leaveRowForMembers(Members leave,int index) {
   return
-    CircleAvatar(
-      radius: 22,
-      backgroundColor: Colors.red,
+    Container(
+      margin: EdgeInsets.only(left:3,right: 3),
       child: CircleAvatar(
         radius: 22,
-        backgroundImage: NetworkImage(
-          leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-        ),
+        backgroundColor: Colors.indigoAccent,
+        child: new Container(
+          width: 50.0,
+          height: 50.0,
+          margin: EdgeInsets.only(left: 1,right: 1),
+          decoration: new BoxDecoration(
+            shape: BoxShape.circle,
+            image: new DecorationImage(
+              fit: BoxFit.cover,
+              image: new CachedNetworkImageProvider(
+                leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image:
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+              ),
+            ),
+          ),
+        )
+        // CircleAvatar(
+        //   radius: 22,
+        //   backgroundImage: NetworkImage(
+        //     leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image:
+        //     "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+        //     "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+        //     "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+        //   ),
+        // ),
       ),
     );
 }
@@ -35,7 +53,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
       navigateTo(context, MeetingDetailsScreen(leave.id));
     },
     child: Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
           color: Colors.white,
@@ -111,7 +129,7 @@ Widget leaveRowForPending(BuildContext context,Pending leave,int index) {
                       },
                     ),
                   ),
-                  leave.members.length>2? Container(
+                  leave.members.length>2? leave.members.length==3?SizedBox():Container(
                     margin: EdgeInsets.only(left: 4,right: 4),
                     width: 30,
                     height: 30,
@@ -196,7 +214,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
       navigateTo(context, MeetingDetailsScreen(leave.id));
     },
     child: Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
           color: Colors.white,
@@ -271,7 +289,7 @@ Widget leaveRowForOnGoing(BuildContext context,Ongoing leave,int index) {
                       },
                     ),
                   ),
-                  leave.members.length>2? Container(
+                  leave.members.length>2? leave.members.length==3?SizedBox():Container(
                     margin: EdgeInsets.only(left: 4,right: 4),
                     width: 30,
                     height: 30,
@@ -358,7 +376,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
       navigateTo(context, MeetingDetailsScreen(leave.id));
     },
     child: Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 0),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
           color: Colors.white,
@@ -409,6 +427,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
               // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
               const SizedBox(width: 8,),
               Container(
+                width: 240,
                   margin: EdgeInsets.only(top: 4),
                   child: Text(leave.title!=null?
                   leave.title:AppLocalizations.of(context).lblDevelopment,style:
@@ -433,7 +452,7 @@ Widget leaveRowForDraft(BuildContext context,Draft leave,int index) {
                       },
                     ),
                   ),
-                  leave.members.length>2? Container(
+                  leave.members.length>2? leave.members.length==3?SizedBox():Container(
                     margin: EdgeInsets.only(left: 4,right: 4),
                     width: 30,
                     height: 30,
@@ -542,7 +561,13 @@ Widget leaveRowForTalkingpoints(BuildContext context,Talkingpoints leave,int ind
             // crossAxisAlignment: CrossAxisAlignment.spa,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(leave.title,style: blueColorBoldStyle(16),),
+              Expanded(
+                child: Container(
+                  // width: MediaQuery.of(context).size.width/2-200,
+                    child: Text(leave.title,style: blueColorBoldStyle(16),)),
+              ),
+              const SizedBox(width: 20,),
+              // Text(leave.title,style: blueColorBoldStyle(16),),
               // const SizedBox(width: 14,),
               SizedBox(
                 height: 60,
@@ -600,7 +625,8 @@ Widget leaveRowForTalkingpoints(BuildContext context,Talkingpoints leave,int ind
                 child: Text(
                   leave.meeting!=null?getFormattedDate(stringToDateTime(leave.meeting.startDate)).toString():"",
                   style: TextStyle(
-                    color: Color(0xff98e0c5) ,
+                    // color: Color(0xff98e0c5) ,
+                    color: Color(0xff4a976e) ,
                     fontFamily: "black",
                     fontSize: 16,
                   ),
@@ -625,7 +651,8 @@ Widget leaveRowForTalkingpoints(BuildContext context,Talkingpoints leave,int ind
                 child: Text(
                   AppLocalizations.of(context).lblLive,
                   style: TextStyle(
-                      color: Color(0xff98e0c5) ,
+                      // color: Color(0xff98e0c5) ,
+                      color: Color(0xff4a976e) ,
                       fontFamily: "black",
                       fontSize: 16,
                 ),
@@ -679,39 +706,33 @@ Widget leaveRowForDecisions(BuildContext context,Decision leave,int index) {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Row(
-            // crossAxisAlignment: CrossAxisAlignment.spa,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(leave.title,style: blueColorBoldStyle(16),),
-              // const SizedBox(width: 14,),
-              SizedBox(
-                height: 60,
-                // width: 400,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: true,
-                  itemCount: leave.meeting.members.length>=3?3:leave.meeting.members.length,
-                  itemBuilder: (context, index) {
-                    return leaveRowForMembers(leave.meeting.members[index],index);
-                  },
+          Container(
+            child: Row(
+              // crossAxisAlignment: CrossAxisAlignment.spa,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Container(
+                      // width: MediaQuery.of(context).size.width/2-200,
+                      child: Text(leave.title,style: blueColorBoldStyle(16),)),
                 ),
-              )
-              // Container(
-              //   margin: EdgeInsets.only(left: 4,right: 4),
-              //   height: 30,
-              //   width: 30,
-              //   child: CircleAvatar(
-              //     radius: 30.0,
-              //     backgroundImage:
-              //     NetworkImage(leave.meeting!=null?
-              //     leave.meeting.members[0].user!=null?leave.meeting.members[0].user.image:
-              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg":
-              //     "https://previews.123rf.com/images/pe3check/pe3check1710/pe3check171000054/88673746-no-image-available-sign-internet-web-icon-to-indicate-the-absence-of-image-until-it-will-be-download.jpg"),
-              //     backgroundColor: Colors.transparent,
-              //   ),
-              // ),
-            ],
+                const SizedBox(width: 20,),
+                SizedBox(
+                  height: 60,
+                  // width: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: leave.meeting.members.length>=3?3:leave.meeting.members.length,
+                    // itemCount: 6,
+                    itemBuilder: (context, index) {
+                      return leaveRowForMembers(leave.meeting.members[index],index);
+                    },
+                  ),
+                )
+
+              ],
+            ),
           ),
           const SizedBox(height: 12,),
           Text(leave.meeting.title,style: grayTextColorStyleMedium(16),),
@@ -740,7 +761,8 @@ Widget leaveRowForDecisions(BuildContext context,Decision leave,int index) {
                 child: Text(
                   leave.meeting!=null?getFormattedDate(stringToDateTime(leave.meeting.startDate)).toString():"",
                   style: TextStyle(
-                    color: Color(0xff98e0c5) ,
+                    // color: Color(0xff98e0c5) ,
+                    color:Color(0xff4a976e) ,
                     fontFamily: "black",
                     fontSize: 16,
                   ),
@@ -765,7 +787,8 @@ Widget leaveRowForDecisions(BuildContext context,Decision leave,int index) {
                   child: Text(
                     AppLocalizations.of(context).lblLive,
                     style: TextStyle(
-                      color: Color(0xff98e0c5) ,
+                      // color: Color(0xff98e0c5) ,
+                      color: Color(0xff4a976e) ,
                       fontFamily: "black",
                       fontSize: 16,
                     ),
@@ -823,7 +846,13 @@ Widget leaveRowForActions(BuildContext context,ActionResponse leave,int index) {
             // crossAxisAlignment: CrossAxisAlignment.spa,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(leave.title,style: blueColorBoldStyle(16),),
+              Expanded(
+                child: Container(
+                  // width: MediaQuery.of(context).size.width/2-200,
+                    child: Text(leave.title,style: blueColorBoldStyle(16),)),
+              ),
+              const SizedBox(width: 20,),
+              // Text(leave.title,style: blueColorBoldStyle(16),),
               // const SizedBox(width: 14,),
               SizedBox(
                 height: 60,
@@ -880,7 +909,8 @@ Widget leaveRowForActions(BuildContext context,ActionResponse leave,int index) {
                 child: Text(
                   leave.meeting!=null?getFormattedDate(stringToDateTime(leave.meeting.startDate)).toString():"",
                   style: TextStyle(
-                    color: Color(0xff98e0c5) ,
+                    // color: Color(0xff98e0c5) ,
+                    color: Color(0xff4a976e) ,
                     fontFamily: "black",
                     fontSize: 16,
                   ),
@@ -905,7 +935,8 @@ Widget leaveRowForActions(BuildContext context,ActionResponse leave,int index) {
                   child: Text(
                     AppLocalizations.of(context).lblLive,
                     style: TextStyle(
-                      color: Color(0xff98e0c5) ,
+                      // color: Color(0xff98e0c5) ,
+                      color: Color(0xff4a976e) ,
                       fontFamily: "black",
                       fontSize: 16,
                     ),
@@ -940,10 +971,10 @@ Widget leaveRowForMembersInAllMeetings(MembersInAllMeeting leave,int index) {
   return  Container(
     margin: EdgeInsets.only(left: 1,right: 1),
     child: CircleAvatar(
-      radius: 18,
+      radius: 15,
       backgroundColor: Colors.red,
       child: CircleAvatar(
-        radius: 18,
+        radius: 15,
         backgroundImage: NetworkImage(
           leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
@@ -954,9 +985,23 @@ Widget leaveRowForMembersInAllMeetings(MembersInAllMeeting leave,int index) {
     ),
   );
 }
-Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int index) {
+Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponseData leave,int index) {
 
   return LayoutBuilder(builder: (context, constraints) {
+    if(leave.status.name.contains("Live")){
+      leave.status.name=AppLocalizations.of(context).lblLive;
+    }else if(leave.status.name.contains("Archived")){
+      leave.status.name=AppLocalizations.of(context).lblArchived;
+    }else if(leave.status.name.contains("Draft")){
+      leave.status.name=AppLocalizations.of(context).lblDraft;
+    }else if(leave.status.name.contains("Scheduled")){
+      leave.status.name=AppLocalizations.of(context).lblScheduled;
+    }else if(leave.status.name.contains("Cancelled")){
+      leave.status.name=AppLocalizations.of(context).lblCanceled;
+    }
+    // else if(leave.status.name=="Live"){
+    //
+    // }
     if(constraints.maxWidth<600){
       return InkWell(
         onTap: () {
@@ -1006,6 +1051,8 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          leave.title!=null && leave.title.length>30?
+                          Flexible(child: Text(leave.title.substring(0,29)+"....",style: blueColorBoldStyle(18),)):
                           Flexible(child: Text(leave.title!=null?leave.title:AppLocalizations.of(context).lblBoardMeeting,style: blueColorBoldStyle(18),)),
                         ],
                       ),
@@ -1056,45 +1103,53 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
-                            children: [
-                              SizedBox(
-                                height: 60,
-                                // width: 200,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  shrinkWrap: true,
-                                  itemCount: leave.members.length>=3?3:leave.members.length,
-                                  itemBuilder: (context, index) {
-                                    return leaveRowForMembersInAllMeetings(leave.members[index],index);
-                                  },
-                                ),
-                              ),
-                              leave.members.length>2? Container(
-                                margin: EdgeInsets.only(left: 4,right: 4),
-                                width: 30,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  border: Border.all(width: 2,color: yellowColor),
-                                  shape: BoxShape.circle,
-                                  // You can use like this way or like the below line
-                                  //borderRadius: new BorderRadius.circular(30.0),
-                                  color: yellowColor,
-                                ),
-                                child:Align(
-                                  alignment: Alignment.center,
-                                  child: Text("+"+(leave.members.length-3).toString(),style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'regular'
-                                  ),),
-                                ),
-                              ):const SizedBox()
-                            ],
-                          ),
                           Container(
-                            padding: EdgeInsets.only(left: 30,right: 30,top: 10,bottom: 6),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 60,
+                                  // width: 200,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    shrinkWrap: true,
+                                    itemCount: leave.members.length>=3?3:leave.members.length,
+                                    // itemCount: 4,
+                                    itemBuilder: (context, index) {
+                                      return leaveRowForMembersInAllMeetings(leave.members[index],index);
+                                      // return Container(
+                                      //   color: Colors.red,
+                                      //   child: Text("ddddd"),
+                                      // );
+                                    },
+                                  ),
+                                ),
+                                leave.members.length>2? leave.members.length==3?SizedBox():Container(
+                                  margin: EdgeInsets.only(left: 4,right: 4),
+                                  // width: 30,
+                                  // height: 30,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(width: 2,color: yellowColor),
+                                    shape: BoxShape.circle,
+                                    // You can use like this way or like the below line
+                                    //borderRadius: new BorderRadius.circular(30.0),
+                                    color: yellowColor,
+                                  ),
+                                  child:Align(
+                                    alignment: Alignment.center,
+                                    child: Text("+"+(leave.members.length-3).toString(),style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'regular'
+                                    ),),
+                                  ),
+                                ):const SizedBox()
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10,),
+                          Container(
+                            padding: EdgeInsets.only(left: 20,right: 20,top: 8,bottom: 4),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(14.0),
                               gradient: LinearGradient(
@@ -1119,6 +1174,12 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                           ),
                         ],
                       ),
+
+                      leave!=null&&leave.lastActivity!=null&&leave.lastActivity.length>100?
+                      Container(
+                          margin: EdgeInsets.only(top: 14),
+                          child: Text(leave.lastActivity.substring(0,99)+"....",style:
+                          grayTextColorStyleMedium(17),)):
 
                       Container(
                           margin: EdgeInsets.only(top: 14),
@@ -1343,7 +1404,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
                                     },
                                   ),
                                 ),
-                                leave.members.length>2? Container(
+                                leave.members.length>2? leave.members.length==3?SizedBox():Container(
                                   margin: EdgeInsets.only(left: 4,right: 4),
                                   width: 30,
                                   height: 30,
@@ -1415,7 +1476,7 @@ Widget leaveRowForAllmeetings(BuildContext context,AllMeetingsResponse leave,int
 
 }
 
-Widget makeBodyForAllmeetings (BuildContext context,List<AllMeetingsResponse> allMeetingList) {
+Widget makeBodyForAllmeetings (BuildContext context,List<AllMeetingsResponseData> allMeetingList) {
   double cardWidth = MediaQuery.of(context).size.width / 3.3;
   double cardHeight = MediaQuery.of(context).size.height / 3.6;
 
@@ -1453,7 +1514,7 @@ Widget makeBodyForAllmeetings (BuildContext context,List<AllMeetingsResponse> al
               child:
               GridView.count(
                   crossAxisCount: 3,
-                  childAspectRatio: 0.9,
+                  childAspectRatio: 0.8,
                   padding: const EdgeInsets.all(4.0),
                   mainAxisSpacing: 3.0,
                   crossAxisSpacing: 3.0,
@@ -1482,7 +1543,10 @@ Widget leaveRowForMembersCalender(MembersCalender leave,int index) {
       child: CircleAvatar(
         radius: 18,
         backgroundImage: NetworkImage(
-          leave.user!=null?!leave.user.image.contains(".html")?leave.user.image:
+          leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image!=null?
+          leave.user.image:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
           "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
           "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
         ),
@@ -1616,7 +1680,7 @@ Widget leaveRowForCalender(BuildContext context,One leave,int index) {
                                   },
                                 ),
                               ),
-                              leave.members.length>2? Container(
+                              leave.members.length>2?leave.members.length==3?SizedBox(): Container(
                                 margin: EdgeInsets.only(left: 4,right: 4),
                                 width: 30,
                                 height: 30,

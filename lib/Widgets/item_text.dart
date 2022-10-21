@@ -29,8 +29,8 @@ Widget itemBuild({
         width: 15,
       ),
       Container(
-          margin: EdgeInsets.only(top:8),
-          child: Center(child: Text(text,style:  blueColorStyleMediumWithColor(20,colorText),))),
+          margin: EdgeInsets.only(top:0),
+          child: Center(child: Text(text,style:  blueColorStyleMediumWithColor(22,colorText),))),
     ],
   ),
 );

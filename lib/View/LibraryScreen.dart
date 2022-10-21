@@ -114,6 +114,8 @@ class LibraryScreenState extends State<LibraryScreen> {
       icon="assets/images/ic_word.webp";
     }else if(cells.name.contains('pot')){
       icon="assets/images/ic_power_point.webp";
+    }else if(cells.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
     }else{
       icon="assets/images/ic_folder.webp";
     }
@@ -142,6 +144,8 @@ class LibraryScreenState extends State<LibraryScreen> {
       icon="assets/images/ic_word.webp";
     }else if(files.name.contains('pot')){
       icon="assets/images/ic_power_point.webp";
+    }else if(files.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
     }else{
       icon="assets/images/ic_folder.webp";
     }

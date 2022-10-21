@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/AddMeetingRequestModel.dart';
@@ -21,6 +23,7 @@ import 'package:itimaaty/cubit/User/user_cubit.dart';
 import 'package:itimaaty/cubit/User/user_states.dart';
 import 'package:intl/intl.dart';
 
+import '../Utils/Constants.dart';
 import 'SignInScreen.dart';
 
 class CreateMeetingScreen extends StatefulWidget {
@@ -62,7 +65,7 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
   int _selectedIndex = 0;
   int _selectedIndexMinutes = 0;
   bool isExpanded=false;
-  LatLng position;
+  // LatLng position;
 
   Future<void> callDateTime() async {
     final selectedDate = await selectDateTime(context);
@@ -87,21 +90,23 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
     });
   }
 
-  void getAllCommites(String token) {
+  void getAllCommites(String baseUrl,String token) {
     print("tokenISSSS>"+token.toString());
     this.token=token;
     load();
     meetingRepository = new MeetingRepository();
-    Future<CommitteeResponseModel> allList = meetingRepository.getAllCommittes(token);
-    allList.then((value) {
+    Future<String> allList = meetingRepository.getAllCommittes(baseUrl,token);
+    allList.then((string) {
       setState(() {
-        if (value != null) {
+        if (string != null) {
           showSuccess();
+          final jsonData = jsonDecode(string);
+          CommitteeResponseModel value =  CommitteeResponseModel.fromJson(jsonData);
           allCommitteList = value.data;
         }else{
           showError();
-          if(value==null){
-            navigateAndFinish(context, SignInScreen());
+          if(string==null){
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
@@ -122,7 +127,7 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
       virtual: virtual
     );
     meetingRepository = new MeetingRepository();
-    Future<AddMeetingResponseModel> response = meetingRepository.addMeeting(token,addMeetingRequestModel);
+    Future<AddMeetingResponseModel> response = meetingRepository.addMeeting(baseUrl,token,addMeetingRequestModel);
     response.then((value) {
       setState(() {
         if (value != null) {
@@ -137,14 +142,14 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
   }
 
 
-  Future<String> getAddress(LatLng latLng)async{
-    // var address = await Geocoder.local.findAddressesFromCoordinates(new Coordinates(latLng.latitude, latLng.longitude)) ;
-    List<Placemark> placemarks = await Geolocator().placemarkFromCoordinates(latLng.latitude, latLng.longitude);
-
-    return placemarks.first.name ;
-    // return placemarks.first.country ;
-    // return address.first.addressLine ;
-  }
+  // Future<String> getAddress(LatLng latLng)async{
+  //   // var address = await Geocoder.local.findAddressesFromCoordinates(new Coordinates(latLng.latitude, latLng.longitude)) ;
+  //   List<Placemark> placemarks = await Geolocator().placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+  //
+  //   return placemarks.first.name ;
+  //   // return placemarks.first.country ;
+  //   // return address.first.addressLine ;
+  // }
 
   _onSelected(int index) {
     setState(() => _selectedIndex = index);
@@ -153,6 +158,7 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
     setState(() => _selectedIndexMinutes = index);
   }
   String userToken;
+  String baseUrl;
 
 
 
@@ -160,7 +166,13 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
   void initState() {
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
-      getAllCommites(value);
+
+    }).then((value) {
+        String baseUri= Constants.BASE_URL;
+        setState(() {
+          baseUrl=baseUri;
+        });
+        getAllCommites(baseUrl,userToken);
     });
   }
 
@@ -590,27 +602,17 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
                                     flex:1,
                                     child: InkWell(
                                       onTap: () async{
-                                        // showDocument(context);
-                                        // createFileOfPdfUrl("test",  "http://test.app.ijtimaati.com/api/public/uploads/library/1641160600881925.pdf")
-                                        //     .then((value) {
-                                        //   Pspdfkit.present(value.path);
-                                        // });
+                                        //       this.position = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetLocation()));
+                                        // if (position != null) {
+                                        //   print("loaction is in : : ${position.latitude},${position.longitude}");
+                                        //   String address = await getAddress(position);
+                                        //   locationController.text = await getAddress(position);
+                                        //   setState(() {
+                                        //     print("address${address}");
+                                        //     // this.address = address;
+                                        //   });
+                                        // }
 
-                                        // Pspdfkit.present("http://test.app.ijtimaati.com/api/public/uploads/library/1641160600881925.pdf");
-                                        //   Pspdfkit.present(
-                                        //       "http://test.app.ijtimaati.com/doc-view?doc=http://test.app.ijtimaati.com/api/public/uploads/library/1640898856727848.pdf&id=120&e=1");
-                                        this.position = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetLocation()));
-                                        if (position != null) {
-                                          print("loaction is in : : ${position.latitude},${position.longitude}");
-                                          String address = await getAddress(position);
-                                          locationController.text = await getAddress(position);
-                                          setState(() {
-                                            print("address${address}");
-                                            // this.address = address;
-                                          });
-                                        }
-
-                                        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => GetLocation()));
                                       },
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -706,15 +708,21 @@ class CreateMeetingScreenState extends State<CreateMeetingScreen> {
                                         ],
                                       ),
                                     ),
-                                    child: FlatButton(
+                                    child: ElevatedButton(
                                       child: Text(
                                         AppLocalizations.of(context).lblCreate,
                                         style: whiteColorStyle(width<600?16:22),
                                       ),
-                                      textColor: Colors.white,
-                                      color: Colors.transparent,
-                                      shape:
-                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                      style: ButtonStyle(
+                                          foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                          backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                              RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(30),
+                                                  side: BorderSide(color: yellowColor)
+                                              )
+                                          )
+                                      ),
                                       onPressed: () {
                                         if (formKey.currentState.validate()) {
                                           if(committeeId!=null){

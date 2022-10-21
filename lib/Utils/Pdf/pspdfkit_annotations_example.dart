@@ -17,14 +17,18 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/ActionsScreen.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:http/http.dart' as http;
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/View/DecisionsScreen.dart';
+import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/View/TalkingPointsScreen.dart';
 import 'package:pspdfkit_flutter/src/widgets/pspdfkit_widget_controller.dart';
 
 import '../../LocalDb/SharedPreferencesHelper.dart';
+import '../../Models/AllAprovalsResponseModel.dart';
 import '../../Models/UplodedResponseModel.dart';
 import '../../Repository/MeetingRepository.dart';
 import '../../View/MeetingDetailsScreen.dart';
@@ -117,6 +121,7 @@ const annotationJsonString = '''
 }''';
 
 class PspdfkitAnnotationsExampleWidget extends StatefulWidget {
+  final AllAprovalsResponseModelData root;
   final String type;
   final String documentPath;
   final int meetingId;
@@ -126,7 +131,7 @@ class PspdfkitAnnotationsExampleWidget extends StatefulWidget {
   final dynamic configuration;
 
   const PspdfkitAnnotationsExampleWidget(
-      {Key key,  this.type,this.subId,this.documentPath,this.meetingId, this.id,this.library_Id,this.configuration})
+      {Key key, this.root, this.type,this.subId,this.documentPath,this.meetingId, this.id,this.library_Id,this.configuration})
       : super(key: key);
 
   @override
@@ -142,37 +147,42 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
 
 
 
-  Future<int> uploadImage (MultipartFile logoFile,int meeting_id,int library_id,String token) async {
-
+bool isClicked=false;
+  // Future<int> uploadImage (MultipartFile logoFile,int meeting_id,int library_id,String token) async {
+  Future<int> uploadImage () async {
     onLoading(context);
-    // http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(BASE_URL+UPDATE_FILE+"/"+id.toString()));
-    print("RemoteUrlIs>>"+BASE_URL+UPDATE_FILE);
-    print("meeting_id>>"+meeting_id.toString());
-    print("library_id>>"+library_id.toString());
+    setState(() {
+      isClicked=true;
+    });
+    // // http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(BASE_URL+UPDATE_FILE+"/"+id.toString()));
+    // // print("RemoteUrlIs>>"+BASE_URL+UPDATE_FILE);
+    print("requestBody>>"+requestBody.toString());
+    print("headers>>"+headers.toString());
+    print("baseUrlbaseUrl>>"+baseUrl+Constants.UPDATE_FILE.toString());
+    // print("baseUrlbaseUrl>>"+Constants.BASE_URL+Constants.UPDATE_FILE.toString());
+    // print("library_id>>"+library_id.toString());
+    http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(baseUrl+Constants.UPDATE_FILE));
+    // Map<String, String> headers = {"Content-type": "application/json",
+    //   'token': token};
+    // Map<String, String> requestBody = <String, String>{
+    //   'meeting_id': meeting_id.toString(),
+    //   'library_id': library_id.toString()
+    // };
 
-    http.MultipartRequest request = new http.MultipartRequest("POST", Uri.parse(BASE_URL+UPDATE_FILE));
-    Map<String, String> headers = {"Content-type": "application/json",
-      'token': token};
-
-    Map<String, String> requestBody = <String, String>{
-      'meeting_id': meeting_id.toString(),
-      'library_id': library_id.toString()
-    };
 
     request.fields.addAll(requestBody);
-    request.files.add(logoFile);
-    // request.fields['meeting_id'] = meeting_id.toString();
-    // request.fields['library_id'] = library_id.toString();
+    request.files.add(MultipartFile('file', File(widget.documentPath).readAsBytes().asStream(),
+        File(widget.documentPath).lengthSync(),
+        filename: widget.documentPath.split("/").last));
+    // request.files.add(await MultipartFile.fromPath(File(widget.documentPath).uri.pathSegments.last, File(widget.documentPath).path));
     request.headers.addAll(headers);
-    StreamedResponse res;
     request.send().then((response) {
-      print("Here>>"+logoFile.toString());
-      print(response.toString());
-      print("dddd"+response.statusCode.toString());
-      res=response;
       dismissLoading(context);
-      if (response.statusCode == 200){
-        showSuccessMsg("Saved Successfully!");
+      setState(() {
+        isClicked=false;
+      });
+      if (response.statusCode == 200||response.statusCode == 201){
+        showSuccessMsg(AppLocalizations.of(context).lblSaveSuccessfuly);
         setState(() {
           saved=true;
         });
@@ -189,11 +199,11 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
     meetingRepository = new MeetingRepository();
     // onLoading(context);
     // Future<UplodedResponseModel> data =meetingRepository.uploadImage(file,widget.id,widget.library_Id,userToken);
-    Future<int> data =meetingRepository.uploadImage(file,widget.id,widget.library_Id,userToken);
+    Future<int> data =meetingRepository.uploadImage(baseUrl,file,widget.id,widget.library_Id,userToken);
     data.then((value) {
       // print("dataaaaa>>"+value.toString());
       if(value!=null){
-        if(value==200){
+        if(value==200||value==201){
           showSuccess();
           setState(() {
             showSuccessMsg("Saved Successfully!");
@@ -227,7 +237,7 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
   String userToken;
 
   Future<bool> _onWillPop() async {
-    // if(saved) {
+    if(isClicked==false) {
       Navigator.pop(context);
       if (widget.type == "talking") {
         navigateTo(
@@ -238,13 +248,22 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
       } else if (widget.type == "decisions") {
         navigateTo(
             context, DecisionsScreen(widget.meetingId, widget.subId, null));
+      }else if (widget.type == "approvals") {
+        // km
+        // navigateTo(context, DecisionsScreen(widget.meetingId, widget.subId, null));
       } else {
         navigateTo(context, MeetingDetailsScreen(widget.meetingId));
       }
-    // }else{
-    //   // return true;
-    // }
+    }else{
+      return false;
+    }
   }
+
+  String baseUrl="";
+  http.MultipartRequest request;
+  // MultipartFile multipartFile;
+  Map<String, String> headers;
+  Map<String, String> requestBody;
 
   @override
   void initState() {
@@ -252,6 +271,22 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
     super.initState();
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
+        String baseUri= Constants.BASE_URL;
+        setState(()  {
+          baseUrl=baseUri;
+           request = new http.MultipartRequest("POST", Uri.parse(baseUrl+Constants.UPDATE_FILE));
+
+          headers = {"Content-type": "application/json",
+            'token': userToken};
+
+           requestBody = <String, String>{
+            'meeting_id': widget.meetingId.toString(),
+            'library_id': widget.library_Id.toString()
+          };
+         // multipartFile = await MultipartFile('file', File(widget.documentPath).readAsBytes().asStream(),
+         //      File(widget.documentPath).lengthSync(),
+         //      filename: widget.documentPath.split("/").last);
+        });
     });
   }
 
@@ -348,35 +383,27 @@ class _PspdfkitAnnotationsExampleWidgetState extends State<PspdfkitAnnotationsEx
                             ElevatedButton(
                                 onPressed: () async {
                                   // load();
-                                   view.save().then((value) {
-                                     print("valueIs>>"+value.toString());
-                                     File fileToUpload = new File(widget.documentPath);
-                                    print("fileToUpload>"+fileToUpload.toString());
+                                   view.save().then((value) async {
 
-                                     // var fileName = (widget.documentPath.split('/').last);
+                                     uploadImage();
+                                     // File file = new File(widget.documentPath);
+                                     // MultipartFile logoFileUpload=
+                                     // MultipartFile('file',
+                                     //     file.readAsBytes().asStream(), file.lengthSync(),
+                                     //     filename: widget.documentPath.split("/").last);
 
-                                     MultipartFile logoFileUpload=
-                                     MultipartFile('file',
-                                         File(widget.documentPath).readAsBytes().asStream(), File(widget.documentPath).lengthSync(),
-                                         filename: widget.documentPath.split("/").last);
+                                     // if(file!=null) {
+                                       // uploadImage(logoFileUpload,widget.meetingId,widget.library_Id,userToken);
+                                       // uploadImage(
+                                       //     file,
+                                       //     widget.meetingId,
+                                       //     widget.library_Id,userToken);
+                                     // }
 
-                                     if(logoFileUpload!=null) {
-                                       print("logoFileUpload>>"+logoFileUpload.toString());
-                                       uploadImage(logoFileUpload,widget.id,widget.library_Id,userToken);
-                                       // uploadFile(logoFileUpload);
-                                     }
-
-                                     // MultipartFile.fromFile(widget.documentPath, filename: fileName).then((value) {
-                                     //   MultipartFile logoFileUpload=value;
-                                     //   print("logoFileUpload>>"+logoFileUpload.toString());
-                                     //   if(logoFileUpload!=null) {
-                                     //     uploadFile(logoFileUpload);
-                                     //   }
-                                     // });
 
                                    });
                                 },
-                                child: const Text('Save Document'))
+                                child:  Text(AppLocalizations.of(context).lblSaveDocument,style: blueColorStyleMediumWithColor(18, Colors.white),))
                           ]))
                       // SizedBox(
                       //     child: Column(children: <Widget>[

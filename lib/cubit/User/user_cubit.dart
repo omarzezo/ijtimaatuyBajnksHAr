@@ -9,9 +9,11 @@ import 'package:itimaaty/Models/ForgetPasswordRequest.dart';
 import 'package:itimaaty/Models/ForgotPasswordResponseModel.dart';
 import 'package:itimaaty/Models/LoginRequestModel.dart';
 import 'package:itimaaty/Models/LoginResponseModel.dart';
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/network/end_points.dart';
 import 'package:itimaaty/network/remote/dio_helper.dart';
 
+import '../../Models/PostSecretSSoRequest.dart';
 import 'user_states.dart';
 
 
@@ -25,6 +27,7 @@ class UserCubit extends Cubit<UserStates> {
 
 
   void userLoginFunc({
+    @required String baseUrl,
     @required String email,
     @required String password,
   }) {
@@ -35,7 +38,33 @@ class UserCubit extends Cubit<UserStates> {
     String jsonUser = jsonEncode(loginRequestModel);
     print("jsonUserIs>>"+jsonUser.toString());
 
-    DioHelper.post( LOGIN, jsonUser,).then((value) {
+    DioHelper.post(baseUrl, Constants.LOGIN, jsonUser,).then((value) {
+      loginResponseModel = LoginResponseModel.fromJson(value);
+      emit(LoginSuccessState(loginResponseModel));
+      // EasyLoading.showSuccess('Success!');
+      EasyLoading.dismiss();
+    }).catchError((error) {
+      // EasyLoading.showError('Data Used');
+      if(EasyLoading.isShow){
+        EasyLoading.showError("please check Data");
+      }
+      print("ErrorIs>>"+error.toString());
+      emit(LoginErrorState(error.toString()));
+    });
+  }
+
+  void userPostSecret({
+    @required String baseUrl,
+    @required String secret,
+  }) {
+    emit(LoginLoadingState());
+    EasyLoading.instance.loadingStyle=EasyLoadingStyle.custom;
+    EasyLoading.show(status: 'loading...');
+    PostSecretSSoRequest postSecretSSoRequest =new PostSecretSSoRequest(secret);
+    String jsonUser = jsonEncode(postSecretSSoRequest);
+    print("jsonUserIs>>"+jsonUser.toString());
+
+    DioHelper.post(baseUrl, Constants.SSoExchange, jsonUser,).then((value) {
       loginResponseModel = LoginResponseModel.fromJson(value);
       emit(LoginSuccessState(loginResponseModel));
       // EasyLoading.showSuccess('Success!');
@@ -51,6 +80,7 @@ class UserCubit extends Cubit<UserStates> {
   }
 
   void forgetPasswordFunc({
+    @required String baseUrl,
     @required String email,
   }) {
     emit(ForgotPasswordLoadingState());
@@ -60,7 +90,7 @@ class UserCubit extends Cubit<UserStates> {
     String jsonUser = jsonEncode(forgetPasswordRequestModel);
     print("jsonUserIs>>"+jsonUser.toString());
 
-    DioHelper.post( FORGOT_PASSWORD, jsonUser,).then((value) {
+    DioHelper.post(baseUrl, Constants.FORGOT_PASSWORD, jsonUser,).then((value) {
       forgotPasswordResponseModel = ForgotPasswordResponseModel.fromJson(value);
       emit(ForgotPasswordSuccessState(forgotPasswordResponseModel));
       // EasyLoading.showSuccess('Success!');

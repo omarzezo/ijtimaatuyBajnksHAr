@@ -11,15 +11,18 @@ import 'package:itimaaty/network/end_points.dart';
 import 'package:itimaaty/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 
+import '../Utils/Constants.dart';
+
 
 class CalenderRepository {
   DioHelper _helper = DioHelper();
 
-  Future<CalenderResponseModel> getCalennder(String token,String date) async {
+  Future<CalenderResponseModel> getCalennder(String baseUrl ,String token,String date) async {
     var response ;
     print("tokenIs>>>>"+token);
     try{
-      response = await DioHelper.getWithToken(token,CALENDER+"?date="+date);
+      // response = await DioHelper.getWithToken(baseUrl,token,Constants.CALENDER+"?date="+date);
+      response = await DioHelper.getWithToken(baseUrl,token,Constants.CALENDER);
       print("ResponsIS>>"+response.toString());
     }catch (e){
       print("kkkkkkkkkkkkkk"+e.toString());

@@ -8,6 +8,9 @@ import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/cubit/User/user_cubit.dart';
 import 'package:itimaaty/cubit/User/user_states.dart';
 
+import '../LocalDb/SharedPreferencesHelper.dart';
+import '../Utils/Constants.dart';
+
 class ForgotPasswordScreen extends StatefulWidget {
 
 String email;
@@ -24,10 +27,14 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   var emailController = TextEditingController();
   double width;
   double height;
-
+  String baseUrl="";
   @override
   void initState() {
     emailController.text=widget.email;
+      String baseUri= Constants.BASE_URL;
+      setState(() {
+        baseUrl=baseUri;
+      });
   }
 
   @override
@@ -161,7 +168,9 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               border: InputBorder.none,
                             ),
                             validator:(input) =>
-                            input.isNotEmpty?isEmail(input.toString()) ? null : "Email is not Correct":"Please Enter Email",
+                            input.isNotEmpty?isEmail(input.toString()) ? null :
+                            AppLocalizations.of(context).lblEmailNot:
+                            AppLocalizations.of(context).lblPleaseEnterEmail,
                           ),
                         ),
                       ),
@@ -194,18 +203,25 @@ class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     ],
                                   ),
                                 ),
-                                child: FlatButton(
+                                child: ElevatedButton(
                                   child: Text(
                                     AppLocalizations.of(context).lblSendInstructions,
                                     style: whiteColorStyle(width<600?16:24),
                                   ),
-                                  textColor: Colors.white,
-                                  color: Colors.transparent,
-                                  shape:
-                                  RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                  style: ButtonStyle(
+                                      foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                      backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(30),
+                                              side: BorderSide(color: yellowColor)
+                                          )
+                                      )
+                                  ),
                                   onPressed: () {
                                     if (formKey.currentState.validate()) {
                                       cubit.forgetPasswordFunc(
+                                        baseUrl: baseUrl,
                                         email: emailController.text,
                                       );
                                     }

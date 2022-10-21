@@ -62,15 +62,15 @@ class ProfileScreenState extends State<ProfileScreen> {
         selectItem5=false;
       }else if (currentIndex == 1) {
         // child=ChangePassword();
-         _passwordVisible= false;
-         newPasswordVisible= false;
-         retypePasswordVisible= false;
+        _passwordVisible= false;
+        newPasswordVisible= false;
+        retypePasswordVisible= false;
         passwordController.text='';
-         newPasswordController.text='';
-         retypePasswordController.text='';
+        newPasswordController.text='';
+        retypePasswordController.text='';
 
         // child=changePassword();
-         selectItem5=false;
+        selectItem5=false;
         selectItem=false;
         selectItem2=true;
         // selectItem3=false;
@@ -84,7 +84,8 @@ class ProfileScreenState extends State<ProfileScreen> {
       //   selectItem4=false;
       // }
       else if (currentIndex == 3) {
-        child= Security();
+        child= Security(baseUrl);
+        // child= Text("gfgfggfhfh");
         selectItem=false;
         selectItem2=false;
         // selectItem3=false;
@@ -95,7 +96,7 @@ class ProfileScreenState extends State<ProfileScreen> {
 
   }
 
-  void getChangePassword(String token) {
+  void getChangePassword(String baseUrl,String token) {
     load();
     UserRepository userRepository = new UserRepository();
     ChangePasswordRequestModel changePasswordRequestModel =new ChangePasswordRequestModel(
@@ -103,7 +104,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         password: newPasswordController.text
     );
 
-    Future<ChangePasswordResponseModel> allList = userRepository.getChangePassword(token,changePasswordRequestModel);
+    Future<ChangePasswordResponseModel> allList = userRepository.getChangePassword(baseUrl,token,changePasswordRequestModel);
     allList.then((loginModel) {
       setState(() {
         if(loginModel!=null){
@@ -120,11 +121,18 @@ class ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  String baseUrl="";
+
   @override
   void initState() {
     super.initState();
     Constants.draweItem="Profile";
-    changeScreen(0);
+      String baseUri= Constants.BASE_URL;
+      setState(() {
+        baseUrl=baseUri;
+      });
+      changeScreen(0);
+
   }
 
 
@@ -137,12 +145,14 @@ class ProfileScreenState extends State<ProfileScreen> {
       body: Column(
         children: [
           Expanded(
-            flex:1,
+            flex:2,
             child: Container(
+              // height: 120,
               margin: EdgeInsets.only(left: 14,right: 14,top: 30),
+              padding: EdgeInsets.only(top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -161,7 +171,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                         child: Text(
                           AppLocalizations.of(context).lblProfilee,
                           style: blueColorBoldStyle(26),
-                        ),margin: EdgeInsets.only(top: 8,left: 16,right: 16),
+                        ),margin: EdgeInsets.only(top: 0,left: 16,right: 16),
                       ),
                     ],
                   ),
@@ -170,6 +180,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       Navigator.pop(context,false);
                     },
                     child: Container(
+                      height: 40,
                       margin: EdgeInsets.only(left: 8,right: 8,top: 4),
                       padding: EdgeInsets.only(left: 14,right: 14,top: 0,bottom: 0),
                       decoration: BoxDecoration(
@@ -195,6 +206,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          // const SizedBox(height: 20,),
           Expanded(
               flex:9,
               child: Row(
@@ -204,141 +216,144 @@ class ProfileScreenState extends State<ProfileScreen> {
                     alignment: Alignment.center,
                     padding: const EdgeInsets.only(left: 0),
                     color: Colors.white,
-                    width: MediaQuery.of(context).size.width/4,
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              print("ddddd");
-                              selectItem = !selectItem;
-                              changeScreen(0);
-                            });
-                          },
-                          child: itemBuild(
-                            text: AppLocalizations.of(context).lblEditProfile,
-                            icon: Icons.person_outline,
-                            border: Border(
-                              right: BorderSide(
-                                  color: (selectItem == false)
-                                      ? Colors.white
-                                      : Colors.amber,
-                                  width: 2),
-                            ),
-                            colorContainer: (selectItem == false)
-                                ? Colors.white
-                                : Colors.amber.withOpacity(0.1),
-                            colorIcon:
-                            (selectItem == false) ? Colors.grey : Colors.amber,
-                            colorText:
-                            (selectItem == false) ? Colors.grey : Colors.amber,
+                    width: (MediaQuery.of(context).size.width/4)+60,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 30,
                           ),
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              selectItem2 = !selectItem2;
-                              changeScreen(1);
-                            });
-                          },
-                          child: itemBuild(
-                            text:AppLocalizations.of(context).lblChangePassword,
-                            icon: Icons.lock_open,
-                            border: Border(
-                              right: BorderSide(
-                                  color: (selectItem2 == false)
-                                      ? Colors.white
-                                      : Colors.amber,
-                                  width: 2),
-                            ),
-                            colorContainer: (selectItem2 == false)
-                                ? Colors.white
-                                : Colors.amber.withOpacity(0.1),
-                            colorIcon:
-                            (selectItem2 == false) ? Colors.grey : Colors.amber,
-                            colorText:
-                            (selectItem2 == false) ? Colors.grey : Colors.amber,
-                          ),
-                        ),
-
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              selectItem4 = !selectItem4;
-                              changeScreen(3);
-                            });
-                          },
-                          child: itemBuild(
-                            text: AppLocalizations.of(context).lblSecurity,
-                            icon: Icons.vpn_key,
-                            border: Border(
-                              right: BorderSide(
-                                  color: (selectItem4 == false)
-                                      ? Colors.white
-                                      : Colors.amber,
-                                  width: 2),
-                            ),
-                            colorContainer: (selectItem4 == false)
-                                ? Colors.white
-                                : Colors.amber.withOpacity(0.1),
-                            colorIcon:
-                            (selectItem4 == false) ? Colors.grey : Colors.amber,
-                            colorText:
-                            (selectItem4 == false) ? Colors.grey : Colors.amber,
-                          ),
-                        ),
-
-                        Container(
-                          margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/2+50),
-                          alignment: Alignment.bottomCenter,
-                          child: InkWell(
-                            onTap: () async{
-                              load();
-                              setState(()  {
-                                selectItem5 = !selectItem5;
-                                selectItem=false;
-                                selectItem2=false;
-                                selectItem4=false;
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                print("ddddd");
+                                selectItem = !selectItem;
+                                changeScreen(0);
                               });
+                            },
+                            child: itemBuild(
+                              text: AppLocalizations.of(context).lblEditProfile,
+                              icon: Icons.person_outline,
+                              border: Border(
+                                right: BorderSide(
+                                    color: (selectItem == false)
+                                        ? Colors.white
+                                        : Colors.amber,
+                                    width: 2),
+                              ),
+                              colorContainer: (selectItem == false)
+                                  ? Colors.white
+                                  : Colors.amber.withOpacity(0.1),
+                              colorIcon:
+                              (selectItem == false) ? Colors.grey : Colors.amber,
+                              colorText:
+                              (selectItem == false) ? Colors.grey : Colors.amber,
+                            ),
+                          ),
+
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectItem2 = !selectItem2;
+                                changeScreen(1);
+                              });
+                            },
+                            child: itemBuild(
+                              text:AppLocalizations.of(context).lblChangePassword,
+                              icon: Icons.lock_open,
+                              border: Border(
+                                right: BorderSide(
+                                    color: (selectItem2 == false)
+                                        ? Colors.white
+                                        : Colors.amber,
+                                    width: 2),
+                              ),
+                              colorContainer: (selectItem2 == false)
+                                  ? Colors.white
+                                  : Colors.amber.withOpacity(0.1),
+                              colorIcon:
+                              (selectItem2 == false) ? Colors.grey : Colors.amber,
+                              colorText:
+                              (selectItem2 == false) ? Colors.grey : Colors.amber,
+                            ),
+                          ),
+
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                selectItem4 = !selectItem4;
+                                changeScreen(3);
+                              });
+                            },
+                            child: itemBuild(
+                              text: AppLocalizations.of(context).lblSecurity,
+                              icon: Icons.vpn_key,
+                              border: Border(
+                                right: BorderSide(
+                                    color: (selectItem4 == false)
+                                        ? Colors.white
+                                        : Colors.amber,
+                                    width: 2),
+                              ),
+                              colorContainer: (selectItem4 == false)
+                                  ? Colors.white
+                                  : Colors.amber.withOpacity(0.1),
+                              colorIcon:
+                              (selectItem4 == false) ? Colors.grey : Colors.amber,
+                              colorText:
+                              (selectItem4 == false) ? Colors.grey : Colors.amber,
+                            ),
+                          ),
+
+                          Container(
+                            margin: EdgeInsets.only(top: MediaQuery.of(context).size.height/2+50,bottom: 20),
+                            alignment: Alignment.bottomCenter,
+                            child: InkWell(
+                              onTap: () async{
+                                load();
+                                setState(()  {
+                                  selectItem5 = !selectItem5;
+                                  selectItem=false;
+                                  selectItem2=false;
+                                  selectItem4=false;
+                                });
                                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.clear();
-                                await Future.delayed(Duration(seconds: 2));
+                                // await prefs.clear();
+                                // await Future.delayed(Duration(seconds: 2));
                                 SharedPreferencesHelper.setLoggedToken("null").then((value) {
                                   removeUser();
                                   showSuccessMsg("Sign out Successfully!");
                                   Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(
-                                      builder: (BuildContext context) => SignInScreen(),
+                                      builder: (BuildContext context) => SignInScreen(false),
                                     ),
                                         (Route route) => false,
                                   );
                                 });
-                            },
-                            child: itemBuild(
-                              text: AppLocalizations.of(context).lblSignOut,
-                              icon: Icons.logout,
-                              border: Border(
-                                right: BorderSide(
-                                    color: (selectItem5 == false)
-                                        ? Colors.white
-                                        : Colors.amber,
-                                    width: 2),
+                              },
+                              child: itemBuild(
+                                text: AppLocalizations.of(context).lblSignOut,
+                                icon: Icons.logout,
+                                border: Border(
+                                  right: BorderSide(
+                                      color: (selectItem5 == false)
+                                          ? Colors.white
+                                          : Colors.amber,
+                                      width: 2),
+                                ),
+                                colorContainer: (selectItem5 == false)
+                                    ? Colors.white
+                                    : Colors.amber.withOpacity(0.1),
+                                colorIcon:
+                                (selectItem5 == false) ? Colors.grey : Colors.amber,
+                                colorText:
+                                (selectItem5 == false) ? Colors.grey : Colors.amber,
                               ),
-                              colorContainer: (selectItem5 == false)
-                                  ? Colors.white
-                                  : Colors.amber.withOpacity(0.1),
-                              colorIcon:
-                              (selectItem5 == false) ? Colors.grey : Colors.amber,
-                              colorText:
-                              (selectItem5 == false) ? Colors.grey : Colors.amber,
                             ),
                           ),
-                        )
-                      ],
+                          const SizedBox(height: 30,)
+                        ],
+                      ),
                     ),
                   ),
 
@@ -378,7 +393,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                             validator: (value) {
                                               if (value.isEmpty) {
                                                 return AppLocalizations.of(context).lblPleaseEnterPassword;
-                                             }else if (value.length<6) {
+                                              }else if (value.length<6) {
                                                 return AppLocalizations.of(context).lblPasswordNotLess;
                                               }
                                               return null;
@@ -531,7 +546,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                                             onPressed: (){
                                               if (formKey.currentState.validate()) {
                                                 SharedPreferencesHelper.getLoggedToken().then((value) {
-                                                  getChangePassword(value);
+                                                  getChangePassword(baseUrl,value);
                                                 });
                                               }
                                             } ,

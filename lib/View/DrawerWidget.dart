@@ -5,8 +5,10 @@ import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/View/AllMeetingsScreen.dart';
+import 'package:itimaaty/View/ApprovalsScreen.dart';
 import 'package:itimaaty/View/CalenderScreen.dart';
 import 'package:itimaaty/View/HomeScreen.dart';
+import 'package:itimaaty/View/HomeScreenNew.dart';
 import 'package:itimaaty/View/NewsScreen.dart';
 import 'package:itimaaty/View/ProfileScreen.dart';
 import 'package:itimaaty/View/SignInToYourOrganizationScreen.dart';
@@ -89,7 +91,8 @@ String firstChar="";
                           Navigator.pop(context);
                           print("selectedIndex>>"+selectedIndex.toString());
                           // if(Constants.draweItem!="home") {
-                            navigateTo(context, HomeScreen());
+                          //   navigateTo(context, HomeScreen());
+                            navigateTo(context, HomeScreenNew());
                           // }
                         }),
                   ),
@@ -127,9 +130,10 @@ String firstChar="";
                       text: AppLocalizations.of(context).lblCalender,
                       isSelected: selectedIndex == 3, onTap: () {
                         setState(() {
-                          // selectedIndex = 3;
+                          selectedIndex = 3;
                         });
-                        // navigateTo(context, CalenderScreen());
+                        Navigator.pop(context);
+                        navigateTo(context, CalenderScreen());
                       })),
 
                   FadeAnimation(
@@ -153,22 +157,39 @@ String firstChar="";
                           navigateTo(context, AllMeetingsScreen());
                         // }
                       })),
+
+
+                  // FadeAnimation(
+                  //     0.7,   _createDrawerItem(context,
+                  //     icon: "assets/images/ic_library.webp",
+                  //     text: AppLocalizations.of(context).lblLibrary,
+                  //     isSelected: selectedIndex == 5, onTap: () {
+                  //       setState(() {
+                  //         // selectedIndex = 5;
+                  //       });
+                  //       navigateTo(context, BasicTilePage2());
+                  //
+                  //
+                  //       // navigateTo(context, ParentLibraryScreen());
+                  //       // navigateTo(context, BasicTilePage());
+                  //       // navigateTo(context, ExpansionTileSample());
+                  //       // navigateTo(context, ExpansionTileSample());
+                  //     })),
+
+
                   FadeAnimation(
                       0.7,   _createDrawerItem(context,
-                      icon: "assets/images/ic_library.webp",
-                      text: AppLocalizations.of(context).lblLibrary,
-                      isSelected: selectedIndex == 5, onTap: () {
+                      icon: "assets/images/approvals_ic.png",
+                      text: AppLocalizations.of(context).lblApprovals,
+                      isSelected: selectedIndex == 6, onTap: () {
                         setState(() {
                           // selectedIndex = 5;
                         });
-                        // navigateTo(context, BasicTilePage2());
+                        navigateTo(context, ApprovalsScreen());
 
-
-                        // navigateTo(context, ParentLibraryScreen());
-                        // navigateTo(context, BasicTilePage());
-                        // navigateTo(context, ExpansionTileSample());
-                        // navigateTo(context, ExpansionTileSample());
                       })),
+
+
                   // FadeAnimation(
                   //     0.9,  _createDrawerItem(context,
                   //     icon: "assets/images/ic_library.png",
@@ -290,9 +311,7 @@ Widget _createDrawerHeader(
     BuildContext context, String name, String companyName) {
   String firstChar ='';
   if(name!=null&&name.isNotEmpty) {
-    for (int i = 0; i < name
-        .split(" ")
-        .length; i++) {
+    for (int i = 0; i < name.split(" ").length; i++) {
       firstChar += name.split(" ")[i][0];
     }
   }
@@ -304,7 +323,8 @@ Widget _createDrawerHeader(
         crossAxisAlignment: CrossAxisAlignment.start ,
       children: [
         Container(
-          padding: EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 13),
+          // padding: EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 13),
+          padding: EdgeInsets.all(5),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.0),
             gradient: LinearGradient(
@@ -317,7 +337,8 @@ Widget _createDrawerHeader(
               ],
             ),
           ),
-          child: Text(firstChar.toString(), style: yellowColorStyleBold(22),),
+          child: Image.asset("assets/images/logo_for_splash.png",width: 80,height: 80,)
+          // Text(firstChar.toString(), style: yellowColorStyleBold(22),),
         ),
         const SizedBox(height: 20,),
         Text(name!=null?name:"",style: blueColorBoldStyle(22),),

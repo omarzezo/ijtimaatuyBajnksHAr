@@ -18,20 +18,25 @@ class BasicTilePageTest extends State<BasicTilePage> {
   MyLibraryResponseModel libaryResponseModel =new MyLibraryResponseModel();
 
   String userToken="";
+  String baseUrl="";
 
   @override
   void initState() {
     Constants.draweItem="Library";
     SharedPreferencesHelper.getLoggedToken().then((value) {
       userToken=value;
-      getLibrary(value);
+        String baseUri= Constants.BASE_URL;
+        setState(() {
+          baseUrl=baseUri;
+        });
+        getLibrary(baseUrl,value);
     });
   }
 
-  void getLibrary(String token) {
+  void getLibrary(String baseUrl ,String token) {
     load();
     libraryRepository = new LibraryRepository();
-    Future<MyLibraryResponseModel> allList = libraryRepository.getLibrary(token);
+    Future<MyLibraryResponseModel> allList = libraryRepository.getLibrary(baseUrl,token);
     allList.then((value) {
       setState(() {
         if (value != null) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
@@ -18,33 +20,42 @@ import 'package:itimaaty/View/SignInScreen.dart';
 import 'package:itimaaty/Models/change_vote_response_model.dart';
 import 'package:intl/intl.dart';
 
+import '../LocalDb/DbHelper.dart';
+import '../LocalDb/DecisionTableOffline.dart';
+import '../LocalDb/OfflineDataLocalModel.dart';
+import '../Utils/Constants.dart';
 import 'MeetingDetailsWidgets.dart';
 
 
 class ActionsWidgetScreen extends StatefulWidget {
 
   // List<MeetingDetailsResponseModelActions> actionsList;
+  MeetingDetailsResponseModel meetingDetailsResponseModel;
   List<AgendasData> actionsList;
   int  meetingId;
   int  index;
-  ActionsWidgetScreen(this.actionsList,this.meetingId,this.index);
+  ActionsWidgetScreen(this.meetingDetailsResponseModel,this.actionsList,this.meetingId,this.index);
 
   @override
   ActionsWidgetScreenState createState() => ActionsWidgetScreenState();
 }
 
 class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
+  List<AgendasData> actionsList=[];
   int userId=0;
   String userToken='';
   MeetingRepository meetingRepository;
   String status='';
+  String email='';
   // List<String> votesList =["In Progress","Complete","Not Complete"];
   List<String> votesList =[];
   String votesValue;
   var voteControler= TextEditingController();
+  var dbHelper = DbHelper();
 
   Color colorStatus=Colors.green;
-  String getStatus(){
+  String getStatus(String votesValue){
+    print("votesValue>>"+votesValue.toString());
     status=votesValue;
     if(status=="Complete")  {
       status="Complete";
@@ -76,7 +87,36 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
     return dateTime;
   }
 
-  void openBottomSheetChangeProgress(String date,int decisionId,BuildContext _context){
+  Future<bool> addOrUpdateOfflineMeetingDetails(String string) async {
+    // var orgainzationsFuture = dbHelper.getOfflineData();
+    var orgainzationsFuture = dbHelper.getAllMeetingsDetailsColumn(baseUrl+Constants.MEETINGS_DETAILS+"/"+widget.meetingId.toString());
+    // var orgainzationsFuture = dbHelper.getOfflineData();
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      for(int i=0;i<data.length;i++){
+        OfflineDataLocalModel localModel =data[i];
+        if(localModel.url == baseUrl+Constants.MEETINGS_DETAILS+"/"+widget.meetingId.toString()) {
+          m =true;
+          break;
+        }else{
+          m=false;
+        }
+      }
+    }).then((value) async {
+      if(m){
+        print("Updatettt>>"+m.toString());
+        var result = await dbHelper.updateMeetingDetails(baseUrl+Constants.MEETINGS_DETAILS+"/"+widget.meetingId.toString(),string);
+      }else{
+        print("Insertttt>>"+m.toString());
+        var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
+          url: baseUrl+Constants.MEETINGS_DETAILS+"/"+widget.meetingId.toString(),
+          allMeetingsDetails: string,
+        ));
+      }
+    });
+  }
+
+  void openBottomSheetChangeProgress(String date,int decisionId,BuildContext _context,AgendasData leave){
     voteControler.text="";
     votesValue=null;
     showModalBottomSheet(
@@ -212,9 +252,13 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                                             Navigator.pop(context);
                                           },
                                           child: Container(
-                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // height:50,
+                                              // width: 180,
+                                              padding: EdgeInsets.only(top: 5),
+                                              // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                               height:50,
-                                              width: 180,
+                                              width: MediaQuery.of(context).size.width/8,
                                               decoration: BoxDecoration(
                                                   border: Border.all(
                                                     color: blueColor,
@@ -229,24 +273,46 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                                         const SizedBox(width: 10,),
                                         InkWell(
                                           onTap: () {
-                                            if(votesValue!=null) {
-                                              String votesValue2;
-                                              if (votesValue == AppLocalizations.of(_context).lblInProgress) {
-                                                votesValue2="In Progress";
-                                              } else if (votesValue == AppLocalizations.of(_context).lblComplete) {
-                                                votesValue2="Complete";
-                                              } else if (votesValue == AppLocalizations.of(_context).lblNotComplete) {
-                                                votesValue2="Not Complete";
+                                            setState(() {
+                                              if(votesValue!=null) {
+                                                String votesValue2;
+                                                if (votesValue == AppLocalizations.of(_context).lblInProgress) {
+                                                  votesValue2="In Progress";
+                                                } else if (votesValue == AppLocalizations.of(_context).lblComplete) {
+                                                  votesValue2="Complete";
+                                                } else if (votesValue == AppLocalizations.of(_context).lblNotComplete) {
+                                                  votesValue2="Not Complete";
+                                                }
+                                                // Navigator.pop(context);
+                                                // leave.actionStauss=votesValue2;
+                                                // String dataString= json.encode(widget.meetingDetailsResponseModel.toJson());
+                                                // addOrUpdateOfflineMeetingDetails(dataString);
+
+                                                hasNetwork().then((value) {
+                                                  if(value){
+                                                    changeStatus(decisionId,userToken,votesValue2,leave);
+                                                  }else{
+                                                    // ffffffff
+                                                    addOfflineVote(votesValue2, voteControler.text != null ? voteControler.text : "",leave);
+                                                    // showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                                                  }
+                                                });
+
+
+                                              }else{
+                                                showErrorWithMsg("Please Choose Status");
                                               }
-                                              changeStatus(decisionId,userToken,votesValue2);
-                                            }else{
-                                              showErrorWithMsg("Please Choose Status");
-                                            }
+                                            });
+
                                           },
                                           child: Container(
-                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // height:50,
+                                              // width: 180,
+                                              padding: EdgeInsets.only(top: 5),
+                                              // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                               height:50,
-                                              width: 180,
+                                              width: MediaQuery.of(context).size.width/8,
                                               decoration: BoxDecoration(
                                                   color: yellowColor,
                                                   border: Border.all(
@@ -464,41 +530,168 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
   //       });
   // }
 
-  void changeStatus(int decisionId,String token,String status) {
+  void changeStatus(int decisionId,String token,String status,AgendasData leave) {
     load();
     meetingRepository = new MeetingRepository();
-    Future<ChangeStatusResponseModel> allList = meetingRepository.changeActionStatus(token,decisionId,new ChangeActionStatusRequestModel(status: status));
+    Future<ChangeStatusResponseModel> allList = meetingRepository.changeActionStatus(baseUrl,token,decisionId,new ChangeActionStatusRequestModel(status: status));
     allList.then((value) {
       setState(() {
         if (value != null) {
           showSuccess();
-          // meetingDetailsResponseModel = value;
           Navigator.pop(context);
-          Navigator.pop(context);
-          navigateTo(context, MeetingDetailsScreen(widget.meetingId));
+          setState(() {
+            getStatus(status);
+            leave.actionStauss=status;
+          });
+
+          // Navigator.pop(context);
+          // Navigator.pop(context);
+          // navigateTo(context, MeetingDetailsScreen(widget.meetingId));
         }else{
           showError();
           if(value==null){
-            navigateAndFinish(context, SignInScreen());
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
     });
   }
-  Widget actionsForMeetingDetails(BuildContext context,AgendasData leave,int index,String stausNew,int parentIndex) {
-    // status=stausNew;
 
+  Future setActions(AgendasData leave,String vote) async{
+    // int index=0;
+    if(widget.meetingDetailsResponseModel!=null){
+      if(widget.meetingDetailsResponseModel.agendas!=null){
+        if(widget.meetingDetailsResponseModel.agendas.isNotEmpty){
+          for(int i=0;i<widget.meetingDetailsResponseModel.agendas.length;i++ ){
+            if(widget.meetingDetailsResponseModel.agendas[i].agendaType!=null){
+              if(widget.meetingDetailsResponseModel.agendas[i].agendaType=="action"){
+                for(int m=0;m<widget.meetingDetailsResponseModel.agendas[i].data.length;m++ ) {
+                  if(actionsList!=null){
+                    if(actionsList.isNotEmpty){
+                      for(int n=0;n<actionsList.length;n++ ){
+                        if(widget.meetingDetailsResponseModel.agendas[i].data[m].id==leave.id){
+                          widget.meetingDetailsResponseModel.agendas[i].data[m]=leave;
+
+                          if(widget.meetingDetailsResponseModel.agendas[i].data[m].participants!=null&&widget.meetingDetailsResponseModel.agendas[i].data[m].participants.isNotEmpty)
+                            for(int r= 0; r <widget.meetingDetailsResponseModel.agendas[i].data[m].participants.length; r++){
+                              if(userId!=null){
+                                if(userId==widget.meetingDetailsResponseModel.agendas[i].data[m].participants[r].userId){
+                                  widget.meetingDetailsResponseModel.agendas[i].data[m].actionStauss=vote;
+                                  widget.meetingDetailsResponseModel.agendas[i].data[m].participants[r].status=vote;
+                                  print("kmkkknnnknknknknk>>"+n.toString());
+                                  break;
+                                }else{
+                                }
+                              }else{
+                                // checkMail
+                                if(email==widget.meetingDetailsResponseModel.agendas[i].data[m].participants[r].userEmail){
+                                  widget.meetingDetailsResponseModel.agendas[i].data[m].actionStauss=vote;
+                                  widget.meetingDetailsResponseModel.agendas[i].data[m].participants[r].status=vote;
+                                  break;
+                                }else{
+                                }
+                              }
+                            }
+
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void addOfflineVote(String vote ,String reason,AgendasData leave){
+    addOrUpdateVote(vote,reason,leave.id).then((value) {
+      Navigator.pop(context);
+      setState(() {
+        getStatus(status);
+        leave.actionStauss=status;
+      });
+      setActions(leave,vote).then((value) {
+        print("jkkkkkkkk>>"+leave.stauss.toString());
+        String dataString= json.encode(widget.meetingDetailsResponseModel.toJson());
+        addOrUpdateOfflineMeetingDetails(dataString);
+      });
+    });
+  }
+
+  Future<bool> addOrUpdateVote(String vote,String reason,int id) async {
+    var orgainzationsFuture = dbHelper.getMeetingActions(baseUrl+"actions/"+id.toString()+Constants.CHANGE_STATUS);
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      for(int i=0;i<data.length;i++){
+        DecisionTableOffline localModel =data[i];
+        if(localModel.url == baseUrl+"actions/"+id.toString()+Constants.CHANGE_STATUS) {
+          m =true;
+          break;
+        }else{
+          m=false;
+        }
+      }
+    }).then((value) async {
+      if(m){
+        print("Updatettt>>"+m.toString());
+        var result = await dbHelper.updateMeetingActions(baseUrl+"actions/"+id.toString()+Constants.CHANGE_STATUS,vote);
+      }else{
+        print("Insertttt>>"+m.toString());
+        var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+            url: baseUrl+"actions/"+id.toString()+Constants.CHANGE_STATUS,
+            changeDecisionVote: vote,
+        ));
+      }
+    });
+  }
+
+  void goToSecondScreen(AgendasData leave,BuildContext _context,int id , int id2,String status)async {
+    // var result = await navigateTo(context, ActionsScreen(id,id2,status));
+    var result = await Navigator.push(
+      _context,
+      createRoute(ActionsScreen(id,id2,status)),
+    );
+    setState(() {
+      if(result!=null){
+        if(leave.actionStauss!=null) {
+          if(leave.actionStauss=="Complete")  {
+            colorStatus=Colors.green;
+            leave.actionStauss=result;
+          }else if(leave.actionStauss=="Not Complete")  {
+            colorStatus=Color(0xffFF6A81);
+            leave.actionStauss=result;
+          }else if(leave.actionStauss=="In Progress")  {
+            colorStatus=Color(0xffFEC20E);
+            leave.actionStauss=result;
+          }
+        }
+      }
+      print("result>>"+result.toString());
+    });
+
+  }
+
+  Widget actionsForMeetingDetails(BuildContext context,AgendasData leave,int index,int parentIndex) {
+    // status=stausNew;
+    // print("leave.action>>"+leave.action.toString());
     index=widget.index++;
     if(leave.actionStauss!=null) {
       if(leave.actionStauss=="Complete")  {
         // status="Complete";
         colorStatus=Colors.green;
+        leave.actionStauss=AppLocalizations.of(context).lblComplete;
       }else if(leave.actionStauss=="Not Complete")  {
         // status="Not Complete";
         colorStatus=Color(0xffFF6A81);
+        leave.actionStauss=AppLocalizations.of(context).lblNotComplete;
       }else if(leave.actionStauss=="In Progress")  {
         // status="In Progress";
         colorStatus=Color(0xffFEC20E);
+        leave.actionStauss=AppLocalizations.of(context).lblInProgress;
       }
     }
 
@@ -511,8 +704,8 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
 
     return InkWell(
       onTap: () {
-        // navigateTo(context, ActionsScreen(leave.meetingId,leave.id,leave.actionStauss));
-        navigateTo(context, ActionsScreen(widget.meetingId,leave.id,leave.actionStauss));
+        // navigateTo(context, ActionsScreen(widget.meetingId,leave.id,leave.actionStauss));
+        goToSecondScreen(leave,context,widget.meetingId,leave.id,leave.actionStauss);
       },
       child: Container(
         margin: EdgeInsets.only(top: 20),
@@ -676,7 +869,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                   shrinkWrap: true,
                   itemCount: leave.attachments.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
+                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context,2);
                   },
                 )
             ):Container(),
@@ -698,7 +891,11 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
             ):Container(),
             leave.subpoints!=null&&leave.subpoints.isNotEmpty?  const SizedBox(height: 20,):SizedBox(height: 0,),
 
-           leave.actionStauss!=null? Row(
+           leave.actionStauss!=null&&
+               (widget.meetingDetailsResponseModel.status.name.contains(AppLocalizations.of(context).lblLive)
+               ||widget.meetingDetailsResponseModel.status.name.contains(AppLocalizations.of(context).lblArchived))
+               ?
+           Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -717,6 +914,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                         const SizedBox(width: 10,),
                         Container(
                           margin: EdgeInsets.only(top: 4),
+                          // child: Text(leave.actionStauss,style: TextStyle(
                           child: Text(leave.actionStauss,style: TextStyle(
                             color: colorStatus ,
                             fontFamily: "black",
@@ -728,15 +926,16 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                     ),
                     const SizedBox(height: 4,),
                     Container(
-                        child: Text(("My Action"),style: grayTextColorStyleMedium(22),))
+                        child: Text(AppLocalizations.of(context).lblMyAction,style: grayTextColorStyleMedium(22),))
                   ],
                 ),
                 InkWell(
                   onTap: () {
-                    openBottomSheetChangeProgress("date", leave.id,context);
+                    openBottomSheetChangeProgress("date", leave.id,context,leave);
                   },
                   child: Container(
-                    padding: EdgeInsets.only(left: 60,right: 60,top: 24,bottom: 20),
+                    // padding: EdgeInsets.only(left: 40,right: 40,top: 16,bottom: 12),
+                    padding: EdgeInsets.only(left: 24,right: 24,top: 8,bottom: 8),
                     decoration: BoxDecoration(
                         color: Color(0xffe8eaed),
                         border: Border.all(
@@ -744,7 +943,7 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
                         ),
                         borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
                     ),
-                    child: Text(AppLocalizations.of(context).lblChange,style: grayTextColorStyleBlack(22),),
+                    child: Text(AppLocalizations.of(context).lblMyStatus,style: grayTextColorStyleBlack(22),),
                   ),
                 )
               ],
@@ -764,37 +963,30 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: actionList.length,
           itemBuilder: (context, index) {
-            String stauss='';
-            for(int m=0;m<actionList.length;m++){
-              if(actionList[m].participants!=null&&actionList[m].participants.isNotEmpty){
-                for(int i=0;i<actionList[m].participants.length;i++){
-                  if(userId==actionList[m].participants[i].userId){
-                    stauss=actionList[m].participants[i].status;
-                    actionList[m].setActionStauss=stauss;
-                    // print("statusIsNUll0>>"+desisionssList[index].stauss);
-                    break;
-                  }
-                }
-              }
-            }
-            // if(actionList!=null && actionList.isNotEmpty){
-            //   for(int i=0;i<actionList.length;i++){
-            //     if(actionList[i]!=null){
-            //       if(actionList[i].participants.isNotEmpty){
-            //         status=actionList[i].participants[0].status;
+            // String stauss='';
+            // for(int m=0;m<actionList.length;m++){
+            //   if(actionList[m].participants!=null&&actionList[m].participants.isNotEmpty){
+            //     for(int i=0;i<actionList[m].participants.length;i++){
+            //       if(userId==actionList[m].participants[i].userId){
+            //         stauss=actionList[m].participants[i].status;
+            //         actionList[m].setActionStauss=stauss;
+            //         // print("statusIsNUll0>>"+desisionssList[index].stauss);
+            //         break;
             //       }
             //     }
             //   }
             // }
-            return actionsForMeetingDetails(context,actionList[index],index,stauss,index);
+            return actionsForMeetingDetails(context,actionList[index],index,index);
           },
         )
     ):Container();
   }
 
+  String baseUrl="";
 
   @override
   void initState() {
+    actionsList=widget.actionsList;
     Future.delayed(Duration.zero,() {
       votesList=[AppLocalizations.of(context).lblInProgress,AppLocalizations.of(context).lblComplete,
         AppLocalizations.of(context).lblNotComplete];
@@ -803,7 +995,13 @@ class ActionsWidgetScreenState extends State<ActionsWidgetScreen> {
       userToken=value;
       getUser().then((value) {
         userId=value.id;
+        email=value.email;
         print("klkmnknknknkn");
+      }).then((value) {
+          String baseUri= Constants.BASE_URL;
+          setState(() {
+            baseUrl=baseUri;
+          });
       });
       // getMeetingDetails(value);
     });

@@ -545,7 +545,7 @@ class Voters {
   int _id;
   int _meetingDecisionId;
   int _userId;
-  dynamic _userEmail;
+  String _userEmail;
   String _vote;
   dynamic _reason;
   User _user;
@@ -553,8 +553,14 @@ class Voters {
   int get id => _id;
   int get meetingDecisionId => _meetingDecisionId;
   int get userId => _userId;
-  dynamic get userEmail => _userEmail;
+  String get userEmail => _userEmail;
   String get vote => _vote;
+
+
+  set vote(String value) {
+    _vote = value;
+  }
+
   dynamic get reason => _reason;
   User get user => _user;
 
@@ -699,6 +705,7 @@ class DecisonResponseModelComments {
   String _user_image;
   String _user_name;
   bool _approved;
+  bool _fromApi;
   dynamic _rate;
   String _createdAt;
   String _updatedAt;
@@ -709,8 +716,39 @@ class DecisonResponseModelComments {
   String get commentedId => _commentedId;
   String get commentedType => _commentedType;
   String get comment => _comment;
+  bool get fromApi => _fromApi;
   String get user_name => _user_name;
   String get user_image => _user_image;
+
+
+  set fromApi(bool value) {
+    _fromApi = value;
+  }
+
+  set id(int value) {
+    _id = value;
+  }
+
+  set commentedId(String value) {
+    _commentedId = value;
+  }
+
+  set user_name(String value) {
+    _user_name = value;
+  }
+
+  set comment(String value) {
+    _comment = value;
+  }
+
+  set user_image(String value) {
+    _user_image = value;
+  }
+
+  set createdAt(String value) {
+    _createdAt = value;
+  }
+
   bool get approved => _approved;
   dynamic get rate => _rate;
   String get createdAt => _createdAt;
@@ -726,6 +764,7 @@ class DecisonResponseModelComments {
     String user_image,
     String user_name,
     bool approved,
+    bool fromApi,
     dynamic rate,
     String createdAt,
     String updatedAt}){
@@ -738,6 +777,7 @@ class DecisonResponseModelComments {
     _user_name = user_name;
     _user_image = user_image;
     _approved = approved;
+    _fromApi = fromApi;
     _rate = rate;
     _createdAt = createdAt;
     _updatedAt = updatedAt;
@@ -755,6 +795,7 @@ class DecisonResponseModelComments {
     _approved = json['approved'];
     _rate = json['rate'];
     _createdAt = json['created_at'];
+    _fromApi = json['fromApi'];
     _updatedAt = json['updated_at'];
   }
 
@@ -771,6 +812,7 @@ class DecisonResponseModelComments {
     map['approved'] = _approved;
     map['rate'] = _rate;
     map['created_at'] = _createdAt;
+    map['fromApi'] = _fromApi;
     map['updated_at'] = _updatedAt;
     return map;
   }

@@ -265,15 +265,22 @@ class WelcomeScreenState extends State<WelcomeScreen> {
                                       ],
                                     ),
                                   ),
-                                  child: FlatButton(
+                                  child: ElevatedButton(
                                     child: Text(
                                       AppLocalizations.of(context).lblCompleteProfile,
                                       style: whiteColorStyle(width<600?16:22),
                                     ),
-                                    textColor: Colors.white,
-                                    color: Colors.transparent,
-                                    shape:
-                                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                    // textColor: Colors.white,
+                                    // color: Colors.transparent,
+                                    // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                                    style: ButtonStyle(
+                                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                            RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(30.0),
+                                                side: BorderSide(color: Colors.transparent),
+                                            ),
+                                        )
+                                    ),
                                     onPressed: () {
                                       if (formKey.currentState.validate()) {
                                         cubit.userLoginFunc(

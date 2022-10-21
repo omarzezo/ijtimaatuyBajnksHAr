@@ -102,6 +102,8 @@ class FavouriteScreenState extends State<FavouriteScreen> {
       icon = "assets/images/ic_word.png";
     } else if (cells.file.name.contains('pot')) {
       icon = "assets/images/ic_power_point.png";
+    }else if(cells.file.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
     } else {
       icon = "assets/images/ic_folder.png";
     }
@@ -112,7 +114,9 @@ class FavouriteScreenState extends State<FavouriteScreen> {
         icon = "assets/images/ic_word.png";
       } else if (cells.dir.name.contains('pot')) {
         icon = "assets/images/ic_power_point.png";
-      } else {
+      } else if(cells.dir.name.contains(".xlsx")){
+        icon="assets/images/ic_excel.webp";
+      }else {
         icon = "assets/images/ic_folder.png";
       }
     }

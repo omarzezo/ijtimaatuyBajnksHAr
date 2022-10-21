@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/View/ForgotPasswordScreen.dart';
 import 'package:itimaaty/View/HomeScreen.dart';
+import 'package:itimaaty/View/HomeScreenNew.dart';
 import 'package:itimaaty/View/ResetPasswordScreen.dart';
 import 'package:itimaaty/View/SignInScreen.dart';
 import 'package:itimaaty/View/WelcomeBackScreen.dart';
 import 'package:itimaaty/View/WelcomeScreen.dart';
+import '../LocalDb/DbHelper.dart';
+import '../LocalDb/OrganizationLocalModel.dart';
 import '../Localizations/localization/LanguageVM.dart';
 import '../Localizations/localization/LocaleHelper.dart';
 import '../Localizations/localization/localizations.dart';
@@ -30,52 +34,183 @@ class InitializationScreenState extends State<InitializationScreen> {
 
  Widget child=Container();
   bool isLoged=false;
+
+  var dbHelper = DbHelper();
+  List orgainzations=[];
+
+ bool logged=false;
+  Future<bool> query(String name) async {
+    // bool logged = false;
+    if (SharedPreferencesHelper.getDomainName() != null) {
+      SharedPreferencesHelper.getDomainName().then((value) {
+        var orgainzationsFuture = dbHelper.getOrganizations();
+        orgainzationsFuture.then((data) {
+          setState(() {
+            this.orgainzations = data;
+            for(int i=0;i<orgainzations.length;i++){
+              OrganizationLocalModel localModel =orgainzations[i];
+              if(value==localModel.domain){
+                if(localModel.userToken!=null && localModel.userToken.isNotEmpty){
+                  setState(() {
+                    print("userToken11>>"+"tokenIsNull");
+                    logged=true;
+                  });
+                  break;
+                }else{
+                  print("userToken22>>"+"tokenIsNull");
+                  setState(() {
+                    logged = false;
+                  });
+                  // break;
+                }
+
+              }
+            }
+          });
+        });
+      });
+    }else{
+      setState(() {
+        logged=false;
+      });
+    }
+    // if(orgainzations!=null){
+    //   for(int i=0;i<orgainzations.length;i++){
+    //     OrganizationLocalModel localModel =orgainzations[i];
+    //     print("mm>>"+localModel.name.toString());
+    //     if(name==localModel.domain){
+    //       logged=true;
+    //       break;
+    //     }else{
+    //       logged=false;
+    //     }
+    //   }
+    // }
+    return logged;
+  }
+
   void initState() {
     super.initState();
 
-
-    // setState(() {
-    //   helper.onLocaleChanged = onLocaleChange;
-    //
-    //   _specificLocalizationDelegate = SpecificLocalizationDelegate(new Locale("en"));
-    //
-    //   if(_specificLocalizationDelegate==null){
-    //     _specificLocalizationDelegate = SpecificLocalizationDelegate(new Locale("en"));
-    //     print("CheckForLanguage>>"+"1");
-    //   }
-    // });
     setState(() {
-      if(SharedPreferencesHelper.getLoggedToken()!=null) {
-        SharedPreferencesHelper.getLoggedToken().then((value) {
-          print("valuevalue>>"+value.toString());
-          if (value != null) {
-            if(value=="null"){
-              // isLoged = true;
-              setState(() {
-                child = SignInScreen();
-              });
-            }else{
-              isLoged = true;
-              setState(() {
-                child = HomeScreen();
-              });
-            }
 
-            print("herrrrr1");
-          } else {
-            print("herrrrr2");
-            setState(() {
-              child = SignInScreen();
-            });
+   query("name").then((valueCheck) {
+     if(valueCheck){
+       SharedPreferencesHelper.getAlreadySignInOrganization().then((value) {
+         if(value!=null){
+           if(value){
+             if (SharedPreferencesHelper.getLoggedToken() != null) {
+               SharedPreferencesHelper.getLoggedToken().then((value) {
+                 print("valuevalue>>" + value.toString());
+                 if (value != null) {
+                   if (value == "null") {
+                     // isLoged = true;
+                     setState(() {
+                       child = SignInScreen(false);
+                     });
+                   } else {
 
-          }
-        });
-      }else{
-        print("herrrrr3");
-        setState(() {
-          child = SignInScreen();
-        });
-      }
+                     if(valueCheck==true){
+                       setState(() {
+                         isLoged = true;
+                         child = HomeScreenNew();
+                         print("ffffffffffff1");
+                       });
+                     }else{
+                       setState(() {
+                         isLoged = false;
+                         print("ffffffffffff2");
+                         child = SignInScreen(false);
+                       });
+                     }
+
+                   }
+                   print("herrrrr1");
+                 } else {
+                   print("herrrrr2");
+                   setState(() {
+                     child = SignInScreen(false);
+                   });
+                 }
+               });
+             } else {
+               print("herrrrr3");
+               setState(() {
+                 child = SignInScreen(false);
+               });
+             }
+           }else{
+             setState(() {
+               print("Org444444");
+               // child = SignInToYourOrganizationScreen();
+               child = SignInScreen(false);
+             });
+           }
+         }else{
+           setState(() {
+             print("Org6666666");
+             child = SignInScreen(false);
+           });
+         }
+
+       });
+     }else{
+       SharedPreferencesHelper.getAlreadySignInOrganization().then((value) {
+         if(value!=null){
+           if(value){
+             if (SharedPreferencesHelper.getLoggedToken() != null) {
+               SharedPreferencesHelper.getLoggedToken().then((value) {
+                 print("valuevalue>>" + value.toString());
+                 if (value != null) {
+                   if (value == "null") {
+                     // isLoged = true;
+                     setState(() {
+                       child = SignInScreen(false);
+                     });
+                   } else {
+
+                       setState(() {
+                         isLoged = true;
+                         child = HomeScreenNew();
+                         print("ffffffffffff1");
+                       });
+
+                   }
+                   print("herrrrr1");
+                 } else {
+                   print("herrrrr2");
+                   setState(() {
+                     child = SignInScreen(false);
+                   });
+                 }
+               });
+             } else {
+               print("herrrrr3");
+               setState(() {
+                 child = SignInScreen(false);
+               });
+             }
+           }else{
+             setState(() {
+               print("Org444444");
+               child = SignInScreen(false);
+             });
+           }
+         }else{
+           setState(() {
+             print("Org6666666");
+             child = SignInScreen(false);
+           });
+         }
+
+       });
+     }
+   });
+
+
+
+
+
       helper.onLocaleChanged = onLocaleChange;
       if(SharedPreferencesHelper.getLanguageCode()!=null) {
         // if(SharedPreferencesHelper.getLanguageCode.) {

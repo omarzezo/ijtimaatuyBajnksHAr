@@ -102,6 +102,8 @@ class SharedWithMeScreenState extends State<SharedWithMeScreen> {
         icon = "assets/images/ic_word.png";
       } else if (cells.file.name.contains('pot')) {
         icon = "assets/images/ic_power_point.png";
+      }else if(cells.file.name.contains(".xlsx")){
+        icon="assets/images/ic_excel.webp";
       } else {
         icon = "assets/images/ic_folder.png";
       }
@@ -110,6 +112,8 @@ class SharedWithMeScreenState extends State<SharedWithMeScreen> {
         icon = "assets/images/ic_pdf.png";
       } else if (cells.dir.name.contains('docx')) {
         icon = "assets/images/ic_word.png";
+      }else if(cells.file.name.contains(".xlsx")){
+        icon="assets/images/ic_excel.webp";
       } else if (cells.dir.name.contains('pot')) {
         icon = "assets/images/ic_power_point.png";
       } else {

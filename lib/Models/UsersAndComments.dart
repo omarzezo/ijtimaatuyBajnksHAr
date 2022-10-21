@@ -6,7 +6,9 @@ class UsersAndComments {
   final String comment;
   final String img;
   final String date;
-  UsersAndComments({@required this.id,@required this.name,@required this.comment,@required this.img,@required this.date});
+  final String commentedId;
+  final bool fromApi;
+  UsersAndComments({@required this.id,@required this.name,@required this.comment,@required this.fromApi,@required this.img,@required this.date,@required this.commentedId});
 
   String toString() => this.comment;
   String toStringColor() => this.img;

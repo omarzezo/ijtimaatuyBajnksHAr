@@ -748,15 +748,22 @@
 //   }
 // }
 
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/Constants.dart';
+import 'package:itimaaty/View/HomeScreenNew.dart';
+import 'package:itimaaty/View/SignInScreen.dart';
+import 'package:itimaaty/network/DioHelper.dart';
+// import 'package:upgrader/upgrader.dart';
 import 'View/SplashScreen.dart';
-import 'BlocObserver/bloc_observer.dart';
+// import 'BlocObserver/bloc_observer.dart';
 import 'cubit/User/cubit.dart';
 import 'cubit/User/states.dart';
 import 'network/remote/dio_helper.dart';
@@ -765,7 +772,10 @@ import 'package:pspdfkit_flutter/src/main.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // await Upgrader.clearSavedSettings();
   // Bloc.observer = MyBlocObserver();
+ // await Firebase.initializeApp();
+  HttpOverrides.global = MyHttpOverrides();
   Widget widget=SplashScreen();
   runApp(MyApp(
     startWidget: widget,
@@ -789,8 +799,13 @@ Future<void> configLoading() async {
     ..userInteractions = false
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
-
-  await Pspdfkit.setLicenseKeys(Constants.ios, Constants.android);
+  // await DioHelperDio.init();
+  if (Platform.isAndroid) {
+    await Pspdfkit.setLicenseKey(Constants.android);
+  } else if (Platform.isIOS) {
+    await Pspdfkit.setLicenseKey(Constants.ios);
+  }
+  // await Pspdfkit.setLicenseKeys(Constants.android, Constants.ios);
 
   // await Pspdfkit.setLicenseKey(Constants.ios);
 }
@@ -805,10 +820,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // SystemChrome.setPreferredOrientations([
-    //   DeviceOrientation.landscapeRight,
-    //   DeviceOrientation.landscapeLeft,
-    // ]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
 
     return BlocProvider(
       create: (BuildContext context) => AppCubit()
@@ -827,7 +842,15 @@ class MyApp extends StatelessWidget {
             // theme: lightTheme,
             // darkTheme: darkTheme,
             themeMode: ThemeMode.light,
+            routes: <String, WidgetBuilder>{
+              // Set routes for using the Navigator.
+              '/home': (BuildContext context) => new HomeScreenNew(),
+              '/login': (BuildContext context) => new SignInScreen(false)
+            },
             home: startWidget,
+            // home: UpgradeAlert(
+            //   child: startWidget,
+            // ),
             builder: EasyLoading.init(),
           );
         },
@@ -854,5 +877,13 @@ class CustomAnimation extends EasyLoadingAnimation {
         child: child,
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext context){
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
   }
 }

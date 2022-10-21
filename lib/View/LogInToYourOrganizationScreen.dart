@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:itimaaty/LocalDb/DbHelper.dart';
@@ -10,10 +11,16 @@ import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:itimaaty/View/CheckYourMailScreen.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaaty/View/HomeScreenNew.dart';
 import 'package:itimaaty/cubit/Organization/organization_cubit.dart';
 import 'package:itimaaty/cubit/Organization/organization_states.dart';
 import 'package:itimaaty/cubit/User/user_cubit.dart';
 import 'package:itimaaty/cubit/User/user_states.dart';
+
+import '../LocalDb/SharedPreferencesHelper.dart';
+import '../Utils/Constants.dart';
+import 'HomeScreen.dart';
+import 'SignInScreen.dart';
 
 class LogInToYourOrganizationScreen extends StatefulWidget {
 
@@ -23,31 +30,26 @@ class LogInToYourOrganizationScreen extends StatefulWidget {
 
 class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationScreen> {
 
-  bool _passwordVisible= false;
   var formKey = GlobalKey<FormState>();
   var igtimaatiURLController = TextEditingController();
-  // List<MyOrganizationsResponseModel> myList =new List<MyOrganizationsResponseModel>();
-  // MyOrganizationsResponseModel model =new MyOrganizationsResponseModel();
   var dbHelper = DbHelper();
   List orgainzations;
   int orgainzationsCount = 0;
   double width;
   double height;
+  bool error= false;
 
   @override
   void initState() {
+    print("hiiiiiiOmar");
     getProducts();
-
-    // model.name="jumia";
-    // myList.add(model);
-    // model.name="700apps";
-    // myList.add(model);
   }
 
   void getProducts() async {
     var orgainzationsFuture = dbHelper.getOrganizations();
     orgainzationsFuture.then((data) {
       setState(() {
+
         this.orgainzations = data;
         orgainzationsCount = data.length;
         print(""+"countIs>>"+orgainzationsCount.toString());
@@ -57,8 +59,10 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
 
   void addProduct(String name , String logo) async {
     var result = await dbHelper.insert(OrganizationLocalModel(
+      domain: igtimaatiURLController.text,
       name: name,
       logo: logo,
+      link: Constants.BASE_URL,
     ));
     getProducts();
   }
@@ -69,7 +73,7 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
       for(int i=0;i<orgainzations.length;i++){
         OrganizationLocalModel localModel =orgainzations[i];
         print("mm>>"+localModel.name.toString());
-        if(name==localModel.name){
+        if(name==localModel.domain){
           m=true;
           break;
         }else{
@@ -105,13 +109,19 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10.0),
-                  child: Image.network(
-                    // "https://www.bhaktiphotos.com/wp-content/uploads/2018/04/Mahadev-Bhagwan-Photo-for-Devotee.jpg",
-                    leave.logo,
-                    height:width<600?40: 60,
-                    width:width<600?40: 50,
-                    fit: BoxFit.fill,
-                  ),
+                  child:CachedNetworkImage(
+                      height:width<600?40: 60,
+                      width:width<600?40: 50,
+                      fit: BoxFit.fill,
+                      imageUrl: leave.logo
+                  )
+        // Image.network(
+        //             // "https://www.bhaktiphotos.com/wp-content/uploads/2018/04/Mahadev-Bhagwan-Photo-for-Devotee.jpg",
+        //             leave.logo,
+        //             height:width<600?40: 60,
+        //             width:width<600?40: 50,
+        //             fit: BoxFit.fill,
+        //           ),
                 ),
                 const SizedBox(width: 14,),
                 Column(
@@ -120,7 +130,7 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
                   children: [
                     Text(leave.name,style: blueColorBoldStyle(width<600?16:20),),
                     const SizedBox(height: 2,),
-                    Text("Jumia@Jumia.com",style: grayTextColorStyleMedium(width<600?14:18),),
+                    Text(leave.link!=null?leave.link:"",style: grayTextColorStyleMedium(width<600?14:18),),
                   ],
                 ),
               ],
@@ -142,16 +152,66 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
                   ],
                 ),
               ),
-              child: FlatButton(
+              child: ElevatedButton(
                 child: Text(
                   AppLocalizations.of(context).lblLaunch,
-                  style: yellowColorStyleBold(width<600?16:22),
+                  style: whiteColorStyle(width<600?16:22),
                 ),
-                textColor: Colors.white,
-                color: Colors.transparent,
-                shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+                style: ButtonStyle(
+                    textStyle: MaterialStateProperty.all<TextStyle>(whiteColorStyle(width<600?16:22)),
+                    foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                    backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            side: BorderSide(color: yellowColor)
+                        )
+                    )
+                ),
                 onPressed: () {
+                  var orgainzationsFuture = dbHelper.getOrganizations();
+                  orgainzationsFuture.then((data) {
+                    setState(() {
+                      this.orgainzations = data;
+                      for(int i=0;i<orgainzations.length;i++){
+                        OrganizationLocalModel localModel =orgainzations[i];
+                        print("mm>>"+localModel.name.toString());
+                        if(leave.domain==localModel.domain){
+                          if(localModel.userToken!=null&&localModel.userToken.isNotEmpty){
+                            print("userToken>>"+"tokenIsNotNull");
+                            SharedPreferencesHelper.setLoggedToken(leave.userToken).then((value) {
+                              SharedPreferencesHelper.setDomainName(leave.domain).then((value) {
+                                // navigateAndFinish(context, HomeScreen());
+                                navigateAndFinish(context, HomeScreenNew());
+                              });
+                            });
+                          }else{
+                            print("userToken>>"+"tokenIsNull");
+                            // SharedPreferencesHelper.setLoggedToken(leave.userToken).then((value) {
+                            SharedPreferencesHelper.setOrg(leave.name).then((value){
+                              SharedPreferencesHelper.setOrgLogo(leave.logo).then((value){
+                                SharedPreferencesHelper.setDomainName(leave.domain).then((value) {
+                                  navigateAndFinish(context, SignInScreen(false));
+                                });
+                              });
+                            });
+
+                            // });
+                            // Navigator.of(context).push(createRoute(SignInScreen()));
+                          }
+                          break;
+                        }else{
+                        }
+                      }
+                    });
+                  });
+
+                  // SharedPreferencesHelper.setLoggedToken(leave.userToken).then((value) {
+                  //   SharedPreferencesHelper.setDomainName(leave.domain).then((value) {
+                  //     navigateAndFinish(context, HomeScreen());
+                  //   });
+                  // });
+
                   // if (formKey.currentState.validate()) {
                   //   cubit.userLoginFunc(
                   //     email: emailController.text,
@@ -175,6 +235,7 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
           child: SizedBox(
             child: orgainzations!=null? orgainzations.isNotEmpty?ListView.builder(
               scrollDirection: Axis.vertical,
+              physics: NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               itemCount: orgainzations.length,
               itemBuilder: (context, index) {
@@ -201,10 +262,13 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
 
             if (state.organizationModel!=null) {
               print("EmailIs>>"+state.organizationModel.name);
-              query("IJTIMAATI1").then((value) {
+              query(igtimaatiURLController.text).then((value) {
                 print("valueIs>>"+value.toString());
                 if(value==false){
+                  error=false;
                   addProduct(state.organizationModel.name, state.organizationModel.logo);
+                }else{
+                  error=true;
                 }
               });
 
@@ -242,94 +306,125 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
                   height: MediaQuery.of(context).size.height,
                   child: Form(
                     key: formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height:60,),
-                        Center(child: Text(AppLocalizations.of(context).lblLoginWith,style: blueColorBoldStyle(width<600?22:30),)),
-                        Container(
-                          margin: EdgeInsets.only(top: 10),
-                          height: 0.3,color: grayTextColor,),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          const SizedBox(height:60,),
+                          Center(child: Text(AppLocalizations.of(context).lblSignInToYour,style: blueColorBoldStyle(width<600?22:30),)),
+                          Container(
+                            margin: EdgeInsets.only(top: 10),
+                            height: 0.3,color: grayTextColor,),
 
-                        const SizedBox(height:40,),
-                        Center(child: Text(AppLocalizations.of(context).lblEnterYour,style: grayTextColorStyleMedium(width<600?16:22),)),
+                          const SizedBox(height:40,),
+                          Center(child: Text(AppLocalizations.of(context).lblEnterYour,style: grayTextColorStyleMedium(width<600?16:22),)),
 
 
-                        const SizedBox(height:30,),
-                        Container(
+                          const SizedBox(height:30,),
+                          error?Container(
+                            // width: width/2+80,
                             margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
-                            child: Text(AppLocalizations.of(context).lblIgtimaatiURL,style: blueColorStyleMedium(width<600?14:20),)),
-                        const SizedBox(height:10,),
-                        Container(
-                          margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: new BorderRadius.circular(10.0),
-                              border: Border.all(
-                                  color: grayRoundedColor,// set border color
-                                  width: 1.0
-                              )
-                          ),
-                          // height: 56,
-                          padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
-                          child: Center(
-                            child: TextFormField(
-                              controller: igtimaatiURLController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
+                            decoration: BoxDecoration(
+                                color: Color(0xfffff1f0),
+                                borderRadius: new BorderRadius.circular(10.0),
+                                border: Border.all(
+                                    color: grayRoundedColor,// set border color
+                                    width: 1.0
+                                )
+                            ),
+                            // height: 56,
+                            padding: EdgeInsets.fromLTRB(16, 10, 16, 12),
+                            child: Center(
+                              child: Text(
+                                AppLocalizations.of(context).lblAlready,
+                                style: blueColorStyleMedium(width<600?14:20),
                               ),
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return "Please Enter Domain";
+                            ),
+                          ):Container(),
+                          const SizedBox(height:30,),
+                          Container(
+                              margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
+                              child: Text(AppLocalizations.of(context).lblIgtimaatiURL,style: blueColorStyleMedium(width<600?14:20),)),
+                          const SizedBox(height:10,),
+                          Container(
+                            margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.circular(10.0),
+                                border: Border.all(
+                                    color: grayRoundedColor,// set border color
+                                    width: 1.0
+                                )
+                            ),
+                            // height: 56,
+                            padding: EdgeInsets.fromLTRB(16, 3, 16, 6),
+                            child: Center(
+                              child: TextFormField(
+                                controller: igtimaatiURLController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return "Please Enter Domain";
+                                    }
+                                    return null;
+                                    // value.isNotEmpty?null:"Please Enter User Name";
                                   }
-                                  return null;
-                                  // value.isNotEmpty?null:"Please Enter User Name";
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height:40,),
+                          Container(
+                            margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
+                            padding: EdgeInsets.only(top: 4,bottom: 2),
+                            width: MediaQuery.of(context).size.width,
+                            // height: 43.0,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              gradient: LinearGradient(
+                                // Where the linear gradient begins and ends
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
+                                // Add one stop for each color. Stops should increase from 0 to 1
+                                stops: [0.1, 0.9],
+                                colors: [
+                                  yellowColor,
+                                  yellowColor,
+                                ],
+                              ),
+                            ),
+                            child: ElevatedButton(
+                              child: Text(
+                                AppLocalizations.of(context).lblContinue,
+                                style: whiteColorStyle(width<600?16:22),
+                              ),
+                              style: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                  backgroundColor: MaterialStateProperty.all<Color>(yellowColor),
+                                  textStyle: MaterialStateProperty.all<TextStyle>(whiteColorStyle(width<600?16:22)),
+                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                          side: BorderSide(color: yellowColor)
+                                      )
+                                  )
+                              ),
+                              onPressed: () {
+                                if (formKey.currentState.validate()) {
+
+                                  cubit.getOrganizationFunc(igtimaatiURLController.text);
                                 }
+                              },
                             ),
                           ),
-                        ),
-                        const SizedBox(height:40,),
-                        Container(
-                          margin: EdgeInsets.only(left: width/4-14,right: width/4-14),
-                          padding: EdgeInsets.only(top: 4,bottom: 2),
-                          width: MediaQuery.of(context).size.width,
-                          // height: 43.0,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            gradient: LinearGradient(
-                              // Where the linear gradient begins and ends
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              // Add one stop for each color. Stops should increase from 0 to 1
-                              stops: [0.1, 0.9],
-                              colors: [
-                                yellowColor,
-                                yellowColor,
-                              ],
-                            ),
-                          ),
-                          child: FlatButton(
-                            child: Text(
-                              AppLocalizations.of(context).lblContinue,
-                              style: whiteColorStyle(width<600?16:22),
-                            ),
-                            textColor: Colors.white,
-                            color: Colors.transparent,
-                            shape:
-                            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-                            onPressed: () {
-                              if (formKey.currentState.validate()) {
-                                cubit.getOrganizationFunc(igtimaatiURLController.text);
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(height:60,),
-                        Center(child: Text(AppLocalizations.of(context).lblAlready,style: grayTextColorStyleMedium(width<600?16:22),)),
-                        // const SizedBox(height:20,),
-                        makeBody
-                      ],
+                          const SizedBox(height:60,),
+                          Center(child: Text(AppLocalizations.of(context).lblAlready,style: grayTextColorStyleMedium(width<600?16:22),)),
+                          // const SizedBox(height:20,),
+                          makeBody
+                        ],
+                      ),
                     ),
                   ),
                 ),

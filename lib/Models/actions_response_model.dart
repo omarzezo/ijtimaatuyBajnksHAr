@@ -19,7 +19,7 @@ class ActionsResponseModel {
   String _priority;
   String _description;
   int _order;
-  List<Comments> _comments;
+  List<ActionComments> _comments;
   List<Participants> _participants;
   List<ActionsResponseModelAttachments> _attachments;
 
@@ -31,7 +31,7 @@ class ActionsResponseModel {
   String get priority => _priority;
   String get description => _description;
   int get order => _order;
-  List<Comments> get comments => _comments;
+  List<ActionComments> get comments => _comments;
   List<Participants> get participants => _participants;
   List<ActionsResponseModelAttachments> get attachments => _attachments;
 
@@ -44,7 +44,7 @@ class ActionsResponseModel {
       String priority, 
       String description, 
       int order, 
-      List<Comments> comments, 
+      List<ActionComments> comments,
       List<Participants> participants, 
       List<ActionsResponseModelAttachments> attachments}){
     _id = id;
@@ -72,7 +72,7 @@ class ActionsResponseModel {
     if (json['comments'] != null) {
       _comments = [];
       json['comments'].forEach((v) {
-        _comments.add(Comments.fromJson(v));
+        _comments.add(ActionComments.fromJson(v));
       });
     }
     if (json['participants'] != null) {
@@ -877,6 +877,11 @@ class Participants {
   String get status => _status;
   User get user => _user;
 
+
+  set status(String value) {
+    _status = value;
+  }
+
   Participants({
       int id, 
       int meetingActionId, 
@@ -928,7 +933,7 @@ class Participants {
 /// created_at : "2021-12-14T08:05:06.000000Z"
 /// updated_at : "2021-12-14T08:05:06.000000Z"
 
-class Comments {
+class ActionComments {
   int _id;
   String _commentableId;
   String _commentableType;
@@ -951,11 +956,17 @@ class Comments {
   String get user_name => _user_name;
   String get user_image => _user_image;
   bool get approved => _approved;
+
+
+  set id(int value) {
+    _id = value;
+  }
+
   dynamic get rate => _rate;
   String get createdAt => _createdAt;
   String get updatedAt => _updatedAt;
 
-  Comments({
+  ActionComments({
       int id, 
       String commentableId, 
       String commentableType, 
@@ -982,7 +993,7 @@ class Comments {
     _updatedAt = updatedAt;
 }
 
-  Comments.fromJson(dynamic json) {
+  ActionComments.fromJson(dynamic json) {
     _id = json['id'];
     _commentableId = json['commentable_id'];
     _commentableType = json['commentable_type'];
@@ -1014,4 +1025,27 @@ class Comments {
     return map;
   }
 
+  set commentableId(String value) {
+    _commentableId = value;
+  }
+
+  set commentedId(String value) {
+    _commentedId = value;
+  }
+
+  set comment(String value) {
+    _comment = value;
+  }
+
+  set user_image(String value) {
+    _user_image = value;
+  }
+
+  set user_name(String value) {
+    _user_name = value;
+  }
+
+  set createdAt(String value) {
+    _createdAt = value;
+  }
 }

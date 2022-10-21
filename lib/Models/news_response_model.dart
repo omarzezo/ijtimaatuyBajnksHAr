@@ -112,6 +112,11 @@ class NewsResponseModel {
   List<Comments> get comments => _comments;
   List<Likers> get likers => _likers;
 
+
+  set liked(bool value) {
+    _liked = value;
+  }
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;

@@ -10,13 +10,13 @@
             android:src="@mipmap/launch_image" />
     </item> -->
 
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/igtimaati_logo"
-            />
-        <!--         android:src="@drawable/falcon_logo_3"-->
-        <!--            android:src="@mipmap/launch_image" />-->
-    </item>
+<!--    <item>-->
+<!--        <bitmap-->
+<!--            android:gravity="center"-->
+<!--            android:src="@drawable/app_icon_store"-->
+<!--            />-->
+<!--        &lt;!&ndash;         android:src="@drawable/falcon_logo_3"&ndash;&gt;-->
+<!--        &lt;!&ndash;            android:src="@mipmap/launch_image" />&ndash;&gt;-->
+<!--    </item>-->
 
 </layer-list>

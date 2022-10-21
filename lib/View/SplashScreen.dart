@@ -12,17 +12,14 @@ class SplashScreen extends StatefulWidget {
 
 class SplashScreenState extends State<SplashScreen> {
 
-
   void initState() {
     super.initState();
-    setState(() {
       Timer(Duration(seconds: 1), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => InitializationScreen()
           ),
         );
       });
-    });
   }
 
 
@@ -42,7 +39,7 @@ class SplashScreenState extends State<SplashScreen> {
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children:[
                       Container(
                         child:Image.asset(
-                          "assets/images/igtimaati_logo.webp",
+                          "assets/images/logo_for_splash.png",
                           height:  160,
                           width: (MediaQuery.of(context).size.width/2)+60,
                         ),
@@ -62,7 +59,7 @@ class SplashScreenState extends State<SplashScreen> {
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children:[
                       Container(
                         child:Image.asset(
-                          "assets/images/igtimaati_logo.webp",
+                          "assets/images/logo_for_splash.png",
                           height:  120,
                           width: 200,
                           fit: BoxFit.fill,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/actions_response_model.dart';
 import 'package:itimaaty/Models/decison_response_model.dart';
@@ -7,13 +8,19 @@ import 'package:itimaaty/Models/metting_details_response_model.dart';
 import 'package:itimaaty/Models/talking_points_response_model.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
+import 'package:itimaaty/Utils/Constants.dart';
 import 'package:itimaaty/View/DecisionsScreen.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
 import 'package:itimaaty/View/MeetingDetailsScreen.dart';
 import 'package:itimaaty/View/TalkingPointsScreen.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../View/PdfViewerScreen.dart';
+import '../View/WebViewScreenForMirrorView.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 Widget leaveRowForMembers(MeetingDetailsResponseModelMembers leave,int index) {
+  // print("nowImg>>"+leave.user.image.toString());
   return
   //   CachedNetworkImage(
   //   imageUrl: leave.user!=null?!leave.user.image.contains(".html")?leave.user.image:
@@ -39,32 +46,44 @@ Widget leaveRowForMembers(MeetingDetailsResponseModelMembers leave,int index) {
   //       Icon(Icons.person, color:Colors.grey),
   // );
 
-  ClipOval(
-      child:
-      CircleAvatar(
-        radius: 22,
-        backgroundColor: Colors.red,
-        child: CircleAvatar(
-          radius: 22,
-          backgroundImage: NetworkImage(
-            leave.user!=null?leave.user.image!=null?!leave.user.image.contains(".html")?leave.user.image:
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-            "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-          ),
-        ),
-      )
-  );
+    CircleAvatar(
+      radius: 15,
+      backgroundColor: Colors.blueAccent,
+      backgroundImage: NetworkImage(
+          leave.user!=null&&leave.user.image!=null&&!leave.user.image.contains(".html")?leave.user.image:
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png"
+        // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+        // "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+      ),
+    );
 }
 
 Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseModel leave,int index) {
+  if(leave.status!=null) {
+    if (leave.status.name != null) {
+      if (leave.status.name.contains("Live")) {
+        leave.status.name = AppLocalizations.of(context).lblLive;
+      } else if (leave.status.name.contains("Archived")) {
+        leave.status.name = AppLocalizations.of(context).lblArchived;
+      } else if (leave.status.name.contains("Draft")) {
+        leave.status.name = AppLocalizations.of(context).lblDraft;
+      } else if (leave.status.name.contains("Scheduled")) {
+        leave.status.name = AppLocalizations.of(context).lblScheduled;
+      } else if (leave.status.name.contains("Cancelled")) {
+        leave.status.name = AppLocalizations.of(context).lblCanceled;
+      }
+    }
+  }
+
   return InkWell(
     onTap: () {
       // navigateTo(context, MeetingDetailsScreen(leave.id));
     },
     child: Container(
+      // width: 300,
       margin: EdgeInsets.only(top: 20),
-      padding: EdgeInsets.all(16),
+      padding:AppLocalizations.of(context).locale=="en"? EdgeInsets.only(top: 16,bottom: 16,right: 60,left: 16)
+          :EdgeInsets.only(top: 16,bottom: 16,right: 16,left: 60),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: new BorderRadius.circular(14.0),
@@ -75,11 +94,13 @@ Widget leaveRowForMeetingDetails(BuildContext context,MeetingDetailsResponseMode
       ),
       child:Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        // mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Text(leave.title!=null?leave.title:"",
             style: blueColorBoldStyle(20),),
           const SizedBox(height: 18,),
+
           Text(leave.description!=null?leave.description:
           " ",style: blueColorStyleMedium(18),),
 
@@ -460,7 +481,7 @@ Widget decisionsForMeetingDetailsForTalkingPoint(int userId,BuildContext context
                         shrinkWrap: true,
                         itemCount: leave.attachments.length,
                         itemBuilder: (context, index) {
-                          return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
+                          return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context,1);
                         },
                       )
                   ):Container(),
@@ -516,7 +537,7 @@ Widget decisionsForMeetingDetailsForTalkingPoint(int userId,BuildContext context
                           ),
                           const SizedBox(height: 4,),
                           Container(
-                              child: Text(("My Decision"),style: grayTextColorStyleMedium(20),))
+                              child: Text(AppLocalizations.of(context).lblMyDecision,style: grayTextColorStyleMedium(20),))
                         ],
                       ),
                       InkWell(
@@ -665,7 +686,7 @@ Widget taikingPointsForMeetingDetails(int userId,int id,BuildContext context,Age
                   shrinkWrap: true,
                   itemCount: leave.attachments.length,
                   itemBuilder: (context, index) {
-                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context);
+                    return leaveRowForAttachments(leave.meetingId,leave.attachments[index],index,context,0);
                   },
                 )
               ):Container(),
@@ -693,10 +714,10 @@ Widget taikingPointsForMeetingDetails(int userId,int id,BuildContext context,Age
           ),
         ),
 
-        leave.decisions!=null&&leave.decisions.isNotEmpty?
+        leave.decision!=null&&leave.decision.isNotEmpty?
 //            لانتلا
         // decisionsForMeetingDetailsForTalkingPoint(context,leave.meetingId, parentIndex+1, "stauss", leave.decisions[0]):
-        decisionsForMeetingDetailsForTalkingPoint(userId,context,leave.meetingId, parentIndex+1, "stauss", leave.decisions):
+        decisionsForMeetingDetailsForTalkingPoint(userId,context,leave.meetingId, parentIndex+1, "stauss", leave.decision):
             Container()
       ],
     ),
@@ -721,7 +742,7 @@ Widget makeBodyTaikingPointsForMeetingDetails(int userId,int id, BuildContext co
   ):Container();
 }
 
-Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachments leave,int index,BuildContext context) {
+Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachments leave,int index,BuildContext context,int type) {
   String url;
   // print("fileUrl>>"+leave.);
   String icon="assets/images/ic_word.webp";
@@ -732,7 +753,9 @@ Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachmen
       icon = "assets/images/ic_pdf.webp";
     } else if (leave.library.name.contains('docx')) {
       icon = "assets/images/ic_word.webp";
-    } else if (leave.library.name.contains('pot')) {
+    } else if(leave.library.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
+    }else if (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')) {
       icon = "assets/images/ic_power_point.webp";
     } else {
       icon = "assets/images/ic_pdf.webp";
@@ -741,18 +764,39 @@ Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachmen
   }
   return leave.library!=null?InkWell(
     onTap: () {
-      print("UrlhhhL>"+leave.library.name);
-      // print("UrlLhhh>"+leave.library.id.toString());
-      // print("UrlLhhh>"+leave.library.fileUrl.toString());
-      // launch(url);
-      // Navigator.pop(context);
-      showDocument("meeting",0,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+
+      // hasNetwork().then((value) {
+      //   if(value){
+      //     if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')){
+      //       SharedPreferencesHelper.getLoggedToken().then((value) {
+      //         SharedPreferencesHelper.getDomainName().then((domain) {
+      //           // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+      //           String baseUri= Constants.first2+domain+Constants.third+"/presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+      //           print("powerPointUrl>>"+baseUri);
+      //           launch(baseUri);
+      //           // launchUrl(Uri.parse(baseUri));
+      //         });
+      //       });
+      //       // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+      //
+      //     }else {
+      //       // navigateTo(context, PdfViewerScreen());
+      //       showDocument(
+      //           "meeting", 0, id, leave.id, leave.library.id, leave.library.name, leave.library.fileUrl.toString(), context);
+      //
+      //     }
+      //
+      //   }else{
+      //     showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+      //   }
+      // });
 
     },
     child: Container(
         margin: EdgeInsets.only(left: 10,right: 10),
         // width: 200,
-        padding: EdgeInsets.only(top: 10,bottom: 10,left: 20,right: 40),
+      padding: EdgeInsets.only(left: 10,right: 10),
+        // padding: EdgeInsets.only(top: 10,bottom: 10,left: 20,right: 40),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: new BorderRadius.circular(14.0),
@@ -761,12 +805,82 @@ Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachmen
                 width: 2.0
             )
         ),child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Image.asset(icon,width: 26,height: 26),
-        const SizedBox(width: 14,),
-        Container(
-            margin: EdgeInsets.only(top: 4),
-            child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),))
+        InkWell(
+          onTap: () {
+            hasNetwork().then((value) {
+              if(value){
+                if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')
+                    ||leave.library.name.contains('xlsx')){
+                  SharedPreferencesHelper.getLoggedToken().then((value) {
+                      // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                      String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                      print("powerPointUrl>>"+baseUri);
+                     if(!leave.library.name.contains('xlsx') )
+                       navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                      // launchUrl(Uri.parse(baseUri));
+                  });
+                  // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+
+                }else {
+                  // navigateTo(context, PdfViewerScreen());
+                  showDocument(
+                      "meeting", 0, id, leave.id, leave.library.id, leave.library.name, leave.library.fileUrl.toString(), context);
+
+                }
+
+              }else{
+                showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+              }
+            });
+          },
+          child: Row(
+            children: [
+              Image.asset(icon,width: 26,height: 26),
+              const SizedBox(width: 14,),
+              Container(
+                  margin: EdgeInsets.only(top: 4),
+                  child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),)),
+              const SizedBox(width: 14,),
+            ],
+          ),
+        ),
+        type==0?((leave!=null)&& (leave.library.name.contains('xlsx')))?
+        InkWell(
+            onTap: () async {
+              downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
+            },
+            child: Icon(Icons.download,color: Colors.black,size: 24,)):InkWell(
+          onTap: () {
+            hasNetwork().then((value) {
+              if(value){
+                SharedPreferencesHelper.getLoggedToken().then((value) {
+                    // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                    String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                    print("powerPointUrl>>"+baseUri);
+                    navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                    // launch(baseUri);
+                    // launchUrl(Uri.parse(baseUri));
+                });
+                // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+
+              }else{
+                showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+              }
+            });
+          },
+          child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.orangeAccent,
+                  ),
+                  color: Colors.orangeAccent,
+                  borderRadius: BorderRadius.all(Radius.circular(10))
+              ),
+              child: Icon(Icons.play_arrow,color: Colors.white,)
+          ),
+        ):const SizedBox()
       ],
     ),
     ),
@@ -803,13 +917,17 @@ Widget leaveRowForSubPoints(int meetingId,MeetingDetailsResponseModelSubpoints l
             ),
             borderRadius: BorderRadius.circular(14) // use instead of BorderRadius.all(Radius.circular(20))
         ),
-        child: Text(leave.duration!=null?(leave.duration.toString()+" "+AppLocalizations.of(context).lblMin):"0 Min",style: grayTextColorStyleMedium(20),),
+        child: Text(
+
+          leave.duration!=null?(leave.duration.toString()+" "+AppLocalizations.of(context).lblMin):"0 Min",style: grayTextColorStyleMedium(20),),
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 // width: 30,
@@ -836,9 +954,16 @@ Widget leaveRowForSubPoints(int meetingId,MeetingDetailsResponseModelSubpoints l
                 ),)),
               ),
               const SizedBox(width: 6,),
+              // Container(
+              //     margin: EdgeInsets.only(top: 10),
+              //     child: Text(leave.title!=null?leave.title:"",style: blueColorStyleMedium(22),))
+
               Container(
+                  width: MediaQuery.of(context).size.width/2-100,
                   margin: EdgeInsets.only(top: 10),
-                  child: Text(leave.title!=null?leave.title:"",style: blueColorStyleMedium(22),))
+                  child: Text(leave.title!=null? leave.title:"",
+                    style: blueColorStyleMedium(22),))
+
             ],
           ),
           Container(
@@ -869,10 +994,11 @@ Widget leaveRowForSubPoints(int meetingId,MeetingDetailsResponseModelSubpoints l
             shrinkWrap: true,
             itemCount: leave.attachments.length,
             itemBuilder: (context, index) {
-              return leaveRowForAttachments(meetingId,leave.attachments[index],index,context);
+              return leaveRowForAttachments(meetingId,leave.attachments[index],index,context,0);
             },
           )
-      ):Container()
+      ):Container(),
+
     ],
   ),
   );
@@ -1027,17 +1153,18 @@ Widget leaveRowForTalikingPoints(BuildContext context,TalkingPointsResponseModel
         // ),
         // const SizedBox(height: 12,),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/images/ic_committee.webp",width: 26,height: 26),
             // Icon(Icons.family_restroom,size: 23,color: Colors.grey,),
-            const SizedBox(width: 8,),
-            Container(
-                margin: EdgeInsets.only(top: 4),
-                child: Text(leave.title!=null?
-                leave.title:AppLocalizations.of(context).lblDevelopment,style:
-                grayTextColorStyleMedium(18),)),
+            const SizedBox(width: 8,height: 4,),
+            Expanded(
+              child: Text(leave.title!=null?
+              leave.title:AppLocalizations.of(context).lblDevelopment,style:
+              grayTextColorStyleMedium(18),),
+            )
           ],
         ),
         // const SizedBox(height: 4,),
@@ -1215,9 +1342,11 @@ Widget leaveRowForAttachmentsTalkingPoints(String type,int subId,int id,TalkingP
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
       icon = "assets/images/ic_pdf.webp";
-    } else if (leave.library.name.contains('docx')) {
+    } else if(leave.library.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
+    }else if (leave.library.name.contains('docx')) {
       icon = "assets/images/ic_word.webp";
-    } else if (leave.library.name.contains('pot')) {
+    } else if (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')) {
       icon = "assets/images/ic_power_point.webp";
     } else {
       icon = "assets/images/ic_folder.webp";
@@ -1226,13 +1355,36 @@ Widget leaveRowForAttachmentsTalkingPoints(String type,int subId,int id,TalkingP
   return leave.library!=null?InkWell(
     onTap: () {
       // Navigator.pop(context);
-      showDocument(type,subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+
+      // hasNetwork().then((value) {
+      //   if(value){
+      //     if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')){
+      //       SharedPreferencesHelper.getLoggedToken().then((value) {
+      //         SharedPreferencesHelper.getDomainName().then((domain) {
+      //           // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+      //           String baseUri= Constants.first2+domain+Constants.third+"/presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+      //           print("powerPointUrl>>"+baseUri);
+      //           launch(baseUri);
+      //           // launchUrl(Uri.parse(baseUri));
+      //         });
+      //       });
+      //       // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+      //     }else {
+      //       showDocument(type,subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+      //     }
+      //
+      //   }else{
+      //     showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+      //   }
+      // });
       // launch(url);
     },
     child: Container(
       margin: EdgeInsets.only(left: 10,right: 10),
+      // height: 160,
       // width: 340,
-      padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
+      // padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
+      padding: EdgeInsets.only(left: 10,right: 10),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: new BorderRadius.circular(14.0),
@@ -1241,14 +1393,81 @@ Widget leaveRowForAttachmentsTalkingPoints(String type,int subId,int id,TalkingP
               width: 2.0
           )
       ),child: Row(
-      children: [
-        Image.asset(icon,width: 26,height: 26),
-        const SizedBox(width: 14,),
-        Container(
-            margin: EdgeInsets.only(top: 6),
-            child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),))
-      ],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              hasNetwork().then((value) {
+                if(value){
+                  if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')
+                      ||leave.library.name.contains('xlsx')){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        if(!leave.library.name.contains('xlsx') )
+                          navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+                  }else {
+                    showDocument(type,subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+                  }
+
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Row(
+            children: [
+              Image.asset(icon,width: 26,height: 26),
+              const SizedBox(width: 14,),
+              Container(
+                  margin: EdgeInsets.only(top: 6),
+                  child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),)),
+              const SizedBox(width: 14,),
+            ],
     ),
+          ),
+          ((leave!=null)&& (leave.library.name.contains('xlsx')))?
+          // ((leave!=null)&& (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')))?
+          InkWell(
+              onTap: () async {
+                downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
+              },
+              child: Icon(Icons.download,color: Colors.black,size: 24,)):   InkWell(
+            onTap: () {
+              hasNetwork().then((value) {
+                if(value){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        // launch(baseUri);
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.orangeAccent,
+                    ),
+                    color: Colors.orangeAccent,
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                child: Icon(Icons.play_arrow,color: Colors.white,)
+            ),
+          )
+        ],
+      ),
     ),
   ):const SizedBox();
 }
@@ -1294,9 +1513,11 @@ Widget leaveRowForAttachmentsDecisions(String type, int subId,int id,DecisonResp
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
       icon = "assets/images/ic_pdf.webp";
-    } else if (leave.library.name.contains('docx')) {
+    } else if(leave.library.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
+    }else if (leave.library.name.contains('docx')) {
       icon = "assets/images/ic_word.webp";
-    } else if (leave.library.name.contains('pot')) {
+    } else if (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')) {
       icon = "assets/images/ic_power_point.webp";
     } else {
       icon = "assets/images/ic_folder.webp";
@@ -1306,12 +1527,34 @@ Widget leaveRowForAttachmentsDecisions(String type, int subId,int id,DecisonResp
     onTap: () {
       // launch(url);
       // Navigator.pop(context);
-      showDocument("decisions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+
+      //
+      // hasNetwork().then((value) {
+      //   if(value){
+      //     if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')){
+      //       SharedPreferencesHelper.getLoggedToken().then((value) {
+      //         SharedPreferencesHelper.getDomainName().then((domain) {
+      //           // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+      //           String baseUri= Constants.first2+domain+Constants.third+"/presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+      //           print("powerPointUrl>>"+baseUri);
+      //           launch(baseUri);
+      //           // launchUrl(Uri.parse(baseUri));
+      //         });
+      //       });
+      //       // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+      //     }else {
+      //       showDocument("decisions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+      //     }
+      //   }else{
+      //     showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+      //   }
+      // });
     },
     child: Container(
       margin: EdgeInsets.only(left: 10,right: 10),
       // width: 340,
-      padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
+      padding: EdgeInsets.only(left: 10,right: 10),
+      // padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: new BorderRadius.circular(14.0),
@@ -1320,14 +1563,83 @@ Widget leaveRowForAttachmentsDecisions(String type, int subId,int id,DecisonResp
               width: 2.0
           )
       ),child: Row(
-      children: [
-        Image.asset(icon,width: 26,height: 26),
-        const SizedBox(width: 14,),
-        Container(
-            margin: EdgeInsets.only(top: 6),
-            child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),))
-      ],
-    ),
+        children: [
+          InkWell(
+            onTap: () {
+
+              hasNetwork().then((value) {
+                if(value){
+                  if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')
+                      ||leave.library.name.contains('xlsx')){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        if(!leave.library.name.contains('xlsx') ){
+                          navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        }
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+                  }else {
+                    showDocument("decisions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+                  }
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Row(
+            children: [
+              Image.asset(icon,width: 26,height: 26),
+              const SizedBox(width: 14,),
+              Container(
+                  margin: EdgeInsets.only(top: 6),
+                  child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),)),
+              const SizedBox(width: 14,),
+            ],
+            ),
+          ),
+          ((leave!=null)&& (leave.library.name.contains('xlsx')))?
+          InkWell(
+              onTap: () async {
+                downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
+              },
+              child: Icon(Icons.download,color: Colors.black,size: 24,)):
+          InkWell(
+            onTap: () {
+
+              hasNetwork().then((value) {
+                if(value){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        // launch(baseUri);
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.orangeAccent,
+                    ),
+                    color: Colors.orangeAccent,
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                child: Icon(Icons.play_arrow,color: Colors.white,)
+            ),
+          )
+
+        ],
+      ),
     ),
   ):const SizedBox();
 }
@@ -1385,6 +1697,8 @@ Widget leaveRowForSubPointsForTalkingPoint(TalkingPointsSubpoints leave,int pare
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   // width: 130,
@@ -1456,7 +1770,7 @@ Widget makeBodyForSubPointsTalkingPoints(BuildContext context, List<TalkingPoint
 Widget makeBodyForAttachmentsActions(String type, int subId,int id,BuildContext context, List<ActionsResponseModelAttachments> activityList,int lenght){
   return activityList!=null&&activityList.isNotEmpty? SizedBox(
       height: 60,
-      width: MediaQuery.of(context).size.width/2+100,
+      width: MediaQuery.of(context).size.width/2,
       child:ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
@@ -1476,9 +1790,11 @@ Widget leaveRowForAttachmentsActions(String type, int subId,int id,ActionsRespon
     url="http://test.app.ijtimaati.com/doc-view?doc="+leave.library.fileUrl.toString()+"&id="+leave.libraryId.toString();
     if (leave.library.name.contains('pdf')) {
       icon = "assets/images/ic_pdf.webp";
+    }else if(leave.library.name.contains(".xlsx")){
+      icon="assets/images/ic_excel.webp";
     } else if (leave.library.name.contains('docx')) {
       icon = "assets/images/ic_word.webp";
-    } else if (leave.library.name.contains('pot')) {
+    } else if (leave.library.name.contains('pot')|| leave.library.name.contains('ppt')||leave.library.name.contains('pptx')) {
       icon = "assets/images/ic_power_point.webp";
     } else {
       icon = "assets/images/ic_folder.webp";
@@ -1488,12 +1804,33 @@ Widget leaveRowForAttachmentsActions(String type, int subId,int id,ActionsRespon
     onTap: () {
       // launch(url);
       // Navigator.pop(context);
-      showDocument("actions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+
+    // hasNetwork().then((value) {
+    //   if(value){
+    //     if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')){
+    //       SharedPreferencesHelper.getLoggedToken().then((value) {
+    //         SharedPreferencesHelper.getDomainName().then((domain) {
+    //           // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+    //           String baseUri= Constants.first2+domain+Constants.third+"/presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+    //           print("powerPointUrl>>"+baseUri);
+    //           launch(baseUri);
+    //           // launchUrl(Uri.parse(baseUri));
+    //         });
+    //       });
+    //       // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+    //     }else {
+    //       showDocument("actions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+    //     }
+    //   }else{
+    //     showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+    //   }
+    // });
     },
     child: Container(
       margin: EdgeInsets.only(left: 10,right: 10),
       // width: 340,
-      padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
+      padding: EdgeInsets.only(left: 10,right: 10),
+      // padding: EdgeInsets.only(top: 16,bottom: 8,left: 20,right: 40),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: new BorderRadius.circular(14.0),
@@ -1502,14 +1839,80 @@ Widget leaveRowForAttachmentsActions(String type, int subId,int id,ActionsRespon
               width: 2.0
           )
       ),child: Row(
-      children: [
-        Image.asset(icon,width: 26,height: 26),
-        const SizedBox(width: 14,),
-        Container(
-            margin: EdgeInsets.only(top: 6),
-            child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),))
-      ],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              hasNetwork().then((value) {
+                if(value){
+                  if(leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')
+                      ||leave.library.name.contains('xlsx')){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        if(!leave.library.name.contains('xlsx') )
+                          navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+                  }else {
+                    showDocument("actions",subId,id,leave.id,leave.library.id,leave.library.name,leave.library.fileUrl.toString(),context);
+                  }
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Row(
+            children: [
+              Image.asset(icon,width: 26,height: 26),
+              const SizedBox(width: 14,),
+              Container(
+                  margin: EdgeInsets.only(top: 6),
+                  child: Text(leave.library!=null?leave.library.name: " ",style: blueColorStyleMedium(18),)),
+              const SizedBox(width: 14,),
+            ],
     ),
+          ),
+          // ((leave!=null)&& (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')))?
+          ((leave!=null)&& (leave.library.name.contains('xlsx')))?
+          InkWell(
+              onTap: () async {
+                downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
+              },
+              child: Icon(Icons.download,color: Colors.black,size: 24,)) : InkWell(
+            onTap: () {
+              hasNetwork().then((value) {
+                if(value){
+                    SharedPreferencesHelper.getLoggedToken().then((value) {
+                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
+                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
+                        print("powerPointUrl>>"+baseUri);
+                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
+                        // launch(baseUri);
+                        // launchUrl(Uri.parse(baseUri));
+                    });
+                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
+
+                }else{
+                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
+                }
+              });
+            },
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.orangeAccent,
+                    ),
+                    color: Colors.orangeAccent,
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                child: Icon(Icons.play_arrow,color: Colors.white,)
+            ),
+          )
+        ],
+      ),
     ),
   ):const SizedBox();
 }

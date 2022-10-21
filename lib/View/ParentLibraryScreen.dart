@@ -57,10 +57,10 @@ class ParentLibraryScreenState extends State<ParentLibraryScreen> {
   //   });
   // }
 
-  void getFavourite(String token) {
+  void getFavourite(String baseUrl, String token) {
     load();
     libraryRepository = new LibraryRepository();
-    Future<List<FavouriteResponseModel>> allList = libraryRepository.getFavourite(token);
+    Future<List<FavouriteResponseModel>> allList = libraryRepository.getFavourite(baseUrl,token);
     allList.then((value) {
       setState(() {
         if (value != null) {
@@ -69,7 +69,7 @@ class ParentLibraryScreenState extends State<ParentLibraryScreen> {
         }else{
           showError();
           if(value==null){
-            navigateAndFinish(context, SignInScreen());
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });

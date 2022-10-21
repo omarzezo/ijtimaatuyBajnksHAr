@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
 import 'package:itimaaty/Localizations/localization/localizations.dart';
 import 'package:itimaaty/Models/AddCommentRequestModel.dart';
@@ -9,6 +12,7 @@ import 'package:itimaaty/Models/AddCommentResponseModel.dart';
 import 'package:itimaaty/Models/AttendenceModel.dart';
 import 'package:itimaaty/Models/ChangeActionStatusRequestModel.dart';
 import 'package:itimaaty/Models/ChangeStatusResponseModel.dart';
+import 'package:itimaaty/Models/LoginResponseModel.dart';
 import 'package:itimaaty/Models/UsersAndComments.dart';
 import 'package:itimaaty/Models/actions_response_model.dart';
 import 'package:itimaaty/Models/add_note_request_model.dart';
@@ -37,7 +41,11 @@ import 'package:itimaaty/cubit/Home/HomeCubit.dart';
 import 'package:itimaaty/cubit/Home/HomeStates.dart';
 import 'package:itimaaty/Models/change_vote_response_model.dart';
 
+import '../LocalDb/DbHelper.dart';
+import '../LocalDb/DecisionTableOffline.dart';
+import '../LocalDb/OfflineDataLocalModel.dart';
 import 'DeleteCommentResponse.dart';
+import 'DeleteCommentsRequestModel.dart';
 import 'actions_comment_response_model.dart';
 
 class ActionsScreen extends StatefulWidget {
@@ -69,24 +77,35 @@ class ActionsScreenState extends State<ActionsScreen> {
   List<String> votesList ;
   String votesValue;
   String status='';
+  String statusBack = null;
   String firstChar='';
   int biggestPercent=0;
   static List<DataForPicChart> data = [];
 
-  void getActionData(String token) {
+  String baseUrl="";
+  var dbHelper = DbHelper();
+  int userId=0;
+  String email="";
+  String userImage;
+  String userName;
+
+  void getActionData(String baseUrl,String token) {
     // load();
     meetingRepository = new MeetingRepository();
-    Future<ActionsResponseModel> allList = meetingRepository.getActionData(token,widget.meetingId,widget.decisionId);
-    allList.then((value) {
+    // Future<ActionsResponseModel> allList = meetingRepository.getActionData(baseUrl,token,widget.meetingId,widget.decisionId);
+    Future<String> allList = meetingRepository.getActionData(baseUrl,token,widget.meetingId,widget.decisionId);
+    allList.then((string) {
       setState(() {
-        if (value != null) {
+        if (string != null) {
           // showSuccess();
+          ActionsResponseModel value =  ActionsResponseModel.fromJson(json.decode(string));
+          addOrUpdateOfflineAction(string);
           decisonResponseModel = value;
 
           if(decisonResponseModel!=null&&decisonResponseModel.participants!=null){
             if(decisonResponseModel.participants.isNotEmpty){
 
-              if(widget.actionStatus!=null) {
+              if(widget.actionStatus!=null&&widget.actionStatus.isNotEmpty) {
                 status = widget.actionStatus;
                 if (status == "Complete") {
                  status = AppLocalizations.of(context).lblComplete;
@@ -98,6 +117,46 @@ class ActionsScreenState extends State<ActionsScreen> {
                 } else if (status == "In Progress") {
                   status=AppLocalizations.of(context).lblInProgress;
                   colorStatus = Color(0xffFEC20E);
+                }
+              }else{
+                if(decisonResponseModel.participants!=null&&decisonResponseModel.participants.isNotEmpty){
+                  for(int i=0;i<decisonResponseModel.participants.length;i++){
+                    if(decisonResponseModel.participants[i].userId!=null) {
+                      if (userId == decisonResponseModel.participants[i].userId) {
+                        status = decisonResponseModel.participants[i].status;
+                        if (status == "Complete") {
+                          status = AppLocalizations.of(context).lblComplete;
+                          colorStatus = Colors.green;
+                        } else
+                        if (status == "Not Complete" || status == "not complete") {
+                          status= AppLocalizations.of(context).lblNotComplete;
+                          colorStatus = Color(0xffFF6A81);
+                        } else if (status == "In Progress") {
+                          status=AppLocalizations.of(context).lblInProgress;
+                          colorStatus = Color(0xffFEC20E);
+                        }
+                        break;
+                      }
+                    }else{
+                      if(decisonResponseModel.participants[i].userEmail!=null){
+                        if (email == decisonResponseModel.participants[i].userEmail) {
+                          status = decisonResponseModel.participants[i].status;
+                          if (status == "Complete") {
+                            status = AppLocalizations.of(context).lblComplete;
+                            colorStatus = Colors.green;
+                          } else
+                          if (status == "Not Complete" || status == "not complete") {
+                            status= AppLocalizations.of(context).lblNotComplete;
+                            colorStatus = Color(0xffFF6A81);
+                          } else if (status == "In Progress") {
+                            status=AppLocalizations.of(context).lblInProgress;
+                            colorStatus = Color(0xffFEC20E);
+                          }
+                          break;
+                        }
+                      }
+                    }
+                  }
                 }
               }
 
@@ -125,13 +184,14 @@ class ActionsScreenState extends State<ActionsScreen> {
           }else{
             print("nottttttttttt");
           }
-
           if(decisonResponseModel.comments!=null&&decisonResponseModel.comments.isNotEmpty){
             for(int i=0;i<decisonResponseModel.comments.length;i++) {
               print("image>>>>"+decisonResponseModel.comments[i].user_name.toString());
               userAndCommentsList.add(UsersAndComments(
+                  fromApi: true,
                   comment: decisonResponseModel.comments[i].comment,
                   id: decisonResponseModel.comments[i].id,
+                  commentedId: decisonResponseModel.comments[i].commentedId,
                   // img: i<decisonResponseModel.participants.length?decisonResponseModel.participants[i].user.image:"",
                   img: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
                   name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
@@ -142,8 +202,8 @@ class ActionsScreenState extends State<ActionsScreen> {
           print("dfdfdfdfdfdfdfdfd");
         }else{
           // showError();
-          if(value==null){
-            navigateAndFinish(context, SignInScreen());
+          if(string==null){
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
@@ -169,20 +229,20 @@ class ActionsScreenState extends State<ActionsScreen> {
   void addComment(String token,String note) {
     load();
     meetingRepository = new MeetingRepository();
-    Future<List<ActionsCommentResponseModel>> allList = meetingRepository.addCommentForAction(token,widget.decisionId,new AddCommentRequestModel(comment: note));
+    Future<List<ActionsCommentResponseModel>> allList = meetingRepository.addCommentForAction(baseUrl,token,widget.decisionId,new AddCommentRequestModel(comment: note));
     allList.then((value) {
       setState(() {
         if (value != null) {
           userAndCommentsList=[];
           writeCommentControler.text='';
           showSuccess();
-          getActionData(userToken);
+          getActionData(baseUrl,userToken);
           // meetingDetailsResponseModel = value;
           // Navigator.pop(context);
         }else{
           showError();
           if(value==null){
-            navigateAndFinish(context, SignInScreen());
+            navigateAndFinish(context, SignInScreen(false));
           }
         }
       });
@@ -192,13 +252,13 @@ class ActionsScreenState extends State<ActionsScreen> {
   void deleteComment(String token, int id) {
     load();
     meetingRepository = new MeetingRepository();
-    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(id,token);
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteComment(baseUrl,id,token);
     allList.then((value) {
       setState(() {
         if (value != null) {
           userAndCommentsList=[];
           writeCommentControler.text='';
-          getActionData(userToken);
+          getActionData(baseUrl,userToken);
           showSuccessMsg("Deleted Successfully");
         }else{
           showError();
@@ -237,24 +297,150 @@ class ActionsScreenState extends State<ActionsScreen> {
     data.add( DataForPicChart(name: AppLocalizations.of(context).lblNotComplete, percent: notCompletePercent+0.0, color: const Color(0xffFF6A81)));
   }
 
-  void changeStatus(String token,String status) {
-    load();
-    meetingRepository = new MeetingRepository();
-    Future<ChangeStatusResponseModel> allList = meetingRepository.changeActionStatus(token,widget.decisionId,new ChangeActionStatusRequestModel(status: status));
-    allList.then((value) {
-      setState(() {
-        if (value != null) {
-          showSuccess();
-          getStatus();
-          // meetingDetailsResponseModel = value;
-          Navigator.pop(context);
+
+  Future<bool> addOrUpdateVote(String vote) async {
+    var orgainzationsFuture = dbHelper.getMeetingActions(baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS);
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      for(int i=0;i<data.length;i++){
+        DecisionTableOffline localModel =data[i];
+        if(localModel.url == baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS) {
+          m =true;
+          break;
         }else{
-          showError();
-          if(value==null){
-            navigateAndFinish(context, SignInScreen());
+          m=false;
+        }
+      }
+    }).then((value) async {
+      if(m){
+        print("Updatettt>>"+m.toString());
+        var result = await dbHelper.updateMeetingActions(baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS,vote);
+      }else{
+        print("Insertttt>>"+m.toString());
+        var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+            url: baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS,
+            changeDecisionVote: vote,
+        ));
+      }
+    });
+  }
+
+  void addOfflineVote(String vote ){
+    setState(() {
+      Navigator.pop(context);
+     getStatus();
+      if(widget.actionStatus!=null) {
+        if(decisonResponseModel.participants!=null&&decisonResponseModel.participants.isNotEmpty){
+          for(int i=0;i<decisonResponseModel.participants.length;i++){
+            if(userId!=null) {
+              if (userId == decisonResponseModel.participants[i].userId) {
+                decisonResponseModel.participants[i].status = vote;
+                status = vote;
+                if (status == "Complete") {
+                  status = AppLocalizations.of(context).lblComplete;
+                  colorStatus = Colors.green;
+                } else
+                if (status == "Not Complete" || status == "not complete") {
+                  status= AppLocalizations.of(context).lblNotComplete;
+                  colorStatus = Color(0xffFF6A81);
+                } else if (status == "In Progress") {
+                  status=AppLocalizations.of(context).lblInProgress;
+                  colorStatus = Color(0xffFEC20E);
+                }
+                break;
+              }
+            }else{
+              if (email == decisonResponseModel.participants[i].userEmail) {
+                status = decisonResponseModel.participants[i].status;
+                if (status == "Complete") {
+                  status = AppLocalizations.of(context).lblComplete;
+                  colorStatus = Colors.green;
+                } else
+                if (status == "Not Complete" || status == "not complete") {
+                  status= AppLocalizations.of(context).lblNotComplete;
+                  colorStatus = Color(0xffFF6A81);
+                } else if (status == "In Progress") {
+                  status=AppLocalizations.of(context).lblInProgress;
+                  colorStatus = Color(0xffFEC20E);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+      addOrUpdateVote(vote).then((value) {
+        String dataString= json.encode(decisonResponseModel.toJson());
+        addOrUpdateOfflineAction(dataString);
+      });
+    });
+  }
+
+  Future<bool> getOfflineVote() async {
+    await Future<String>.delayed(const Duration(seconds:3));
+    print("Hereeeeeeeeee");
+    var orgainzationsFuture = dbHelper.getMeetingActions(baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS);
+    bool m=false;
+    String vote="";
+    orgainzationsFuture.then((data) {
+      setState(()  {
+        for(int i=0;i<data.length;i++){
+          DecisionTableOffline localModel =data[i];
+          if(localModel.url==baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS) {
+            m =true;
+            print("");
+            print("ididid>>"+localModel.id.toString());
+            vote=localModel.changeDecisionVote;
+            break;
+          }else{
+            m=false;
           }
         }
       });
+    }).then((value)  {
+      // print("mmmm>>"+m.toString());
+      if(m){
+        changeStatus(baseUrl,userToken, vote,false);
+      }else{
+        Future.delayed(Duration.zero,() {
+          getActionData(baseUrl,userToken);
+        });
+      }
+    });
+  }
+
+  void changeStatus(String baseUrl,String token,String status,bool close) {
+    load();
+    bool m;
+    meetingRepository = new MeetingRepository();
+    Future<ChangeStatusResponseModel> allList = meetingRepository.changeActionStatus(baseUrl,token,widget.decisionId,new ChangeActionStatusRequestModel(status: status));
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          statusBack=status;
+          showSuccess();
+          getStatus();
+          m=true;
+          // meetingDetailsResponseModel = value;
+          if(close) {
+            Navigator.pop(context);
+          }
+        }else{
+          showError();
+          if(value==null){
+            navigateAndFinish(context, SignInScreen(false));
+          }
+        }
+      });
+    }).then((value) {
+      // Future.delayed(Duration(seconds: 2),() {
+        dbHelper.deleteAllDecisionComments(whereArgs: [baseUrl+"actions/"+widget.meetingId.toString()+Constants.CHANGE_STATUS]).then((value) {
+          // getActionData(baseUrl,userToken);
+          if(m){
+            getActionData(baseUrl,userToken);
+          }
+        });
+      // });
     });
   }
 
@@ -394,9 +580,13 @@ class ActionsScreenState extends State<ActionsScreen> {
                                             Navigator.pop(context);
                                           },
                                           child: Container(
-                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // height:50,
+                                              // width: 180,
+                                              padding: EdgeInsets.only(top: 5),
+                                              // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                               height:50,
-                                              width: 180,
+                                              width: MediaQuery.of(context).size.width/8,
                                               decoration: BoxDecoration(
                                                   border: Border.all(
                                                     color: blueColor,
@@ -420,15 +610,27 @@ class ActionsScreenState extends State<ActionsScreen> {
                                               } else if (votesValue == AppLocalizations.of(_context).lblNotComplete) {
                                                 votesValue2="Not Complete";
                                               }
-                                              changeStatus(userToken,votesValue2);
+
+                                              hasNetwork().then((value) {
+                                                if(value){
+                                                  changeStatus(baseUrl,userToken,votesValue2,true);
+                                                }else{
+                                                  addOfflineVote(votesValue2);
+                                                }
+                                              });
+
                                             }else{
                                               showErrorWithMsg("Please Choose Status");
                                             }
                                           },
                                           child: Container(
-                                              padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // padding: EdgeInsets.only(top: 10,bottom: 3),
+                                              // height:50,
+                                              // width: 180,
+                                              padding: EdgeInsets.only(top: 5),
+                                              // padding: EdgeInsets.only(top: 8,bottom:6,left: 30,right: 30),
                                               height:50,
-                                              width: 180,
+                                              width: MediaQuery.of(context).size.width/8,
                                               decoration: BoxDecoration(
                                                   color: yellowColor,
                                                   border: Border.all(
@@ -499,6 +701,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                 )
             ),
             Container(
+              width: MediaQuery.of(context).size.width/2-100,
               margin: EdgeInsets.only(left: 14,right: 14),
               padding: EdgeInsets.only(left: 14,right: 14,top: 20,bottom: 20),
               decoration: BoxDecoration(
@@ -526,12 +729,24 @@ class ActionsScreenState extends State<ActionsScreen> {
                   const SizedBox(height: 6,),
                   Text(leave.comment!=null?leave.comment:"",style: blueColorStyleMedium(16),),
                   const SizedBox(height: 10,),
-                  InkWell(
+                  userId==int.parse(leave.commentedId)?InkWell(
                     onTap: () {
-                      deleteComment(userToken, leave.id);
+                      hasNetwork().then((value) {
+                        if(value){
+                          deleteComment(userToken, leave.id);
+                        }else{
+                          dbHelper.deleteStoredDecisionComment(whereArgs: [leave.id]).then((value) {
+                            print("ValIss>>"+value.toString());
+                            print("commentIs>>"+leave.comment);
+                            print("idIs>>"+leave.id.toString());
+                            print("indexIs>>"+index.toString());
+                            fillDeleteComments(index, leave.id,leave.comment,value);
+                          });
+                        }
+                      });
                     },
                     child:Text(AppLocalizations.of(context).lblDelete,style: blueColorBoldStyle(16),) ,
-                  )
+                  ):Container()
                 ],
               ),
             )
@@ -541,6 +756,7 @@ class ActionsScreenState extends State<ActionsScreen> {
     );
   }
 
+
   @override
   void initState() {
     Future.delayed(Duration.zero,() {
@@ -548,21 +764,333 @@ class ActionsScreenState extends State<ActionsScreen> {
         AppLocalizations.of(context).lblNotComplete];
     });
     // votesList =["In Progress","Complete","Not Complete"];
-    SharedPreferencesHelper.getLoggedToken().then((value) {
-      userToken=value;
-      SharedPreferencesHelper.getLoggedUserName().then((valueSecond) {
-        SharedPreferencesHelper.getUserImageUrl().then((value) {
-          // firstChar=valueSecond.split(" ");
-          for(int i=0;i<valueSecond.split(" ").length ;i++){
-            firstChar+=valueSecond.split(" ")[i][0];
-          }
-          getActionData(userToken);
+    getUser().then((value) {
+      userId=value.id;
+      email=value.email;
+      userImage=value.image!=null?value.image:"";
+      userName=value.name!=null?value.name:"";
+      SharedPreferencesHelper.getLoggedToken().then((value) {
+        userToken=value;
+        SharedPreferencesHelper.getLoggedUserName().then((valueSecond) {
+          SharedPreferencesHelper.getUserImageUrl().then((value) {
+            // firstChar=valueSecond.split(" ");
+            for(int i=0;i<valueSecond.split(" ").length ;i++){
+              firstChar+=valueSecond.split(" ")[i][0];
+            }
+              String baseUri= Constants.BASE_URL;
+              setState(() {
+                baseUrl=baseUri;
+              hasNetwork().then((hasNet) {
+                if(hasNet){
+                  getOfflineComments();
+                  // getActionData(baseUrl,userToken);
+                }else{
+                  getOfflineAction();
+                }
+              });
+              });
 
+          });
         });
       });
     });
   }
 
+  Future getOfflineAction() async {
+    var orgainzationsFuture = dbHelper.getActionColumn(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString());
+    orgainzationsFuture.then((data) {
+      setState(()  {
+        // this.offlineMeetings = data;
+        for(int i=0;i<data.length;i++){
+          OfflineDataLocalModel localModel =data[i];
+          if(localModel.url==baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString()) {
+            setState(() {
+              ActionsResponseModel value =  ActionsResponseModel.fromJson(json.decode(localModel.action));
+              decisonResponseModel = value;
+              if(decisonResponseModel!=null&&decisonResponseModel.participants!=null){
+                if(decisonResponseModel.participants.isNotEmpty){
+
+                  if(widget.actionStatus!=null&&widget.actionStatus.isNotEmpty) {
+                    status = widget.actionStatus;
+                    if (status == "Complete") {
+                      status = AppLocalizations.of(context).lblComplete;
+                      colorStatus = Colors.green;
+                    } else
+                    if (status == "Not Complete" || status == "not complete") {
+                      status= AppLocalizations.of(context).lblNotComplete;
+                      colorStatus = Color(0xffFF6A81);
+                    } else if (status == "In Progress") {
+                      status=AppLocalizations.of(context).lblInProgress;
+                      colorStatus = Color(0xffFEC20E);
+                    }
+                  }else{
+                    if(decisonResponseModel.participants!=null&&decisonResponseModel.participants.isNotEmpty){
+                      for(int i=0;i<decisonResponseModel.participants.length;i++){
+                        if(decisonResponseModel.participants[i].userId!=null) {
+                          if (userId == decisonResponseModel.participants[i].userId) {
+                            status = decisonResponseModel.participants[i].status;
+                            if (status == "Complete") {
+                              status = AppLocalizations.of(context).lblComplete;
+                              colorStatus = Colors.green;
+                            } else
+                            if (status == "Not Complete" || status == "not complete") {
+                              status= AppLocalizations.of(context).lblNotComplete;
+                              colorStatus = Color(0xffFF6A81);
+                            } else if (status == "In Progress") {
+                              status=AppLocalizations.of(context).lblInProgress;
+                              colorStatus = Color(0xffFEC20E);
+                            }
+                            break;
+                          }
+                        }else{
+                          if(decisonResponseModel.participants[i].userEmail!=null){
+                            if (email == decisonResponseModel.participants[i].userEmail) {
+                              status = decisonResponseModel.participants[i].status;
+                              if (status == "Complete") {
+                                status = AppLocalizations.of(context).lblComplete;
+                                colorStatus = Colors.green;
+                              } else
+                              if (status == "Not Complete" || status == "not complete") {
+                                status= AppLocalizations.of(context).lblNotComplete;
+                                colorStatus = Color(0xffFF6A81);
+                              } else if (status == "In Progress") {
+                                status=AppLocalizations.of(context).lblInProgress;
+                                colorStatus = Color(0xffFEC20E);
+                              }
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+
+                  for(int i=0;i<decisonResponseModel.participants.length;i++){
+                    if(decisonResponseModel.participants[i].status.toLowerCase()==("Complete")||
+                        decisonResponseModel.participants[i].status==("Complete")){
+                      complete.add(decisonResponseModel.participants[i].status);
+                      print("approvedList>>"+complete.length.toString());
+                    }else if(decisonResponseModel.participants[i].status.toLowerCase()==("Not Complete")||
+                        decisonResponseModel.participants[i].status==("Not Complete")){
+                      notComplete.add(decisonResponseModel.participants[i].status);
+                      print("abstainedList>>"+notComplete.length.toString());
+                    }else if(decisonResponseModel.participants[i].status.toLowerCase()==("In Progress")||
+                        decisonResponseModel.participants[i].status==("In Progress")){
+                      inProgress.add(decisonResponseModel.participants[i].status);
+                      print("deniedList>>"+inProgress.length.toString());
+                    }
+                  }
+
+                  dataReady();
+                  // getStatus();
+                }else{
+                  print("mkmkmkmkmkmkk");
+                }
+              }else{
+                print("nottttttttttt");
+              }
+              if(decisonResponseModel.comments!=null&&decisonResponseModel.comments.isNotEmpty){
+                for(int i=0;i<decisonResponseModel.comments.length;i++) {
+                  print("image>>>>"+decisonResponseModel.comments[i].user_name.toString());
+                  userAndCommentsList.add(UsersAndComments(
+                      comment: decisonResponseModel.comments[i].comment,
+                      id: decisonResponseModel.comments[i].id,
+                      commentedId: decisonResponseModel.comments[i].commentedId,
+                      // img: i<decisonResponseModel.participants.length?decisonResponseModel.participants[i].user.image:"",
+                      img: decisonResponseModel.comments[i].user_image!=null?decisonResponseModel.comments[i].user_image:"",
+                      name:decisonResponseModel.comments[i].user_name!=null?decisonResponseModel.comments[i].user_name:"",
+                      // name:i<decisonResponseModel.participants.length? decisonResponseModel.participants[i].user.name:"",
+                      date: decisonResponseModel.comments[i].createdAt));
+                }
+              }
+              print("dfdfdfdfdfdfdfdfd");
+            });
+            break;
+          }
+          // allFilterdMeetingList = allMeetingList;
+        }
+      });
+    });
+  }
+
+  Future<bool> addOrUpdateOfflineAction(String string) async {
+    // var orgainzationsFuture = dbHelper.getOfflineData();
+    var orgainzationsFuture = dbHelper.getActionColumn(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString());
+    bool m=false;
+    orgainzationsFuture.then((data) async {
+      for(int i=0;i<data.length;i++){
+        OfflineDataLocalModel localModel =data[i];
+        if(localModel.url==baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString()) {
+          m =true;
+          break;
+        }else{
+          m=false;
+        }
+      }
+    }).then((value) async {
+      print("inserstinserst>>"+m.toString());
+      if(m){
+        var result = await dbHelper.updateAction(baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString(),string);
+      }else{
+        var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
+          url: baseUrl+Constants.MEETINGS_DETAILS+widget.meetingId.toString()+Constants.ACTIONS+widget.decisionId.toString(),
+          action: string,
+        ));
+      }
+    });
+  }
+
+  //For Add Comment << __________________________________________________________
+
+  Future<int> addOfflineComment(String comment) async {
+    var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+      url: baseUrl+"actions/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments,
+      addDecisionComment: comment,
+    ));
+    print("result>>"+result.toString());
+    return result;
+  }
+
+  Future<bool> addOfflineCommentToAPi(List<AddCommentRequestModel> model) {
+    bool m = false ;
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<List<AddCommentResponseModel>> allList = meetingRepository.addMultipleACtionsComments(baseUrl,userToken,widget.decisionId,model);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          dbHelper.deleteAllDecisionComments(whereArgs: [baseUrl+"actions/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments]);
+          showSuccess();
+          m=true;
+          // return m;
+        }else{
+          m=false;
+          showError();
+          if(value==null){
+            navigateAndFinish(context, SignInScreen(false));
+          }
+        }
+      });
+    }).then((value) {
+      if(m){
+        getOfflineDeleteComments();
+      }
+    });
+  }
+
+  Future<bool> getOfflineComments() async {
+    var orgainzationsFuture = dbHelper.getDecisionComment(baseUrl+"actions/"+widget.decisionId.toString()+Constants.MultipleDecisionsComments);
+    orgainzationsFuture.then((data) async {
+      print("lemgth>>"+data.toString());
+      if(data.isNotEmpty) {
+        await addOfflineCommentToAPi(data);
+      }else{
+        getOfflineDeleteComments();
+      }
+    }).then((value) {
+    });
+  }
+
+
+  // __________________________________________________________ >>
+
+  //For Delete Comment << __________________________________________________________
+
+  Future<bool> addDeleteOfflineComment(int commentId) async {
+    var result = await dbHelper.insertRequestsData(DecisionTableOffline(
+      url: baseUrl+Constants.DeleteMultipleComments+"actions/"+widget.decisionId.toString(),
+      deleteDecisionComment: commentId,
+    ));
+    print("resultmmmm>"+result.toString());
+  }
+
+  Future<bool> getOfflineDeleteComments() async {
+    var orgainzationsFuture = dbHelper.getDeleteDecisionComment(baseUrl+Constants.DeleteMultipleComments+"actions/"+widget.decisionId.toString());
+    orgainzationsFuture.then((data) async {
+      print("lemgthHere>>"+data.toString());
+      if(data.isNotEmpty) {
+        await deleteOfflineCommentToAPi(userToken,data);
+      }else{
+        getOfflineVote();
+        // getActionData(baseUrl,userToken);
+      }
+    }).then((value) {
+    });
+    //
+  }
+
+  Future<bool> deleteOfflineCommentToAPi(String token,List<DeleteCommentsRequestModel> model) {
+    bool m = false ;
+    load();
+    meetingRepository = new MeetingRepository();
+    Future<DeleteCommentResponse> allList = meetingRepository.deleteMultipleComment(baseUrl,token,model);
+    allList.then((value) {
+      setState(() {
+        if (value != null) {
+          dbHelper.deleteAllDecisionComments(whereArgs: [baseUrl+Constants.DeleteMultipleComments+"actions/"+widget.decisionId.toString()]);
+          showSuccess();
+          m=true;
+        }else{
+          m=false;
+          showError();
+          if(value==null){
+            showErrorWithMsg('this item not deleted');
+            // navigateAndFinish(context, SignInScreen());
+          }
+        }
+      });
+    }).then((value) {
+      if(m){
+        getOfflineVote();
+        // getActionData(baseUrl,userToken);
+      }
+    });
+  }
+
+  // __________________________________________________________ >>
+  fillComments(String comment,int id) {
+    setState(() {
+      DateFormat dateFormat;
+      if (AppLocalizations.of(context).locale == "en") {
+        dateFormat = DateFormat('yyyy-MM-dd hh:mm', 'en');
+      } else {
+        dateFormat = DateFormat('yyyy-MM-dd hh:mm', 'ar');
+      }
+      String date = dateFormat.format(DateTime.now());
+      ActionComments modelComments = new ActionComments();
+      modelComments.id = id;
+      // modelComments.id = null;
+      modelComments.user_image = userImage;
+      modelComments.comment = comment;
+      modelComments.user_name = userName;
+      modelComments.createdAt = date;
+      modelComments.commentedId = userId.toString();
+      decisonResponseModel.comments.add(modelComments);
+      userAndCommentsList.add(UsersAndComments(
+          comment: modelComments.comment,
+          id: modelComments.id,
+          commentedId: modelComments.commentedId,
+          img: modelComments.user_image != null ? modelComments.user_image : "",
+          name: modelComments.user_name != null ? modelComments.user_name : "",
+          date: modelComments.createdAt));
+      writeCommentControler.text="";
+      String dataString= json.encode(decisonResponseModel.toJson());
+      addOrUpdateOfflineAction(dataString);
+    });
+  }
+
+  fillDeleteComments(int index,int id,String comment,int num) {
+    setState(() {
+      decisonResponseModel.comments.removeWhere((item) => item.id == id);
+      userAndCommentsList.removeAt(index);
+      String dataString= json.encode(decisonResponseModel.toJson());
+      addOrUpdateOfflineAction(dataString);
+      if(num==0){
+        addDeleteOfflineComment(id);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -586,7 +1114,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                       InkWell(
                           onTap: () {
                             print("sddsd");
-                            Navigator.pop(context);
+                            Navigator.pop(context,statusBack);
                           },
                           child: Icon(Icons.chevron_left,color: Colors.black,size: 40,)),
                       Image.asset("assets/images/ic_action.webp",width: 24,height: 24,color: Colors.black,),
@@ -614,7 +1142,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Expanded(
-                        flex: 7,
+                        flex: 8,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -642,7 +1170,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment:CrossAxisAlignment.start,
                                       children: [
-                                        Text(AppLocalizations.of(context).lblAssignedTo, style: blueColorBoldStyle(22),),
+                                        Text(AppLocalizations.of(context).lblAssignedTo, style: blueColorBoldStyle(20),),
                                         const SizedBox(height: 4,),
                                         decisonResponseModel!=null&&decisonResponseModel.participants!=null? SizedBox(
                                           height: 40,
@@ -695,11 +1223,11 @@ class ActionsScreenState extends State<ActionsScreen> {
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment:CrossAxisAlignment.start,
                                       children: [
-                                        Text(AppLocalizations.of(context).lblOpenTill, style: blueColorBoldStyle(22),),
-                                        const SizedBox(height: 20,),
+                                        Text(AppLocalizations.of(context).lblOpenTill, style: blueColorBoldStyle(20),),
+                                        const SizedBox(height: 14,),
                                         Text(decisonResponseModel.openTill!=null?
                                         getFormattedDate(stringToDateTime(decisonResponseModel.openTill)):"2021 oct ",style:
-                                        grayTextColorStyleMedium(18),)
+                                        grayTextColorStyleMedium(16),)
                                       ],
                                     ),
                                   ),
@@ -725,7 +1253,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment:CrossAxisAlignment.start,
                                         children: [
-                                          Text(AppLocalizations.of(context).lblProgress, style: blueColorBoldStyle(22),),
+                                          Text(AppLocalizations.of(context).lblProgress, style: blueColorBoldStyle(20),),
                                           const SizedBox(height: 10,),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -738,14 +1266,16 @@ class ActionsScreenState extends State<ActionsScreen> {
                                                     color: colorStatus),
                                               ),
                                               const SizedBox(width: 10,),
-                                              Container(
-                                                margin: EdgeInsets.only(top: 4),
-                                                child: Text(status,style: TextStyle(
-                                                  color: colorStatus ,
-                                                  fontFamily: "black",
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20,
-                                                )),
+                                              Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.only(top: 4),
+                                                  child: Text(status!=null?status:"",style: TextStyle(
+                                                    color: colorStatus ,
+                                                    fontFamily: "black",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 16,
+                                                  )),
+                                                ),
                                               ),
                                             ],
                                           )
@@ -775,7 +1305,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         crossAxisAlignment:CrossAxisAlignment.start,
                                         children: [
-                                          Text(AppLocalizations.of(context).lblPriority, style: blueColorBoldStyle(22),),
+                                          Text(AppLocalizations.of(context).lblPriority, style: blueColorBoldStyle(20),),
                                           const SizedBox(height: 10,),
                                           Row(
                                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -790,13 +1320,15 @@ class ActionsScreenState extends State<ActionsScreen> {
                                               ),
                                               const SizedBox(width: 10,),
                                               Container(
-                                                margin: EdgeInsets.only(top: 4),
-                                                child: Text(decisonResponseModel.priority!=null?decisonResponseModel.priority:"",style: TextStyle(
+                                                margin: EdgeInsets.only(top: 0),
+                                                // child: Text(decisonResponseModel.priority!=null?decisonResponseModel.priority:"",style: TextStyle(
+                                                child: Text(decisonResponseModel.priority!=null?
+                                                decisonResponseModel.priority=="Low"?AppLocalizations.of(context).lblLow:AppLocalizations.of(context).lblHigh:"",style: TextStyle(
                                                   // color:decisonResponseModel.priority!=null?decisonResponseModel.priority=="High"?Colors.red: colorStatus :colorStatus,
                                                   color:decisonResponseModel.priority!=null&&decisonResponseModel.priority=="Low"?Colors.red:Colors.green,
                                                   fontFamily: "black",
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 22,
+                                                  fontSize: 18,
                                                 )),
                                               ),
                                             ],
@@ -940,7 +1472,7 @@ class ActionsScreenState extends State<ActionsScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width:MediaQuery.of(context).size.width/2-80,
+                                          width:MediaQuery.of(context).size.width/2-180,
                                           child: TextField(
                                               controller: writeCommentControler,
                                               maxLines: null,
@@ -962,8 +1494,15 @@ class ActionsScreenState extends State<ActionsScreen> {
                                         InkWell(
                                           onTap: () {
                                             setState(() {
-
-                                              addComment(userToken, writeCommentControler.text==null?"": writeCommentControler.text);
+                                              hasNetwork().then((value){
+                                                if(value){
+                                                  addComment(userToken, writeCommentControler.text==null?"": writeCommentControler.text);
+                                                }else{
+                                                  addOfflineComment(writeCommentControler.text==null?"": writeCommentControler.text).then((value) {
+                                                    fillComments(writeCommentControler.text==null?"": writeCommentControler.text,value);
+                                                  });
+                                                }
+                                              });
                                             });
                                           },
                                           child: Container(
@@ -994,11 +1533,11 @@ class ActionsScreenState extends State<ActionsScreen> {
                       ),
 
 
-                      const SizedBox(width: 20,),
+                      const SizedBox(width: 16,),
 
 
                       Expanded(
-                        flex: 3,
+                        flex: 5,
                         child: Column(
                           children: [
                             Container(
@@ -1072,57 +1611,70 @@ class ActionsScreenState extends State<ActionsScreen> {
                                           return Container(
                                             margin: EdgeInsets.only(bottom: 20),
                                             padding: EdgeInsets.only(left: 16,right: 16),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
                                                   children: [
-                                                    ClipOval(
-                                                        child:
-                                                        CircleAvatar(
-                                                          radius: 18,
-                                                          backgroundColor: Colors.red,
-                                                          child: CircleAvatar(
-                                                            radius: 18,
-                                                            backgroundImage: NetworkImage(
-                                                              decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
-                                                              decisonResponseModel.participants[index].user.image!=null?decisonResponseModel.participants[index].user.image:
-                                                              "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
-                                                              "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
-                                                            ),
-                                                          ),
-                                                        )
+                                                    Row(
+                                                      children: [
+                                                        ClipOval(
+                                                            child:
+                                                            CircleAvatar(
+                                                              radius: 18,
+                                                              backgroundColor: Colors.red,
+                                                              child: CircleAvatar(
+                                                                radius: 18,
+                                                                backgroundImage: NetworkImage(
+                                                                  decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
+                                                                  decisonResponseModel.participants[index].user.image!=null?decisonResponseModel.participants[index].user.image:
+                                                                  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png":
+                                                                  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/450px-No_image_available.svg.png",
+                                                                ),
+                                                              ),
+                                                            )
+                                                        ),
+                                                        const SizedBox(width: 10,),
+                                                        Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
+                                                        decisonResponseModel.participants[index].user.name:"",style: blueColorStyleMedium(15), ),
+                                                        // Column(
+                                                        //   children: [
+                                                        //     Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
+                                                        //     decisonResponseModel.participants[index].user.name:"",style: blueColorStyleMedium(18), ),
+                                                        //     Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&& decisonResponseModel.participants[index].status!=null?
+                                                        //     decisonResponseModel.participants[index].status:"Status Reason",style: blueColorStyleregular(16), ),
+                                                        //   ],
+                                                        // )
+                                                      ],
                                                     ),
-                                                    const SizedBox(width: 10,),
-                                                    Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
-                                                    decisonResponseModel.participants[index].user.name:"",style: blueColorStyleMedium(18), ),
-                                                    // Column(
-                                                    //   children: [
-                                                    //     Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&&decisonResponseModel.participants[index].user!=null?
-                                                    //     decisonResponseModel.participants[index].user.name:"",style: blueColorStyleMedium(18), ),
-                                                    //     Text(decisonResponseModel!=null&& decisonResponseModel.participants!=null&& decisonResponseModel.participants[index].status!=null?
-                                                    //     decisonResponseModel.participants[index].status:"Status Reason",style: blueColorStyleregular(16), ),
-                                                    //   ],
-                                                    // )
+                                                    Container(
+                                                      padding: EdgeInsets.only(left:22,right: 22,top: 6,bottom: 2),
+                                                      decoration: BoxDecoration(
+                                                          color: two,
+                                                          border: Border.all(
+                                                            color: two,
+                                                          ),
+                                                          borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
+                                                      ),
+                                                      child: Text((decisonResponseModel!=null&& decisonResponseModel.participants!=null&& decisonResponseModel.participants[index].status!=null?
+                                                      decisonResponseModel.participants[index].status:""),style: TextStyle(
+                                                        color: one ,
+                                                        fontFamily: "medium",
+                                                        fontSize: 18,
+                                                      ),),
+                                                    )
                                                   ],
                                                 ),
+                                                decisonResponseModel!=null&& decisonResponseModel.participants!=null&& decisonResponseModel.participants[index].status!=null?
                                                 Container(
-                                                  padding: EdgeInsets.only(left:22,right: 22,top: 6,bottom: 2),
-                                                  decoration: BoxDecoration(
-                                                      color: two,
-                                                      border: Border.all(
-                                                        color: two,
-                                                      ),
-                                                      borderRadius: BorderRadius.circular(20) // use instead of BorderRadius.all(Radius.circular(20))
-                                                  ),
-                                                  child: Text((decisonResponseModel!=null&& decisonResponseModel.participants!=null&& decisonResponseModel.participants[index].status!=null?
-                                                  decisonResponseModel.participants[index].status:""),style: TextStyle(
-                                                    color: one ,
-                                                    fontFamily: "medium",
-                                                    fontSize: 20,
-                                                  ),),
-                                                )
+                                                  margin: EdgeInsets.only(top: 10),
+                                                  padding: EdgeInsets.only(left: 45,right: 60),
+                                                  child:
+                                                  Text(decisonResponseModel.participants[index].status,style: blueColorStyleregular(16), ),
+                                                ):const SizedBox()
                                               ],
                                             ),
                                           );

@@ -9,9 +9,11 @@ import 'package:itimaaty/Repository/UserRepository.dart';
 import 'package:itimaaty/Utils/AppColors.dart';
 import 'package:itimaaty/Utils/CommonMethods.dart';
 import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaaty/View/HomeScreenNew.dart';
 import 'package:itimaaty/Widgets/text_for.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
+import '../Utils/Constants.dart';
 import 'HomeScreen.dart';
 
 class TwoFactorAuthenticationScreen extends StatefulWidget {
@@ -29,6 +31,8 @@ class TwoFactorAuthenticationScreenState extends State<TwoFactorAuthenticationSc
 
   bool hasError = false;
   String currentText = "";
+  String baseUrl = "";
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
   BuildContext mContext;
@@ -38,7 +42,11 @@ class TwoFactorAuthenticationScreenState extends State<TwoFactorAuthenticationSc
       ..onTap = () {
         Navigator.pop(context);
       };
-    // errorController = StreamController<ErrorAnimationType>();
+      String baseUri= Constants.BASE_URL;
+      setState(() {
+        baseUrl=baseUri;
+      });
+
     super.initState();
   }
 
@@ -46,17 +54,18 @@ class TwoFactorAuthenticationScreenState extends State<TwoFactorAuthenticationSc
   UserRepository userRepository =new UserRepository();
   load();
   AuthVerificationResponseModel authVerificationResponseModel =new AuthVerificationResponseModel(code: code);
-  Future<LoginResponseModel> authVerficationResponse = userRepository.authVerfication(authVerificationResponseModel);
+  Future<LoginResponseModel> authVerficationResponse = userRepository.authVerfication(baseUrl,authVerificationResponseModel);
   authVerficationResponse.then((loginModel) {
     if(loginModel!=null){
       showSuccess();
       SharedPreferencesHelper.setLoggedToken(loginModel.token).then((value) {
         SharedPreferencesHelper.setLoggedUserName(loginModel.name).then((value) {
-          SharedPreferencesHelper.setUserImageUrl(loginModel.image).then((value) {
+          SharedPreferencesHelper.setUserImageUrl(loginModel.image!=null?loginModel.image:"").then((value) {
             saveUser(loginModel).then((value) {
               print("TokenIssssss>>"+loginModel.token);
               Navigator.pop(mContext);
-              navigateTo(mContext, HomeScreen());
+              // navigateTo(mContext, HomeScreen());
+              navigateTo(mContext, HomeScreenNew());
             });
 
           });

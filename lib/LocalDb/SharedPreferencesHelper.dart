@@ -172,4 +172,123 @@ class SharedPreferencesHelper {
     return prefs.setBool("TowFactor", value);
   }
 
+  // ________________________________________________
+
+
+  static Future<String> getDashboardData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("DashboardData") ;
+  }
+  static Future<bool> setDashboardData(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("DashboardData", value);
+  }
+
+  // _______________________________________________________________
+
+
+  static Future<List<String>> getALlMeetingData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getStringList("ALlMeetingData") ;
+  }
+  static Future<bool> setALlMeetingData(List<String> value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList("ALlMeetingData", value);
+  }
+
+  // _______________________________________________________________
+
+  static Future<List<String>> getALlMeetingDataWithKey() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getStringList("ALlMeetingDataKey") ;
+  }
+  static Future<bool> setALlMeetingDataWithKey(List<String> value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList("ALlMeetingDataKey", value);
+  }
+
+  static Future<String> getToday() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("Today") ;
+  }
+  static Future<bool> setToday(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("Today", value);
+  }
+
+  // ________________________________________________________________
+
+  static Future<List<String>> getALlNews() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getStringList("ALlNews") ;
+  }
+  static Future<bool> setALlNews(List<String> value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList("ALlNews", value);
+  }
+  // ________________________________________________________________
+
+  static Future<List<String>> getNewsDetails() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getStringList("NewsDetails") ;
+  }
+  static Future<bool> setNewsDetails(List<String> value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setStringList("NewsDetails", value);
+  }
+// ________________________________________________________________
+
+  static Future<bool> getAlreadySignInOrganization() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.getBool("AlreadySignInOrganization") ;
+  }
+  static Future<bool> setAlreadySignInOrganization(bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setBool("AlreadySignInOrganization", value);
+  }
+
+// ________________________________________________
+
+  static Future<String> getOrg() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("org") ;
+  }
+  static Future<bool> setOrg(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("org", value);
+  }
+// ________________________________________________________________
+
+  static Future<String> getDomainName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("DomainName") ;
+  }
+  static Future<bool> setDomainName(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("DomainName", value);
+  }
+// ________________________________________________________________
+
+  static Future<String> getOrgLogo() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("OrgLogo") ;
+  }
+  static Future<bool> setOrgLogo(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("OrgLogo", value);
+  }
+// ________________________________________________________________
+
+
+  static Future<String> getAllCommite() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return  prefs.getString("AllCommite") ;
+  }
+
+  static Future<bool> setAllCommite(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.setString("AllCommite", value);
+  }
+
 }
