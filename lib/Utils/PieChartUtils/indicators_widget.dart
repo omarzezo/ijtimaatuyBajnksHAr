@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Utils/PieChartUtils/pie_data.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/Utils/PieChartUtils/pie_data.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
 
 class IndicatorsWidget extends StatefulWidget {
   List<DataForPicChart>data;

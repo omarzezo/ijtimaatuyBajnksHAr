@@ -4,26 +4,26 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/LoginRequestModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Models/SsoRequestModel.dart';
-import 'package:itimaaty/Repository/UserRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/View/AllMeetingsScreen.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/ForgotPasswordScreen.dart';
-import 'package:itimaaty/View/HomeScreen.dart';
-import 'package:itimaaty/View/HomeScreenNew.dart';
-import 'package:itimaaty/View/MotherScreen.dart';
-import 'package:itimaaty/View/TwoFactorAuthenticationScreen.dart';
-import 'package:itimaaty/View/WebViewScreen.dart';
-import 'package:itimaaty/View/WelcomeScreen.dart';
-import 'package:itimaaty/cubit/User/user_cubit.dart';
-import 'package:itimaaty/cubit/User/user_states.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/LoginRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/SsoRequestModel.dart';
+import 'package:itimaatysoharsohar/Repository/UserRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/View/AllMeetingsScreen.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/ForgotPasswordScreen.dart';
+import 'package:itimaatysoharsohar/View/HomeScreen.dart';
+import 'package:itimaatysoharsohar/View/HomeScreenNew.dart';
+import 'package:itimaatysoharsohar/View/MotherScreen.dart';
+import 'package:itimaatysoharsohar/View/TwoFactorAuthenticationScreen.dart';
+import 'package:itimaatysoharsohar/View/WebViewScreen.dart';
+import 'package:itimaatysoharsohar/View/WelcomeScreen.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_cubit.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_states.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../LocalDb/DbHelper.dart';
@@ -222,6 +222,7 @@ class SignInScreenState extends State<SignInScreen> {
                                   )
                               ),
                               onPressed: () {
+
                                 if(emailControllerInsidePop.text.isNotEmpty){
                                   load();
                                   // Navigator.pop(context);

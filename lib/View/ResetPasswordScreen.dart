@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/cubit/User/user_cubit.dart';
-import 'package:itimaaty/cubit/User/user_states.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_cubit.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_states.dart';
 
 import 'WelcomeScreen.dart';
 

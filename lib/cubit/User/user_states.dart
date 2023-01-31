@@ -1,6 +1,6 @@
 
-import 'package:itimaaty/Models/ForgotPasswordResponseModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/ForgotPasswordResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
 
 abstract class UserStates {}
 

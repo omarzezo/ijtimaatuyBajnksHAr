@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
 
 bool selectItems = true;
 

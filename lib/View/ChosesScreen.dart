@@ -1,18 +1,18 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:itimaaty/Localizations/localization/localizations.dart';
-// import 'package:itimaaty/Models/MyOrganizationsResponseModel.dart';
-// import 'package:itimaaty/Utils/AppColors.dart';
-// import 'package:itimaaty/Utils/CommonMethods.dart';
-// import 'package:itimaaty/View/CheckYourMailScreen.dart';
-// import 'package:itimaaty/View/FontsStyle.dart';
-// import 'package:itimaaty/View/MotherScreen.dart';
-// import 'package:itimaaty/View/SignInScreen.dart';
-// import 'package:itimaaty/View/SignInToYourOrganizationScreen.dart';
-// import 'package:itimaaty/View/WelcomeBackScreen.dart';
-// import 'package:itimaaty/View/WelcomeScreen.dart';
-// import 'package:itimaaty/cubit/User/user_cubit.dart';
-// import 'package:itimaaty/cubit/User/user_states.dart';
+// import 'package:itimaatysohar/Localizations/localization/localizations.dart';
+// import 'package:itimaatysohar/Models/MyOrganizationsResponseModel.dart';
+// import 'package:itimaatysohar/Utils/AppColors.dart';
+// import 'package:itimaatysohar/Utils/CommonMethods.dart';
+// import 'package:itimaatysohar/View/CheckYourMailScreen.dart';
+// import 'package:itimaatysohar/View/FontsStyle.dart';
+// import 'package:itimaatysohar/View/MotherScreen.dart';
+// import 'package:itimaatysohar/View/SignInScreen.dart';
+// import 'package:itimaatysohar/View/SignInToYourOrganizationScreen.dart';
+// import 'package:itimaatysohar/View/WelcomeBackScreen.dart';
+// import 'package:itimaatysohar/View/WelcomeScreen.dart';
+// import 'package:itimaatysohar/cubit/User/user_cubit.dart';
+// import 'package:itimaatysohar/cubit/User/user_states.dart';
 //
 // class ChosesScreen extends StatefulWidget {
 //   @override

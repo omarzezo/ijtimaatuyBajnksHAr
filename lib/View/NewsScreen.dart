@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/MultipleLikeRequestModel.dart';
-import 'package:itimaaty/Models/liked_response_model.dart';
-import 'package:itimaaty/Models/news_response_model.dart';
-import 'package:itimaaty/Repository/NewsRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/NewsDetailsScreen.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/MultipleLikeRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/liked_response_model.dart';
+import 'package:itimaatysoharsohar/Models/news_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/NewsRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/View/NewsDetailsScreen.dart';
 import 'package:intl/intl.dart';
 
 import '../LocalDb/DbHelper.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
 
 grayTextColorStyleMedium(double fontSize){
   return TextStyle(

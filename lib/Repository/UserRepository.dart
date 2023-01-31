@@ -3,17 +3,17 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 // import 'package:http/http.dart';
-import 'package:itimaaty/Models/LoginRequestModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Models/UserChangeStatusRequestModel.dart';
-import 'package:itimaaty/Models/auth_verification_response_model.dart';
-import 'package:itimaaty/Models/change_password_request_model.dart';
-import 'package:itimaaty/Models/change_password_response_model.dart';
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/Models/user_change_status_response_model.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/network/end_points.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/LoginRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/UserChangeStatusRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/auth_verification_response_model.dart';
+import 'package:itimaatysoharsohar/Models/change_password_request_model.dart';
+import 'package:itimaatysoharsohar/Models/change_password_response_model.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Models/user_change_status_response_model.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 
 import '../Models/PostSecretSSoRequest.dart';
 import '../Models/SsoRequestModel.dart';

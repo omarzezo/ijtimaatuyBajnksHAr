@@ -5,40 +5,40 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
-import 'package:itimaaty/LocalDb/DecisionTableOffline.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/AttendenceModel.dart';
-import 'package:itimaaty/Models/ChangeMeetingStatusRequestModel.dart';
-import 'package:itimaaty/Models/ChangeStatusMeetingResponseModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Models/UserChangeStatusRequestModel.dart';
-import 'package:itimaaty/Models/add_note_request_model.dart';
-import 'package:itimaaty/Models/add_note_response_model.dart';
-import 'package:itimaaty/Models/all_meetings_response.dart';
-import 'package:itimaaty/Models/all_status_response.dart';
-import 'package:itimaaty/Models/committee_response_model.dart';
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/Models/metting_details_response_model.dart';
-import 'package:itimaaty/Models/user_change_status_response_model.dart';
-import 'package:itimaaty/Repository/MeetingRepository.dart';
-import 'package:itimaaty/Repository/UserRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/View/CreateMeetingScreen.dart';
-import 'package:itimaaty/View/DrawerWidget.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/SignInScreen.dart';
-import 'package:itimaaty/View/WebViewScreenForMirrorView.dart';
-import 'package:itimaaty/Widgets/ActionsWidget.dart';
-import 'package:itimaaty/Widgets/AgendaDetailsScreen.dart';
-import 'package:itimaaty/Widgets/DescisionsWidget.dart';
-import 'package:itimaaty/Widgets/HomeWidgets.dart';
-import 'package:itimaaty/Widgets/MeetingDetailsWidgets.dart';
-import 'package:itimaaty/Widgets/TalkingPointsWidget.dart';
-import 'package:itimaaty/cubit/Home/HomeCubit.dart';
-import 'package:itimaaty/cubit/Home/HomeStates.dart';
+import 'package:itimaatysoharsohar/LocalDb/DecisionTableOffline.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/AttendenceModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeMeetingStatusRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeStatusMeetingResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/UserChangeStatusRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/add_note_request_model.dart';
+import 'package:itimaatysoharsohar/Models/add_note_response_model.dart';
+import 'package:itimaatysoharsohar/Models/all_meetings_response.dart';
+import 'package:itimaatysoharsohar/Models/all_status_response.dart';
+import 'package:itimaatysoharsohar/Models/committee_response_model.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Models/metting_details_response_model.dart';
+import 'package:itimaatysoharsohar/Models/user_change_status_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/MeetingRepository.dart';
+import 'package:itimaatysoharsohar/Repository/UserRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/View/CreateMeetingScreen.dart';
+import 'package:itimaatysoharsohar/View/DrawerWidget.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/SignInScreen.dart';
+import 'package:itimaatysoharsohar/View/WebViewScreenForMirrorView.dart';
+import 'package:itimaatysoharsohar/Widgets/ActionsWidget.dart';
+import 'package:itimaatysoharsohar/Widgets/AgendaDetailsScreen.dart';
+import 'package:itimaatysoharsohar/Widgets/DescisionsWidget.dart';
+import 'package:itimaatysoharsohar/Widgets/HomeWidgets.dart';
+import 'package:itimaatysoharsohar/Widgets/MeetingDetailsWidgets.dart';
+import 'package:itimaatysoharsohar/Widgets/TalkingPointsWidget.dart';
+import 'package:itimaatysoharsohar/cubit/Home/HomeCubit.dart';
+import 'package:itimaatysoharsohar/cubit/Home/HomeStates.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../LocalDb/DbHelper.dart';
@@ -1489,14 +1489,7 @@ class MeetingDetailsScreenState extends State<MeetingDetailsScreen> {
                           showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
                         }
                       });
-                     // String url= 'http://test.app.ijtimaati.com/api/public/uploads/library/1643868394181121.pdf';
-                     //  createFileOfPdfUrl("test",  url).then((value) async {
-                     //    await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
-                     //        builder: (_) => PspdfkitAnnotationsExampleWidget(
-                     //            documentPath: file.path)));
-                     //  });
-                     //  https://test.ijtimaati.com/doc-view?doc=https://test.ijtimaati.com/api/public/uploads/library/1637735070830163.pdf&id=72&e=1
-                    },
+                      },
                     child: Container(
                       margin:EdgeInsets.only(left: 8, right: 8),
                       padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 8),

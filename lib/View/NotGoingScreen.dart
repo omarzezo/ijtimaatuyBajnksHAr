@@ -1,15 +1,15 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-// import 'package:itimaaty/Localizations/localization/localizations.dart';
-// import 'package:itimaaty/Models/dashboard_response_model.dart';
-// import 'package:itimaaty/Repository/HomeRepository.dart';
-// import 'package:itimaaty/Utils/AppColors.dart';
-// import 'package:itimaaty/Utils/CommonMethods.dart';
-// import 'package:itimaaty/View/FontsStyle.dart';
-// import 'package:itimaaty/Widgets/HomeWidgets.dart';
-// import 'package:itimaaty/cubit/Home/HomeCubit.dart';
-// import 'package:itimaaty/cubit/Home/HomeStates.dart';
+// import 'package:itimaatysohar/LocalDb/SharedPreferencesHelper.dart';
+// import 'package:itimaatysohar/Localizations/localization/localizations.dart';
+// import 'package:itimaatysohar/Models/dashboard_response_model.dart';
+// import 'package:itimaatysohar/Repository/HomeRepository.dart';
+// import 'package:itimaatysohar/Utils/AppColors.dart';
+// import 'package:itimaatysohar/Utils/CommonMethods.dart';
+// import 'package:itimaatysohar/View/FontsStyle.dart';
+// import 'package:itimaatysohar/Widgets/HomeWidgets.dart';
+// import 'package:itimaatysohar/cubit/Home/HomeCubit.dart';
+// import 'package:itimaatysohar/cubit/Home/HomeStates.dart';
 //
 // import '../Utils/Constants.dart';
 // import 'MotherScreen.dart';

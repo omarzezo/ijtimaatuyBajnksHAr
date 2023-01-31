@@ -1,7 +1,7 @@
 
 // import 'package:ijmeet/Models/users_response_model.dart';
 
-import 'package:itimaaty/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
 
 abstract class AppStates {}
 

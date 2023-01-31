@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Utils/PieChartUtils/pie_chart_sections.dart';
-import 'package:itimaaty/Utils/PieChartUtils/pie_data.dart';
+import 'package:itimaatysoharsohar/Utils/PieChartUtils/pie_chart_sections.dart';
+import 'package:itimaatysoharsohar/Utils/PieChartUtils/pie_data.dart';
 
 import 'indicators_widget.dart';
 

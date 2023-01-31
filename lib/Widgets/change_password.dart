@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Models/change_password_request_model.dart';
-import 'package:itimaaty/Models/change_password_response_model.dart';
-import 'package:itimaaty/Repository/UserRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/ProfileScreen.dart';
-import 'package:itimaaty/View/SignInScreen.dart';
-import 'package:itimaaty/Widgets/text_for.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/change_password_request_model.dart';
+import 'package:itimaatysoharsohar/Models/change_password_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/UserRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/ProfileScreen.dart';
+import 'package:itimaatysoharsohar/View/SignInScreen.dart';
+import 'package:itimaatysoharsohar/Widgets/text_for.dart';
 
 import '../Utils/Constants.dart';
 

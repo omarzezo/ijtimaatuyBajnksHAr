@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:itimaaty/Models/AllAprovalsResponseModel.dart';
-import 'package:itimaaty/Models/add_to_favorite_response_model.dart';
-import 'package:itimaaty/Models/add_to_favourite_request_model.dart';
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/Models/favourite_response_model.dart';
-import 'package:itimaaty/Models/libary_response_model.dart';
-import 'package:itimaaty/Models/my_library_response_model.dart';
-import 'package:itimaaty/network/end_points.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/AllAprovalsResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/add_to_favorite_response_model.dart';
+import 'package:itimaatysoharsohar/Models/add_to_favourite_request_model.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Models/favourite_response_model.dart';
+import 'package:itimaatysoharsohar/Models/libary_response_model.dart';
+import 'package:itimaatysoharsohar/Models/my_library_response_model.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 
 import '../Models/all_status_response.dart';

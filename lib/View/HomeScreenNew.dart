@@ -1,34 +1,27 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/LocaleHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/Event.dart';
-import 'package:itimaaty/Models/all_meetings_response.dart';
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/Repository/HomeRepository.dart';
-import 'package:itimaaty/Repository/MeetingRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/View/AllMeetingsScreen.dart';
-import 'package:itimaaty/View/DrawerWidget.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/LogInToYourOrganizationScreen.dart';
-import 'package:itimaaty/View/SignInScreen.dart';
-import 'package:itimaaty/View/SignInToYourOrganizationScreen.dart';
-import 'package:itimaaty/Widgets/HomeWidgets.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/LocaleHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/Event.dart';
+import 'package:itimaatysoharsohar/Models/all_meetings_response.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/HomeRepository.dart';
+import 'package:itimaatysoharsohar/Repository/MeetingRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/View/AllMeetingsScreen.dart';
+import 'package:itimaatysoharsohar/View/DrawerWidget.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/LogInToYourOrganizationScreen.dart';
+import 'package:itimaatysoharsohar/View/SignInScreen.dart';
+import 'package:itimaatysoharsohar/Widgets/HomeWidgets.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:responsive_framework/responsive_wrapper.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../LocalDb/DbHelper.dart';
 import '../LocalDb/OfflineDataLocalModel.dart';
 import '../LocalDb/OrganizationLocalModel.dart';
@@ -105,16 +98,12 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
       }
     }).then((value) async {
       if(m) {
-        print("updateupdate");
-        // update
         var result = await dbHelper.updateMeetingsDasboard(baseUrl+Constants.MEETINGS+"Dashboard"+selectedDateString,string);
       }else{
         var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
           url: baseUrl+Constants.MEETINGS+"Dashboard"+selectedDateString,
           allMeetingsDashboard: string,
         ));
-        print("inserstinserst");
-        // inserst
       }
     });
   }
@@ -131,7 +120,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
               AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(localModel.allMeetingsDashboard));
               // List<AllMeetingsResponseData> value = (json.decode(localModel.allMeetingsDashboard) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
               allMeetingList = value.data;
-              print("allMeetingList>>"+allMeetingList.toString());
               for(int i=0;i<allMeetingList.length;i++){
                 DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
                 allDates.add(tempDate);
@@ -148,7 +136,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
             });
             break;
           }else{
-            print("NotExist");
           }
         }
       });
@@ -170,16 +157,13 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
         }
       }
     }).then((value) async {
-      print("inserstinsersthhhhh>>"+m.toString());
       if(m){
         var result = await dbHelper.updateDashboard(baseUrl+Constants.DASHBOARD,string);
-        print("HereUpdateeee>>"+m.toString());
       }else{
         var result = await dbHelper.insertOfflineData(OfflineDataLocalModel(
           url: baseUrl+Constants.DASHBOARD,
           dashboard: string,
         ));
-        print("HereInsert>>"+m.toString());
       }
     });
   }
@@ -207,7 +191,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
         }
       });
     }).then((value) {
-      print("dddddddddddddddd");
       getOfflineMeetings();
     });
   }
@@ -219,33 +202,32 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
     // Future<List<AllMeetingsResponse>> allList = homeRepository.getAllMeetingsCache(token);
     // Future<List<AllMeetingsResponse>> allList = homeRepository.getAllMeetingsUsingDio2(token,"2022/3");
     allList.then((string) async{
-        if (string != null) {
-          showSuccess();
-          AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(string));
-          // List<AllMeetingsResponseData> value = await (json.decode(string) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
-          setState(() {
-            allMeetingList = value.data;
-            List<String> strList = allMeetingList.map((person) => jsonEncode(person.toJson())).toList();
-            // SharedPreferencesHelper.setALlMeetingData(strList);
-            addOrUpdateOfflineMeetings(string);
-            print("allMeetingListSize>>"+strList.length.toString());
-            for(int i=0;i<allMeetingList.length;i++){
-              DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
-              allDates.add(tempDate);
-              if (selectedEvents[tempDate] != null) {
-                selectedEvents[tempDate].add(Event(
-                    title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
-                    bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000"),);
-              } else {
-                selectedEvents[tempDate] = [Event(
-                    title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
-                    bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000")];
-              }
+      if (string != null) {
+        showSuccess();
+        AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(string));
+        // List<AllMeetingsResponseData> value = await (json.decode(string) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
+        setState(() {
+          allMeetingList = value.data;
+          List<String> strList = allMeetingList.map((person) => jsonEncode(person.toJson())).toList();
+          // SharedPreferencesHelper.setALlMeetingData(strList);
+          addOrUpdateOfflineMeetings(string);
+          for(int i=0;i<allMeetingList.length;i++){
+            DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
+            allDates.add(tempDate);
+            if (selectedEvents[tempDate] != null) {
+              selectedEvents[tempDate].add(Event(
+                  title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
+                  bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000"),);
+            } else {
+              selectedEvents[tempDate] = [Event(
+                  title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
+                  bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000")];
             }
-          });
-        }else{
-          showError();
-        }
+          }
+        });
+      }else{
+        showError();
+      }
       // });
     });
   }
@@ -255,36 +237,35 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
     homeRepository = new HomeRepository();
     Future<String> allList = homeRepository.getAllMeetingsByDate(baseUrl,token,selectedDateString);
     allList.then((string) async{
-        if (string != null) {
-          showSuccess();
-          AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(string));
-          // List<AllMeetingsResponseData> value = await (json.decode(string) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
-          setState(() {
-            if(selectedEvents!=null&&selectedEvents.isNotEmpty) {
-              selectedEvents.clear();
+      if (string != null) {
+        showSuccess();
+        AllMeetingsResponse value =  AllMeetingsResponse.fromJson(json.decode(string));
+        // List<AllMeetingsResponseData> value = await (json.decode(string) as List).map((i) => AllMeetingsResponseData.fromJson(i)).toList();
+        setState(() {
+          if(selectedEvents!=null&&selectedEvents.isNotEmpty) {
+            selectedEvents.clear();
+          }
+          allMeetingList = value.data;
+          List<String> strList = allMeetingList.map((person) => jsonEncode(person.toJson())).toList();
+          // SharedPreferencesHelper.setALlMeetingData(strList);
+          addOrUpdateOfflineMeetings(string);
+          for(int i=0;i<allMeetingList.length;i++){
+            DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
+            allDates.add(tempDate);
+            if (selectedEvents[tempDate] != null) {
+              selectedEvents[tempDate].add(Event(
+                  title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
+                  bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000"),);
+            } else {
+              selectedEvents[tempDate] = [Event(
+                  title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
+                  bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000")];
             }
-            allMeetingList = value.data;
-            List<String> strList = allMeetingList.map((person) => jsonEncode(person.toJson())).toList();
-            // SharedPreferencesHelper.setALlMeetingData(strList);
-            addOrUpdateOfflineMeetings(string);
-            print("allMeetingListSize>>"+strList.length.toString());
-            for(int i=0;i<allMeetingList.length;i++){
-              DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
-              allDates.add(tempDate);
-              if (selectedEvents[tempDate] != null) {
-                selectedEvents[tempDate].add(Event(
-                    title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
-                    bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000"),);
-              } else {
-                selectedEvents[tempDate] = [Event(
-                    title: allMeetingList[i].status!=null?allMeetingList[i].status.name:"",
-                    bgColor:allMeetingList[i].status!=null?allMeetingList[i].status.bgcolor:"#000000")];
-              }
-            }
-          });
-        }else{
-          showError();
-        }
+          }
+        });
+      }else{
+        showError();
+      }
       // });
     });
   }
@@ -309,23 +290,19 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
           talkingpointsList=value.talkingpoints;
           decisionList=value.decision;
           actionList=value.action;
-          print("goingCounIS>>"+value.toString());
         }else{
           showError();
-          print("dddddddd");
           navigateAndFinish(context, SignInScreen(false));
         }
       });
 
     }).then((value) {
-        String baseUrl= Constants.BASE_URL;
-        getAllMeetingsForOnline(baseUrl,token) ;
-      });
+      getAllMeetingsForOnline(baseUrl,token) ;
+    });
   }
 
 
   _toggleContainer() {
-    print(_animation.status);
     if (_animation.status != AnimationStatus.completed) {
       _controller.forward();
     } else {
@@ -391,7 +368,7 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                             child: Container(
                               margin:EdgeInsets.only(left: 20,right: 20,bottom: 20),
                               child: SingleChildScrollView(
-                                child: makeBodyForAllmeetings(_context, newallMeetingList),
+                                child: makeBodyForAllmeetings(MOBILE,_context, newallMeetingList),
                               ),
                             ),
                           ),
@@ -412,7 +389,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
         DateTime tempDate = new DateFormat("yyyy-MM-dd",'en').parse(allMeetingList[i].startDate);
         if(dateSelect==tempDate){
           await  newallMeetingList.add(allMeetingList[i]);
-          print("NewList>>"+newallMeetingList.toList().toString());
         }
       }
     }
@@ -431,7 +407,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
         for(int i=0;i<orgainzations.length;i++){
           OrganizationLocalModel leave =orgainzations[i];
           if(domain==leave.domain){
-            // print("namename>>"+leave.name);
             name=leave.name;
             logo=leave.logo;
             for(int i=0;i<leave.userName.split(" ").length ;i++){
@@ -443,8 +418,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
             break;
           }
         }
-        // orgainzationsCount = data.length;
-        // print(""+"countIs>>"+orgainzationsCount.toString());
       });
     });
   }
@@ -452,87 +425,84 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
   String baseUrl ="";
   String token ;
 
-  versionCheck(context) async {
-    //Get Current installed version of app
-    final PackageInfo info = await PackageInfo.fromPlatform();
-    double currentVersion = double.parse(info.version.trim().replaceAll(".", ""));
-
-    //Get Latest version info from firebase config
-    final FirebaseRemoteConfig remoteConfig = await FirebaseRemoteConfig.instance;
-
-    try {
-      // Using default duration to force fetching from remote server.
-      await remoteConfig.fetch();
-      await remoteConfig.fetchAndActivate();
-      // await remoteConfig.activateFetched();
-      remoteConfig.getString('force_update_current_version');
-      double newVersion = double.parse(remoteConfig
-          .getString('force_update_current_version')
-          .trim()
-          .replaceAll(".", ""));
-      if (newVersion > currentVersion) {
-        _showVersionDialog(context);
-      }
-    } catch(exception) {
-      // Fetch throttled.
-      print(exception);
-    }
-  }
-  String APP_STORE_URL =
-      'https://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftwareUpdate?id=YOUR-APP-ID&mt=8';
-  String PLAY_STORE_URL =
-      'https://play.google.com/store/apps/details?id=com.itimaaty.itimaat';
-  //Show Dialog to force user to update
-  _showVersionDialog(context) async {
-    await showDialog<String>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        String title = "New Update Available";
-        String message =
-            "There is a newer version of app available please update it now.";
-        String btnLabel = "Update Now";
-        String btnLabelCancel = "Later";
-        return Platform.isIOS
-            ? new CupertinoAlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(btnLabel),
-              onPressed: () => _launchURL(APP_STORE_URL),
-            ),
-            FlatButton(
-              child: Text(btnLabelCancel),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        )
-            : new AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(btnLabel),
-              onPressed: () => _launchURL(PLAY_STORE_URL),
-            ),
-            FlatButton(
-              child: Text(btnLabelCancel),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+  // versionCheck(context) async {
+  //   //Get Current installed version of app
+  //   final PackageInfo info = await PackageInfo.fromPlatform();
+  //   double currentVersion = double.parse(info.version.trim().replaceAll(".", ""));
+  //
+  //   //Get Latest version info from firebase config
+  //   final FirebaseRemoteConfig remoteConfig = await FirebaseRemoteConfig.instance;
+  //
+  //   try {
+  //     // Using default duration to force fetching from remote server.
+  //     await remoteConfig.fetch();
+  //     await remoteConfig.fetchAndActivate();
+  //     // await remoteConfig.activateFetched();
+  //     remoteConfig.getString('force_update_current_version');
+  //     double newVersion = double.parse(remoteConfig
+  //         .getString('force_update_current_version')
+  //         .trim()
+  //         .replaceAll(".", ""));
+  //     if (newVersion > currentVersion) {
+  //       _showVersionDialog(context);
+  //     }
+  //   } catch(exception) {
+  //   }
+  // }
+  // String APP_STORE_URL =
+  //     'https://phobos.apple.com/WebObjects/MZStore.woa/wa/viewSoftwareUpdate?id=YOUR-APP-ID&mt=8';
+  // String PLAY_STORE_URL =
+  //     'https://play.google.com/store/apps/details?id=com.itimaatysohar.soharbank';
+  // _showVersionDialog(context) async {
+  //   await showDialog<String>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       String title = "New Update Available";
+  //       String message =
+  //           "There is a newer version of app available please update it now.";
+  //       String btnLabel = "Update Now";
+  //       String btnLabelCancel = "Later";
+  //       return Platform.isIOS
+  //           ? new CupertinoAlertDialog(
+  //         title: Text(title),
+  //         content: Text(message),
+  //         actions: <Widget>[
+  //           FlatButton(
+  //             child: Text(btnLabel),
+  //             onPressed: () => _launchURL(APP_STORE_URL),
+  //           ),
+  //           FlatButton(
+  //             child: Text(btnLabelCancel),
+  //             onPressed: () => Navigator.pop(context),
+  //           ),
+  //         ],
+  //       )
+  //           : new AlertDialog(
+  //         title: Text(title),
+  //         content: Text(message),
+  //         actions: <Widget>[
+  //           FlatButton(
+  //             child: Text(btnLabel),
+  //             onPressed: () => _launchURL(PLAY_STORE_URL),
+  //           ),
+  //           FlatButton(
+  //             child: Text(btnLabelCancel),
+  //             onPressed: () => Navigator.pop(context),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
+  //
+  // _launchURL(String url) async {
+  //   if (await canLaunch(url)) {
+  //     await launch(url);
+  //   } else {
+  //     throw 'Could not launch $url';
+  //   }
+  // }
 
   @override
   void initState() {
@@ -552,23 +522,23 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
 
     // versionCheck(context);
     setState(() {
-        SharedPreferencesHelper.getLoggedToken().then((valueFirst) {
-            setState(() {
-              hasNetwork().then((hasNet) {
-                  String baseUri = Constants.BASE_URL;
-                  setState(() {
-                    baseUrl = baseUri;
-                  });
-                  if(hasNet) {
-                    token=valueFirst;
-                    getDashboardData(baseUrl, valueFirst);
-                    print("Net exist");
-                  }else{
-                    getOfflineDashboard();
-                  }
-              });
+      String baseUri= Constants.BASE_URL;
+      baseUrl=baseUri;
+      // getProducts(value);
+      SharedPreferencesHelper.getLoggedToken().then((valueFirst) {
+        SharedPreferencesHelper.getUserImageUrl().then((value) {
+          setState(() {
+            hasNetwork().then((hasNet) {
+              if(hasNet) {
+                token=valueFirst;
+                getDashboardData(baseUrl, valueFirst);
+              }else{
+                getOfflineDashboard();
+              }
             });
+          });
         });
+      });
 
     });
   }
@@ -580,16 +550,10 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
     setState(() {
       if (AppLocalizations.of(context).locale == "en") {
         this.setState((){
-          print("ar");
           helper.onLocaleChanged(new Locale("ar"));
         });
       } else {
-        // this.setState((){
-        //   print("En");
-        //   helper.onLocaleChanged(new Locale("en"));
-        // });
       }
-      print("Logout");
       setState(() {
         SharedPreferencesHelper.setLanguageCode("ar");
       });
@@ -599,17 +563,12 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
   void handleEnglish(){
     setState(() {
       if (AppLocalizations.of(context).locale == "en") {
-        // this.setState((){
-        //   print("ar");
-        //   helper.onLocaleChanged(new Locale("ar"));
-        // });
+
       } else {
         this.setState((){
-          print("En");
           helper.onLocaleChanged(new Locale("en"));
         });
       }
-      print("Logout");
       setState(() {
         SharedPreferencesHelper.setLanguageCode("en");
       });
@@ -618,11 +577,9 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
   void handleClick(String value) {
     switch (value) {
       case 'العربيه':
-        print("here1");
         handleArabic();
         break;
       case 'English':
-        print("here2");
         handleEnglish();
         break;
     }
@@ -630,19 +587,13 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
 
   Future<void> handleClickProfile(String value) async {
     if(value==AppLocalizations.of(context).lblSignOut){
-      print("here2");
       load();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      // await prefs.clear();
-      // await Future.delayed(Duration(seconds: 2));
       SharedPreferencesHelper.setLoggedToken("null").then((value) {
-        // removeUser();
         showSuccessMsg("Sign out Successfully!");
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (BuildContext context) => SignInScreen(false),
-          ),
-              (Route route) => false,
+          ),(Route route) => false,
         );
       });
     }else{
@@ -678,10 +629,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                   children: [
                     InkWell(
                         onTap: () {
-                          print("sddsd");
-
-                          // navigateTo(context, TestTask());
-                          // navigateTo(context, TestSignature());
                           if (_scaffoldKey.currentState.isDrawerOpen) {
                             _scaffoldKey.currentState.openEndDrawer();
                           } else {
@@ -695,6 +642,138 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                         child: Text(AppLocalizations.of(context).lblHomeLabel,style: blueColorBoldStyle(width<600?22:30),)),
 
                     const SizedBox(width: 20,),
+
+                    // PopupMenuButton(
+                    //   offset: Offset(0, 60),
+                    //   shape: const TooltipShape(),
+                    //   child: Container(
+                    //     // width: 260,
+                    //     padding: AppLocalizations.of(context).locale=="en"?EdgeInsets.only(top: 8,bottom: 8,left: 33,right: 10):
+                    //     EdgeInsets.only(top: 8,bottom: 8,left: 10,right: 33),
+                    //     decoration: BoxDecoration(
+                    //         color: Colors.white,
+                    //         border: Border.all(
+                    //           color: Colors.black45,
+                    //         ),
+                    //         borderRadius: BorderRadius.all(Radius.circular(10))
+                    //     ),
+                    //     margin: EdgeInsets.only(top: 0),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //       children: [
+                    //         Row(
+                    //           children: [
+                    //             logo!=null? ClipRRect(
+                    //               borderRadius: BorderRadius.circular(20.0),
+                    //               child: CachedNetworkImage(
+                    //                   width: 40,
+                    //                   height: 40,
+                    //                   fit: BoxFit.fill,
+                    //                   imageUrl: logo
+                    //               ),
+                    //             ):Container(),
+                    //             const SizedBox(width: 6,),
+                    //             name!=null? Text(name,
+                    //               overflow: TextOverflow.ellipsis,
+                    //               style: blueColorBoldStyle(16),):Container()
+                    //           ],
+                    //         ),
+                    //         Icon(Icons.keyboard_arrow_down_sharp,color: Colors.black,)
+                    //       ],
+                    //     ),
+                    //   ),
+                    //   itemBuilder: (_) => <PopupMenuEntry>[
+                    //     PopupMenuItem(
+                    //         child: PopupMenuItem(
+                    //             child: InkWell(
+                    //               onTap: () {
+                    //                 // navigateTo(context, SignInToYourOrganizationScreen());
+                    //                 navigateTo(context, LogInToYourOrganizationScreen());
+                    //               },
+                    //               child: Row(
+                    //                 children: [
+                    //                   Container(
+                    //                     width: 40.0,
+                    //                     height: 40.0,
+                    //                     // color: Colors.grey,
+                    //                     decoration: new BoxDecoration(
+                    //                       shape: BoxShape.circle ,
+                    //                       color: yellowColor,
+                    //                     ),
+                    //                     child: Icon(Icons.account_balance_wallet_outlined,color: Colors.white,),
+                    //                   ),
+                    //                   const SizedBox(width: 6,),
+                    //                   Text(AppLocalizations.of(context).lblAddNewOrganization,style: blueColorBoldStyle(16),)
+                    //                 ],
+                    //               ),
+                    //             ))
+                    //     ),
+                    //     PopupMenuItem(
+                    //         child: Container(
+                    //           margin: EdgeInsets.only(left: 14),
+                    //           padding: AppLocalizations.of(context).locale=="en"?EdgeInsets.all(0):
+                    //           EdgeInsets.only(right: 18),
+                    //           height: orgainzations.length==1?70:orgainzations.length==2?140:orgainzations.length==3?200:260, // Change as per your requirement
+                    //           // width: MediaQuery.of(context).size.width/2, // Change as per your requirement
+                    //           width: 300, // Change as per your requirement
+                    //           child: ListView.builder(
+                    //             scrollDirection: Axis.vertical,
+                    //             shrinkWrap: true,
+                    //             itemCount: orgainzations.length,
+                    //             itemBuilder: (context, index) {
+                    //               OrganizationLocalModel leave =orgainzations[index];
+                    //               return InkWell(
+                    //                 onTap: () {
+                    //                   SharedPreferencesHelper.setOrgLogo(leave.logo).then((value) {
+                    //                     SharedPreferencesHelper.setOrg(leave.name).then((value) {
+                    //                       SharedPreferencesHelper.setLoggedToken(leave.userToken).then((value) {
+                    //                         SharedPreferencesHelper.setDomainName(leave.domain).then((value) {
+                    //                           navigateAndFinish(context, HomeScreenNew());
+                    //                         });
+                    //                       });
+                    //                     });
+                    //                   });
+                    //                 },
+                    //                 child: Container(
+                    //                     margin: EdgeInsets.only(top: 20,bottom: 6),
+                    //                     child:
+                    //                     Row(
+                    //                       children: [
+                    //                         ClipRRect(
+                    //                             borderRadius: BorderRadius.circular(20.0),
+                    //                             child: CachedNetworkImage(
+                    //                                 width: 40,
+                    //                                 height: 40,
+                    //                                 fit: BoxFit.fill,
+                    //                                 imageUrl: leave.logo
+                    //                             )
+                    //                         ),
+                    //                         const SizedBox(width: 6,),
+                    //                         Flexible(
+                    //                           child:
+                    //                           Container(
+                    //                             child: Text(leave.name,
+                    //                               overflow: TextOverflow.ellipsis,
+                    //                               style: blueColorBoldStyle(16),),
+                    //                           ),
+                    //                         )
+                    //                       ],
+                    //                     )
+                    //                   // Column(
+                    //                   //   children: [
+                    //                   //     ,
+                    //                   //     Container(height: 1,color: Colors.black12,)
+                    //                   //   ],
+                    //                   // ),
+                    //                 ),
+                    //               );
+                    //             },
+                    //           ),
+                    //         )
+                    //     ),
+                    //
+                    //   ],
+                    // ),
 
                   ],
                 ),
@@ -831,8 +910,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
             Expanded(
               child: SingleChildScrollView(
                 child: LayoutBuilder(builder: (context, constraints) {
-                  print("WidthIs>>"+constraints.maxWidth.toString());
-
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -958,8 +1035,6 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                                           ),
                                           InkWell(
                                             onTap: () {
-                                              // Navigator.pop(context);
-                                              print("gddddhfhfhfhfh");
                                               navigateTo(context, AllMeetingsScreen());
                                             },
                                             child: Container(
@@ -1385,9 +1460,9 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                                     setState(() {
                                       DateFormat dateFormat;
                                       if(AppLocalizations.of(context).locale=="en"){
-                                         dateFormat = DateFormat('dd MMMM yyyy','en');
+                                        dateFormat = DateFormat('dd MMMM yyyy','en');
                                       }else{
-                                         dateFormat = DateFormat('dd MMMM yyyy','ar');
+                                        dateFormat = DateFormat('dd MMMM yyyy','ar');
                                       }
 
                                       String date=  dateFormat.format(day);
@@ -1420,16 +1495,16 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                                     });
                                   },
                                   afterNextOrBackAction: (date){
-                                   // String selectedDate =getFormattedDateForCalender(date);
-                                   selectedDateString=getFormattedDateForCalender(date);
-                                   selectedDateString=selectedDateString.substring(0,4);
-                                   hasNetwork().then((value) {
-                                     if(value){
-                                       getAllMeetingsForOnline(baseUrl, token);
-                                     }else{
-                                       getOfflineMeetings();
-                                     }
-                                   });
+                                    // String selectedDate =getFormattedDateForCalender(date);
+                                    selectedDateString=getFormattedDateForCalender(date);
+                                    selectedDateString=selectedDateString.substring(0,4);
+                                    hasNetwork().then((value) {
+                                      if(value){
+                                        getAllMeetingsForOnline(baseUrl, token);
+                                      }else{
+                                        getOfflineMeetings();
+                                      }
+                                    });
                                   },
                                 ),
                               ),
@@ -1702,7 +1777,7 @@ class HomeScreenNewState extends State<HomeScreenNew> with SingleTickerProviderS
                                   ],
                                 ),)
                           )
-                          
+
                         ],
                       )
                     ],

@@ -4,12 +4,12 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:itimaaty/Models/LoginRequestModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/cubit/User/states.dart';
-import 'package:itimaaty/network/end_points.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/LoginRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/cubit/User/states.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 
 
 class AppCubit extends Cubit<AppStates> {

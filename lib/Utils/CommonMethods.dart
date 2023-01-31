@@ -7,10 +7,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/Utils/Pdf/view_pdf_after_download.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pspdfkit_flutter/src/main.dart';
+// import 'package:pspdfkit_flutter/src/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:signature/signature.dart';
 
@@ -124,21 +125,19 @@ Future<File> createFileOfPdfUrl(String filename,String url) async {
 void showDocumentForApprovals(AllAprovalsResponseModelData root,String type, int subId,int meetingId,int id ,int library_id,String name ,String url,BuildContext context) async {
   onLoading(context);
   print("urlllll>>"+url.toString());
-
   try {
     createFileOfPdfUrl(name,  url).then((value) async {
-      print("valuevalueIs>>"+value.toString());
-      print("pathIs>>"+value.path.toString());
       dismissLoading(context);
+      navigateTo(context,ViewPdfAFterDownload(value.path ?? ''));
       // Navigator.pop(context);
-      await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
-          builder: (_) => PspdfkitAnnotationsExampleWidget(
-            type: type,
-            subId: subId,
-            documentPath: value.path,
-            meetingId: meetingId,
-            id: id,
-            library_Id: library_id,)));
+      // await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
+      //     builder: (_) => PspdfkitAnnotationsExampleWidget(
+      //       type: type,
+      //       subId: subId,
+      //       documentPath: value.path,
+      //       meetingId: meetingId,
+      //       id: id,
+      //       library_Id: library_id,)));
 
     });
 
@@ -153,18 +152,19 @@ void showDocument(String type, int subId,int meetingId,int id ,int library_id,St
 
   try {
     createFileOfPdfUrl(name,  url).then((value) async {
-      print("valuevalueIs>>"+value.toString());
-      print("pathIs>>"+value.path.toString());
+      // print("valuevalueIs>>"+value.toString());
+      // print("pathIs>>"+value.path.toString());
       dismissLoading(context);
-      Navigator.pop(context);
-      await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
-          builder: (_) => PspdfkitAnnotationsExampleWidget(
-            type: type,
-              subId: subId,
-              documentPath: value.path,
-          meetingId: meetingId,
-          id: id,
-          library_Id: library_id,)));
+      navigateTo(context,ViewPdfAFterDownload(value.path ?? ''));
+      // Navigator.pop(context);
+      // await Navigator.of(context).push<dynamic>(MaterialPageRoute<dynamic>(
+      //     builder: (_) => PspdfkitAnnotationsExampleWidget(
+      //       type: type,
+      //         subId: subId,
+      //         documentPath: value.path,
+      //     meetingId: meetingId,
+      //     id: id,
+      //     library_Id: library_id,)));
 
     });
 

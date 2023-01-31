@@ -4,8 +4,8 @@
 // import 'package:google_api_headers/google_api_headers.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:google_maps_webservice/places.dart';
-// import 'package:itimaaty/Utils/Constants.dart';
-// import 'package:itimaaty/network/end_points.dart';
+// import 'package:itimaatysohar/Utils/Constants.dart';
+// import 'package:itimaatysohar/network/end_points.dart';
 //
 //
 // class LocationClass extends StatefulWidget{

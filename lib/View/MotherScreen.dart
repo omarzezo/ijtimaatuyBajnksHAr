@@ -1,10 +1,10 @@
 // import 'package:flutter/material.dart';
-// import 'package:itimaaty/Utils/AppColors.dart';
-// import 'package:itimaaty/View/AllMeetingsScreen.dart';
-// import 'package:itimaaty/View/DrawerWidget.dart';
-// import 'package:itimaaty/View/HomeScreen.dart';
-// import 'package:itimaaty/View/HomeScreenNew.dart';
-// import 'package:itimaaty/View/NotGoingScreen.dart';
+// import 'package:itimaatysohar/Utils/AppColors.dart';
+// import 'package:itimaatysohar/View/AllMeetingsScreen.dart';
+// import 'package:itimaatysohar/View/DrawerWidget.dart';
+// import 'package:itimaatysohar/View/HomeScreen.dart';
+// import 'package:itimaatysohar/View/HomeScreenNew.dart';
+// import 'package:itimaatysohar/View/NotGoingScreen.dart';
 //
 //
 // class MotherScreen extends StatefulWidget {

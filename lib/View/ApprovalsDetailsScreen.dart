@@ -13,22 +13,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get_connect/http/src/multipart/multipart_file.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/AllAprovalsResponseModel.dart';
-import 'package:itimaaty/Models/LoginResponseModel.dart';
-import 'package:itimaaty/Models/SignatureRequestModel.dart';
-import 'package:itimaaty/Models/SignatureResponseModel.dart';
-import 'package:itimaaty/Models/SignatureStatusEnumModel.dart';
-import 'package:itimaaty/Models/UsersAndComments.dart';
-import 'package:itimaaty/Models/actions_response_model.dart';
-import 'package:itimaaty/Repository/MeetingRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/Utils/PieChartUtils/pie_data.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/WebViewScreenForMirrorView.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/AllAprovalsResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/LoginResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/SignatureRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/SignatureResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/SignatureStatusEnumModel.dart';
+import 'package:itimaatysoharsohar/Models/UsersAndComments.dart';
+import 'package:itimaatysoharsohar/Models/actions_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/MeetingRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/Utils/PieChartUtils/pie_data.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/WebViewScreenForMirrorView.dart';
 import 'package:path_provider/path_provider.dart';
 // import 'package:screenshot/screenshot.dart';
 import 'package:signature/signature.dart';
@@ -287,10 +287,7 @@ class ApprovalsDetailsScreenState extends State<ApprovalsDetailsScreen> {
                   String baseUri= Constants.BASE_URL+"/presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
                   print("powerPointUrl>>"+baseUri);
                   navigateTo(context,WebViewScreenForMirrorView(baseUri));
-
-                  // launch(baseUri);
                   // launchUrl(Uri.parse(baseUri));
-
               });
             }else {
               showDocumentForApprovals(widget.allAprovalsResponseModelData,

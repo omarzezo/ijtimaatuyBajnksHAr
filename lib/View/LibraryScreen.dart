@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Models/libary_response_model.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/Models/libary_response_model.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
 import 'package:intl/intl.dart';
 
 class LibraryScreen extends StatefulWidget {

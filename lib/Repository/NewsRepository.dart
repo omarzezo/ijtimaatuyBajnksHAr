@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:itimaaty/Models/MultipleLikeRequestModel.dart';
-import 'package:itimaaty/Models/add_comment_response_model.dart';
-import 'package:itimaaty/Models/add_news_comment.dart';
-import 'package:itimaaty/Models/liked_response_model.dart';
-import 'package:itimaaty/Models/news_details_response_model.dart';
-import 'package:itimaaty/Models/news_response_model.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/MultipleLikeRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/add_comment_response_model.dart';
+import 'package:itimaatysoharsohar/Models/add_news_comment.dart';
+import 'package:itimaatysoharsohar/Models/liked_response_model.dart';
+import 'package:itimaatysoharsohar/Models/news_details_response_model.dart';
+import 'package:itimaatysoharsohar/Models/news_response_model.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 
 import '../Models/DeleteCommentResponse.dart';

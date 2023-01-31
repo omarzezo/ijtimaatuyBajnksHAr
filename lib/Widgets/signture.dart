@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Widgets/text_for.dart';
+import 'package:itimaatysoharsohar/Widgets/text_for.dart';
 
 class Signature extends StatefulWidget {
 

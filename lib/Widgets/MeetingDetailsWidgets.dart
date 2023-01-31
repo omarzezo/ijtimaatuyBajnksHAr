@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/actions_response_model.dart';
-import 'package:itimaaty/Models/decison_response_model.dart';
-import 'package:itimaaty/Models/metting_details_response_model.dart';
-import 'package:itimaaty/Models/talking_points_response_model.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Utils/Constants.dart';
-import 'package:itimaaty/View/DecisionsScreen.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/MeetingDetailsScreen.dart';
-import 'package:itimaaty/View/TalkingPointsScreen.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/actions_response_model.dart';
+import 'package:itimaatysoharsohar/Models/decison_response_model.dart';
+import 'package:itimaatysoharsohar/Models/metting_details_response_model.dart';
+import 'package:itimaatysoharsohar/Models/talking_points_response_model.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Utils/Constants.dart';
+import 'package:itimaatysoharsohar/View/DecisionsScreen.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/MeetingDetailsScreen.dart';
+import 'package:itimaatysoharsohar/View/TalkingPointsScreen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../View/PdfViewerScreen.dart';
@@ -827,7 +827,6 @@ Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachmen
                   // navigateTo(context, PdfViewerScreen());
                   showDocument(
                       "meeting", 0, id, leave.id, leave.library.id, leave.library.name, leave.library.fileUrl.toString(), context);
-
                 }
 
               }else{
@@ -851,36 +850,7 @@ Widget leaveRowForAttachments(int id,MeetingDetailsResponseModelMembersAttachmen
             onTap: () async {
               downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
             },
-            child: Icon(Icons.download,color: Colors.black,size: 24,)):InkWell(
-          onTap: () {
-            hasNetwork().then((value) {
-              if(value){
-                SharedPreferencesHelper.getLoggedToken().then((value) {
-                    // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
-                    String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
-                    print("powerPointUrl>>"+baseUri);
-                    navigateTo(context,WebViewScreenForMirrorView(baseUri));
-                    // launch(baseUri);
-                    // launchUrl(Uri.parse(baseUri));
-                });
-                // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
-
-              }else{
-                showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
-              }
-            });
-          },
-          child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.orangeAccent,
-                  ),
-                  color: Colors.orangeAccent,
-                  borderRadius: BorderRadius.all(Radius.circular(10))
-              ),
-              child: Icon(Icons.play_arrow,color: Colors.white,)
-          ),
-        ):const SizedBox()
+            child: Icon(Icons.download,color: Colors.black,size: 24,)):const SizedBox.shrink():const SizedBox()
       ],
     ),
     ),
@@ -1431,41 +1401,12 @@ Widget leaveRowForAttachmentsTalkingPoints(String type,int subId,int id,TalkingP
     ),
           ),
           ((leave!=null)&& (leave.library.name.contains('xlsx')))?
-          // ((leave!=null)&& (leave.library.name.contains('pot')||leave.library.name.contains('ppt')||leave.library.name.contains('pptx')))?
           InkWell(
               onTap: () async {
                 downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
               },
-              child: Icon(Icons.download,color: Colors.black,size: 24,)):   InkWell(
-            onTap: () {
-              hasNetwork().then((value) {
-                if(value){
-                    SharedPreferencesHelper.getLoggedToken().then((value) {
-                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
-                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
-                        print("powerPointUrl>>"+baseUri);
-                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
-                        // launch(baseUri);
-                        // launchUrl(Uri.parse(baseUri));
-                    });
-                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
-
-                }else{
-                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
-                }
-              });
-            },
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.orangeAccent,
-                    ),
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
-                child: Icon(Icons.play_arrow,color: Colors.white,)
-            ),
-          )
+              child: Icon(Icons.download,color: Colors.black,size: 24,)):
+          const SizedBox.shrink()
         ],
       ),
     ),
@@ -1606,37 +1547,7 @@ Widget leaveRowForAttachmentsDecisions(String type, int subId,int id,DecisonResp
                 downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
               },
               child: Icon(Icons.download,color: Colors.black,size: 24,)):
-          InkWell(
-            onTap: () {
-
-              hasNetwork().then((value) {
-                if(value){
-                    SharedPreferencesHelper.getLoggedToken().then((value) {
-                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
-                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
-                        print("powerPointUrl>>"+baseUri);
-                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
-                        // launch(baseUri);
-                        // launchUrl(Uri.parse(baseUri));
-                    });
-                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
-
-                }else{
-                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
-                }
-              });
-            },
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.orangeAccent,
-                    ),
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
-                child: Icon(Icons.play_arrow,color: Colors.white,)
-            ),
-          )
+          const SizedBox.shrink()
 
         ],
       ),
@@ -1881,36 +1792,7 @@ Widget leaveRowForAttachmentsActions(String type, int subId,int id,ActionsRespon
               onTap: () async {
                 downloadFileandOpen(context, leave.library.fileUrl, leave.library.name);
               },
-              child: Icon(Icons.download,color: Colors.black,size: 24,)) : InkWell(
-            onTap: () {
-              hasNetwork().then((value) {
-                if(value){
-                    SharedPreferencesHelper.getLoggedToken().then((value) {
-                        // print("powerPointUrl>>"+Constants.powerPointUrl+id.toString()+"/"+leave.library.id.toString()+"?auth="+value);
-                        String baseUri= Constants.BASE_URL+"presentation/"+id.toString()+"/"+leave.library.id.toString()+"?auth="+value;
-                        print("powerPointUrl>>"+baseUri);
-                        navigateTo(context,WebViewScreenForMirrorView(baseUri));
-                        // launch(baseUri);
-                        // launchUrl(Uri.parse(baseUri));
-                    });
-                    // launch(Constants.powerPointUrl+"meeting_id="+id.toString()+"&"+"id="+leave.library.id.toString());
-
-                }else{
-                  showErrorWithMsg(AppLocalizations.of(context).lblNoInternet);
-                }
-              });
-            },
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.orangeAccent,
-                    ),
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.all(Radius.circular(10))
-                ),
-                child: Icon(Icons.play_arrow,color: Colors.white,)
-            ),
-          )
+              child: Icon(Icons.download,color: Colors.black,size: 24,)) : const SizedBox.shrink()
         ],
       ),
     ),

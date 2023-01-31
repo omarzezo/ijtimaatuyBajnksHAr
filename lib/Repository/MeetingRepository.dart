@@ -1,30 +1,30 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:itimaaty/Models/AddCommentRequestModel.dart';
-import 'package:itimaaty/Models/AddCommentResponseModel.dart';
-import 'package:itimaaty/Models/AddMeetingRequestModel.dart';
-import 'package:itimaaty/Models/ChangeActionStatusRequestModel.dart';
-import 'package:itimaaty/Models/ChangeMeetingStatusRequestModel.dart';
-import 'package:itimaaty/Models/ChangeStatusMeetingResponseModel.dart';
-import 'package:itimaaty/Models/ChangeStatusResponseModel.dart';
-import 'package:itimaaty/Models/DeleteCommentResponse.dart';
-import 'package:itimaaty/Models/DeleteCommentsRequestModel.dart';
-import 'package:itimaaty/Models/actions_comment_response_model.dart';
-import 'package:itimaaty/Models/actions_response_model.dart';
-import 'package:itimaaty/Models/add_meeting_response_model.dart';
-import 'package:itimaaty/Models/add_note_request_model.dart';
-import 'package:itimaaty/Models/add_note_response_model.dart';
-import 'package:itimaaty/Models/all_meetings_response.dart';
-import 'package:itimaaty/Models/all_status_response.dart';
-import 'package:itimaaty/Models/change_vote_request_model.dart';
-import 'package:itimaaty/Models/committee_response_model.dart';
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/Models/decison_response_model.dart';
-import 'package:itimaaty/Models/change_vote_response_model.dart';
-import 'package:itimaaty/Models/metting_details_response_model.dart';
-import 'package:itimaaty/Models/talking_points_response_model.dart';
-import 'package:itimaaty/network/end_points.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/AddCommentRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/AddCommentResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/AddMeetingRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeActionStatusRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeMeetingStatusRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeStatusMeetingResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/ChangeStatusResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/DeleteCommentResponse.dart';
+import 'package:itimaatysoharsohar/Models/DeleteCommentsRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/actions_comment_response_model.dart';
+import 'package:itimaatysoharsohar/Models/actions_response_model.dart';
+import 'package:itimaatysoharsohar/Models/add_meeting_response_model.dart';
+import 'package:itimaatysoharsohar/Models/add_note_request_model.dart';
+import 'package:itimaatysoharsohar/Models/add_note_response_model.dart';
+import 'package:itimaatysoharsohar/Models/all_meetings_response.dart';
+import 'package:itimaatysoharsohar/Models/all_status_response.dart';
+import 'package:itimaatysoharsohar/Models/change_vote_request_model.dart';
+import 'package:itimaatysoharsohar/Models/committee_response_model.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Models/decison_response_model.dart';
+import 'package:itimaatysoharsohar/Models/change_vote_response_model.dart';
+import 'package:itimaatysoharsohar/Models/metting_details_response_model.dart';
+import 'package:itimaatysoharsohar/Models/talking_points_response_model.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 
 import '../Models/SignatureRequestModel.dart';
@@ -65,11 +65,6 @@ class MeetingRepository {
       String role,
       ) async {
     var response ;
-    print(page.toString());
-    print(attendance.toString());
-    print(committee.toString());
-    print(meeting_status_id.toString());
-    print(role.toString());
     Map<String,String> query = {};
 
     if(attendance != null && attendance.isNotEmpty ) query['attendance'] = attendance.toString();
@@ -81,25 +76,17 @@ class MeetingRepository {
       Map<String, String> headers = {
         "Content-type": "application/json",
         'token': token,
-      'x-ijtimaati-using':"ios",
-      'x-ijtimaati-version':"4",
-      'x-isweb':'false'};
-      print("parseHere>>"+Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()).replace(queryParameters: query).path);
-      print("parseHere>>"+Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()).replace(queryParameters: query).origin);
-      print("parseHere>>"+Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()).replace(queryParameters: query).query);
-      print("parseHere>>"+Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()).replace(queryParameters: query).queryParametersAll.toString());
-      print("parseHere>>"+Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()).replace(queryParameters: query).toString());
-     print("dddddd>>"+query.toString());
+        'x-ijtimaati-using':"ios",
+        'x-ijtimaati-version':"4",
+        'x-isweb':'false'};
 
       String queryString = Uri(queryParameters:query).query.isNotEmpty?"&"+Uri(queryParameters:query).query:"";
-      // print("queryString>>"+queryString.toString());
-      print("urlIs>>>>"+baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()+queryString);
 
+      // print("urlHere>>"+baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()+queryString.toString());
       response = await http.get(Uri.parse(baseUrl + Constants.MEETINGS+'?date='+date+"&page="+page.toString()+queryString),
-        headers: headers
+          headers: headers
       );
     }catch (e){
-      print("kkkkkkkkkkkkkk"+e.toString());
     }
     // return response==null?[]: await myModels;
     return response==null?[]: response.body;

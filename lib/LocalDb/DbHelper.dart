@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:itimaaty/LocalDb/DecisionTableOffline.dart';
-import 'package:itimaaty/Models/DeleteCommentsRequestModel.dart';
-import 'package:itimaaty/Models/MultipleLikeRequestModel.dart';
-import 'package:itimaaty/Models/add_news_comment.dart';
+import 'package:itimaatysoharsohar/LocalDb/DecisionTableOffline.dart';
+import 'package:itimaatysoharsohar/Models/DeleteCommentsRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/MultipleLikeRequestModel.dart';
+import 'package:itimaatysoharsohar/Models/add_news_comment.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../Models/AddCommentRequestModel.dart';

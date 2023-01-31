@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/MyCalenderClass.dart';
-import 'package:itimaaty/Models/calender_response_model.dart';
-import 'package:itimaaty/Models/news_response_model.dart';
-import 'package:itimaaty/Repository/CalenderRepository.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/Widgets/HomeWidgets.dart';
+import 'package:itimaatysoharsohar/LocalDb/SharedPreferencesHelper.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/MyCalenderClass.dart';
+import 'package:itimaatysoharsohar/Models/calender_response_model.dart';
+import 'package:itimaatysoharsohar/Models/news_response_model.dart';
+import 'package:itimaatysoharsohar/Repository/CalenderRepository.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/Widgets/HomeWidgets.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 

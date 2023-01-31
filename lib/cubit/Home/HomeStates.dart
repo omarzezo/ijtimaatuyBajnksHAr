@@ -1,4 +1,4 @@
-import 'package:itimaaty/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
 
 abstract class HomeStates {}
 

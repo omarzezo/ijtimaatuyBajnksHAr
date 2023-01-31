@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
 
 
 Widget customText ({ String  text, Color color,double size }) => 

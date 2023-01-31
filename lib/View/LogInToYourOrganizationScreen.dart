@@ -3,19 +3,19 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:itimaaty/LocalDb/DbHelper.dart';
-import 'package:itimaaty/LocalDb/OrganizationLocalModel.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/Models/MyOrganizationsResponseModel.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/Utils/CommonMethods.dart';
-import 'package:itimaaty/View/CheckYourMailScreen.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
-import 'package:itimaaty/View/HomeScreenNew.dart';
-import 'package:itimaaty/cubit/Organization/organization_cubit.dart';
-import 'package:itimaaty/cubit/Organization/organization_states.dart';
-import 'package:itimaaty/cubit/User/user_cubit.dart';
-import 'package:itimaaty/cubit/User/user_states.dart';
+import 'package:itimaatysoharsohar/LocalDb/DbHelper.dart';
+import 'package:itimaatysoharsohar/LocalDb/OrganizationLocalModel.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/Models/MyOrganizationsResponseModel.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/CommonMethods.dart';
+import 'package:itimaatysoharsohar/View/CheckYourMailScreen.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/View/HomeScreenNew.dart';
+import 'package:itimaatysoharsohar/cubit/Organization/organization_cubit.dart';
+import 'package:itimaatysoharsohar/cubit/Organization/organization_states.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_cubit.dart';
+import 'package:itimaatysoharsohar/cubit/User/user_states.dart';
 
 import '../LocalDb/SharedPreferencesHelper.dart';
 import '../Utils/Constants.dart';
@@ -422,7 +422,7 @@ class LogInToYourOrganizationScreenState extends State<LogInToYourOrganizationSc
                           const SizedBox(height:60,),
                           Center(child: Text(AppLocalizations.of(context).lblAlready,style: grayTextColorStyleMedium(width<600?16:22),)),
                           // const SizedBox(height:20,),
-                          makeBody
+                          // makeBody
                         ],
                       ),
                     ),

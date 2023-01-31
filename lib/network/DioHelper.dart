@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
-import 'package:itimaaty/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
 
 import '../Utils/Constants.dart';
 

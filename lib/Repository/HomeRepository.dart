@@ -1,9 +1,9 @@
 
 import 'dart:convert';
 
-import 'package:itimaaty/Models/dashboard_response_model.dart';
-import 'package:itimaaty/network/end_points.dart';
-import 'package:itimaaty/network/remote/dio_helper.dart';
+import 'package:itimaatysoharsohar/Models/dashboard_response_model.dart';
+import 'package:itimaatysoharsohar/network/end_points.dart';
+import 'package:itimaatysoharsohar/network/remote/dio_helper.dart';
 import 'package:http/http.dart' as http;
 import '../Models/all_meetings_response.dart';
 import '../Utils/CommonMethods.dart';
@@ -75,7 +75,7 @@ class HomeRepository {
   Future<String> getAllMeetingsByDate(String baseUrl,String token,String date) async {
     var response ;
     // List<AllMeetingsResponse> myModels;
-    print("UrlIs>>"+baseUrl + Constants.MEETINGS+'?date='+date+"&page=1");
+    // print("UrlIs>>"+baseUrl + Constants.MEETINGS+'?date='+date+"&page=1");
     try{
       Map<String, String> headers = {"Content-type": "application/json",
         'token': token,

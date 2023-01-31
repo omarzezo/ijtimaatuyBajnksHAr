@@ -1,4 +1,4 @@
-import 'package:itimaaty/Models/OrganizationResponseModel.dart';
+import 'package:itimaatysoharsohar/Models/OrganizationResponseModel.dart';
 
 abstract class OrganizationStates {}
 

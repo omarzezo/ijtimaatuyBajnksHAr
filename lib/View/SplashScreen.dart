@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
-import 'package:itimaaty/View/InitializationScreen.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/View/InitializationScreen.dart';
 
 
 

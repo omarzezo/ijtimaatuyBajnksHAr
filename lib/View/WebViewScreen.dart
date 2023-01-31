@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:itimaaty/Localizations/localization/localizations.dart';
-import 'package:itimaaty/View/FontsStyle.dart';
+import 'package:itimaatysoharsohar/Localizations/localization/localizations.dart';
+import 'package:itimaatysoharsohar/View/FontsStyle.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -200,7 +200,7 @@ class _WebViewStackState extends State<WebViewScreen> {
 // import 'package:flutter/material.dart';
 //
 // import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-// import 'package:itimaaty/Localizations/localization/localizations.dart';
+// import 'package:itimaatysohar/Localizations/localization/localizations.dart';
 //
 //
 // class WebViewScreen extends StatefulWidget {

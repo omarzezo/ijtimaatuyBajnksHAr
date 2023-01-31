@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itimaaty/Utils/AppColors.dart';
+import 'package:itimaatysoharsohar/Utils/AppColors.dart';
 
 class CustomSwitch extends StatefulWidget {
   final bool value;

@@ -6,9 +6,9 @@
 // // import 'package:flutter_google_places/flutter_google_places.dart';
 // import 'package:google_maps_webservice/places.dart';
 // import 'package:geolocator/geolocator.dart';
-// import 'package:itimaaty/Utils/Constants.dart';
-// import 'package:itimaaty/View/FontsStyle.dart';
-// import 'package:itimaaty/network/end_points.dart';
+// import 'package:itimaatysohar/Utils/Constants.dart';
+// import 'package:itimaatysohar/View/FontsStyle.dart';
+// import 'package:itimaatysohar/network/end_points.dart';
 // import 'AppColors.dart';
 //
 //

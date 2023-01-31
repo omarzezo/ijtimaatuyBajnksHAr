@@ -1,7 +1,7 @@
 // import 'package:flutter/material.dart';
-// import 'package:itimaaty/LocalDb/SharedPreferencesHelper.dart';
-// import 'package:itimaaty/Models/news_response_model.dart';
-// import 'package:itimaaty/Repository/NewsRepository.dart';
+// import 'package:itimaatysohar/LocalDb/SharedPreferencesHelper.dart';
+// import 'package:itimaatysohar/Models/news_response_model.dart';
+// import 'package:itimaatysohar/Repository/NewsRepository.dart';
 //
 // import '../Utils/Constants.dart';
 //
